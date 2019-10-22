@@ -1,0 +1,144 @@
+{
+  "users": [
+    {
+      "id": "fcc76bf2-2864-417f-8b67-7ba1eea9b885",
+      "first_name": "Mattias",
+      "last_name": "Hulland",
+      "email": "adenaikeyomi@gmail.com",
+      "employee_type": 1
+    },
+    {
+      "id": "d77dd160-c911-4780-96d2-5b5d399e3af4",
+      "first_name": "Terencio",
+      "last_name": "Lennard",
+      "email": "tlennard1@wikia.com",
+      "employee_type": 3
+    },
+    {
+      "id": "1dd64a61-828d-4106-adf9-c282de53ee23",
+      "first_name": "Read",
+      "last_name": "Kinsett",
+      "email": "rkinsett2@nytimes.com",
+      "employee_type": 1
+    },
+    {
+      "id": "14353ac7-0bf4-4b14-8895-59cf37544583",
+      "first_name": "Row",
+      "last_name": "Wasmuth",
+      "email": "rwasmuth3@bloglovin.com",
+      "employee_type": 3
+    },
+    {
+      "id": "4042100a-f7fa-418b-a113-788dc9b8916e",
+      "first_name": "Jori",
+      "last_name": "Timmermann",
+      "email": "jtimmermann4@hostgator.com",
+      "employee_type": 3
+    },
+    {
+      "id": "31702221-3211-4def-a20c-b80ad179fbc0",
+      "first_name": "Matti",
+      "last_name": "Wonham",
+      "email": "mwonham5@usnews.com",
+      "employee_type": 2
+    },
+    {
+      "id": "cf6f3d3e-8179-4fad-8e2c-24bd05fd8e21",
+      "first_name": "Melantha",
+      "last_name": "Garmanson",
+      "email": "mgarmanson6@gov.uk",
+      "employee_type": 2
+    },
+    {
+      "id": "ae6751f0-9742-4016-a4ec-bf27c0249ddd",
+      "first_name": "Kai",
+      "last_name": "Float",
+      "email": "kfloat7@harvard.edu",
+      "employee_type": 3
+    },
+    {
+      "id": "6abafb0e-f9b6-430e-a5da-9f5cf4f3211d",
+      "first_name": "Dulsea",
+      "last_name": "Oles",
+      "email": "doles8@homestead.com",
+      "employee_type": 1
+    },
+    {
+      "id": "d9d08858-fab4-4f95-bf41-05cfe4626c1e",
+      "first_name": "Stephi",
+      "last_name": "Bransom",
+      "email": "sbransom9@bloomberg.com",
+      "employee_type": 2
+    },
+    {
+      "id": "afd2485a-9e97-4e8d-b2ba-30e8c78cc8ef",
+      "first_name": "Jonah",
+      "last_name": "Pococke",
+      "email": "jpocockea@wiley.com",
+      "employee_type": 2
+    },
+    {
+      "id": "ed7a054d-22ec-4aa0-97da-cce57f2fa775",
+      "first_name": "Benny",
+      "last_name": "McMonies",
+      "email": "bmcmoniesb@craigslist.org",
+      "employee_type": 1
+    },
+    {
+      "id": "89c3ecea-6a10-4e51-bd0c-bfc592c362d9",
+      "first_name": "Anet",
+      "last_name": "Vasilchikov",
+      "email": "avasilchikovc@npr.org",
+      "employee_type": 3
+    },
+    {
+      "id": "2ff32b05-7905-473f-afd2-a6729e847ca0",
+      "first_name": "Dyna",
+      "last_name": "Marty",
+      "email": "dmartyd@unc.edu",
+      "employee_type": 3
+    },
+    {
+      "id": "3b812ece-105b-44ab-b6ce-9ae1738d6768",
+      "first_name": "Tatiana",
+      "last_name": "O'Haire",
+      "email": "tohairee@macromedia.com",
+      "employee_type": 1
+    },
+    {
+      "id": "c36d7915-d93e-45c8-a832-91563b9ecce4",
+      "first_name": "Maurise",
+      "last_name": "Wanklin",
+      "email": "mwanklinf@slashdot.org",
+      "employee_type": 1
+    },
+    {
+      "id": "809186b6-779e-41f8-9f85-06b7adff5e62",
+      "first_name": "Sandie",
+      "last_name": "Reen",
+      "email": "sreeng@adobe.com",
+      "employee_type": 3
+    },
+    {
+      "id": "f07eff4d-f2b6-461a-8025-b240b28a38a7",
+      "first_name": "Diannne",
+      "last_name": "Featonby",
+      "email": "dfeatonbyh@sogou.com",
+      "employee_type": 1
+    },
+    {
+      "id": "299dacb9-cd18-45cb-b60a-2ef0192d2a5d",
+      "first_name": "Licha",
+      "last_name": "Escalera",
+      "email": "lescalerai@yellowpages.com",
+      "employee_type": 3
+    },
+    {
+      "id": "32a0ce50-770c-4c0c-afe1-81f4439ac2fc",
+      "first_name": "Werner",
+      "last_name": "Ebrall",
+      "email": "webrallj@51.la",
+      "employee_type": 1
+    }
+  ]
+}

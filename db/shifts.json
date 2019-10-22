@@ -1,0 +1,212 @@
+{
+  "shifts": [
+    {
+      "start_date": "21102019 ",
+      "end_date": "22102019 ",
+      "key": "fcc76bf2-2864-417f-8b67-7ba1eea9b885",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "shift_type": 1,
+      "approved": {
+        "admin": 1,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "12092019 ",
+      "end_date": "12102019 ",
+      "key": "fcc76bf2-2864-417f-8b67-7ba1eea9b885",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "shift_type": 1,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "02022019 ",
+      "end_date": "12022019 ",
+      "key": "d77dd160-c911-4780-96d2-5b5d399e3af4",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "shift_type": 3,
+      "approved": {
+        "admin": 0,
+        "user": 0
+      }
+    },
+    {
+      "start_date": "06072019 ",
+      "end_date": "09072019 ",
+      "key": "1dd64a61-828d-4106-adf9-c282de53ee23",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "shift_type": 2,
+      "approved": {
+        "admin": 1,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "11062019 ",
+      "end_date": "17062019 ",
+      "key": "14353ac7-0bf4-4b14-8895-59cf37544583",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "shift_type": 3,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+
+    {
+      "start_date": "08092019 ",
+      "end_date": "12092019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "31702221-3211-4def-a20c-b80ad179fbc0",
+      "shift_type": 3,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "01022019 ",
+      "end_date": "04022019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "cf6f3d3e-8179-4fad-8e2c-24bd05fd8e21",
+      "shift_type": 2,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "07112019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "end_date": "08112019 ",
+      "key": "ae6751f0-9742-4016-a4ec-bf27c0249ddd",
+      "shift_type": 2,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "12092019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "end_date": "15092019 ",
+      "key": "6abafb0e-f9b6-430e-a5da-9f5cf4f3211d",
+      "shift_type": 3,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+
+    {
+      "start_date": "01072019 ",
+      "end_date": "10072019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "afd2485a-9e97-4e8d-b2ba-30e8c78cc8ef",
+      "shift_type": 0,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+
+    {
+      "start_date": "02122019 ",
+      "end_date": "04122019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "89c3ecea-6a10-4e51-bd0c-bfc592c362d9",
+      "shift_type": 2,
+      "approved": {
+        "admin": 1,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "03062019 ",
+      "end_date": "03062019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "2ff32b05-7905-473f-afd2-a6729e847ca0",
+      "shift_type": 2,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "05032019 ",
+      "end_date": "11032019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "3b812ece-105b-44ab-b6ce-9ae1738d6768",
+      "shift_type": 3,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+
+    {
+      "start_date": "12072019 ",
+      "end_date": "12082019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "809186b6-779e-41f8-9f85-06b7adff5e62",
+      "shift_type": 2,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "06092019 ",
+      "end_date": "06102019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "f07eff4d-f2b6-461a-8025-b240b28a38a7",
+      "shift_type": 1,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "12092019 ",
+      "end_date": "12102019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "key": "299dacb9-cd18-45cb-b60a-2ef0192d2a5d",
+      "shift_type": 1,
+      "approved": {
+        "admin": 0,
+        "user": 1
+      }
+    },
+    {
+      "start_date": "05122019 ",
+      "start_time": "00:00",
+      "end_time": "00:00",
+      "end_date": "15122019 ",
+      "key": "32a0ce50-770c-4c0c-afe1-81f4439ac2fc",
+      "shift_type": 1,
+      "approved": {
+        "admin": 1,
+        "user": 1
+      }
+    }
+  ]
+}
