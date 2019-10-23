@@ -1,21 +1,13 @@
+// Validation
+const Joi = require('@hapi/joi')
+const bcrypt = require('bcrypt')
+// Moment
 const moment = require('moment-timezone')
 const format = 'DD/MM/YYYY'
 const timezone = 'Europe/London'
-
 const now = moment.tz(timezone)
 module.exports = () => {
-  function checkSession(req, res) {
-    let session = req.session
-    if (!session.user) {
-      createError(req, res, {
-        code: 201,
-        message: 'No session found, please login again'
-      })
-    }
-  }
-  function checkInput(req, res, params) {}
-
-  function createError(req, res, err) {
+  function createError(res, err) {
     res
       .json({
         message: err['message'],
@@ -24,10 +16,70 @@ module.exports = () => {
       .end()
   }
   let DatabaseMethods = {
+    /**
+     *
+     * @param {String} string
+     * @param {Number} saltRounds
+     */
+    hash: async function(string) {
+      let salt = await bcrypt.genSalt(10)
+      let hash = await bcrypt.hash(string, salt)
+      return hash
+    },
+    /**
+     *
+     * @param {Object} toValidate
+     * @param {String} event
+     */
+    validate: function(toValidate, event) {
+      let isError = false
+
+      let validations = {
+        register: Joi.object({
+          name: Joi.string()
+            .min(6)
+            .required(),
+          email: Joi.string()
+            .min(6)
+            .required()
+            .email(),
+          employee_type: Joi.number().required(),
+          password: Joi.string()
+            .required()
+            .max(120)
+            .min(6)
+        }),
+        login: Joi.object({
+          email: Joi.string()
+            .required()
+            .email()
+        })
+      }
+      switch (event) {
+        case 'register': {
+          const { error, value } = validations.register.validate(toValidate)
+          return error ? error : value
+        }
+        case 'login': {
+          const { error, value } = validations.login.validate(toValidate)
+          return error ? error : value
+        }
+      }
+    },
+    /**
+     * Finds an item within the database
+     * @param {Object} res
+     * @param {Object} schema
+     * @param {Object} params
+     */
     findOne: async function(schema, params) {
       let query = schema.findOne(params)
       await query.findOne((err, res) => {
-        return Promise.resolve(res)
+        if (err) {
+          return Promise.reject(error)
+        } else {
+          return Promise.resolve(res)
+        }
       })
     }
   }
@@ -52,46 +104,9 @@ module.exports = () => {
     }
   }
 
-  /**
-   *
-   * @param {Object} config(from,to,email,pass,message,customHtml)
-   */
-  function sendEmail(config) {
-    const nodeMailer = require('nodemailer')
-    /**
-     * 
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'youremail@gmail.com',
-    pass: 'yourpassword'
-  }
-});
-
-var mailOptions = {
-  from: 'youremail@gmail.com',
-  to: 'myfriend@yahoo.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
-    html: '<h1>Welcome</h1><p>That was easy!</p>'
-
-};
-
-transporter.sendMail(mailOptions, function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-});
-     */
-  }
   return {
     createError: createError,
-    checkInput: checkInput,
-    checkSession: checkSession,
     DateMethods: DateMethods,
-    sendEmail: sendEmail,
     DatabaseMethods: DatabaseMethods
   }
 }

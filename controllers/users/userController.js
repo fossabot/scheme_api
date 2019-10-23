@@ -9,7 +9,7 @@ module.exports = (fs, helpers, passport) => {
   const login = (req, res) => {
     let params = req.body
     if (!params.email || !params.password) {
-      helpers.createError(req, res, {
+      helpers.createError(res, {
         message:
           'Failed to login, please enter your email or password please ?',
         code: 1010
@@ -29,7 +29,7 @@ module.exports = (fs, helpers, passport) => {
     try {
       res.json(helpers.DatabaseMethods.findOne(User, { id: params.userID }))
     } catch (error) {
-      helpers.createError(req, res, error)
+      helpers.createError(res, error)
     }
   }
   /**
@@ -37,8 +37,8 @@ module.exports = (fs, helpers, passport) => {
    * @param {*} req
    * @param {*} res
    */
-  const register = async (req, res) => {
-    userManagement.register(req).then(user => {
+  const register = (req, res) => {
+    userManagement.register(helpers, req, res).then(user => {
       res.json(user)
     })
   }
@@ -66,23 +66,41 @@ var userManagement = {
     return user
   },
   /**
-   * Register a new user
+   *
+   * @param {File} helpers
+   * @param {Object} req
+   * @param {Object} res
    */
-  register: async function(req) {
+  register: async function(helpers, req, res) {
     let params = req.body
+    const validation = helpers.DatabaseMethods.validate(params, 'register')
+    let hashedPassword = await helpers.DatabaseMethods.hash(params.password)
 
-    const user = new User({
-      name: params.name,
-      email: params.email,
-      employee_type: params.employeeType,
-      password: params.password
-    })
+    if (validation) {
+      const user = new User({
+        name: params.name,
+        email: params.email,
+        employee_type: params.employeeType,
+        password: hashedPassword
+      })
 
-    try {
-      const savedUser = await user.save()
-      return Promise.resolve(savedUser)
-    } catch (error) {
-      res.send(error)
+      const isEmailPresent = await helpers.DatabaseMethods.findOne(User, params)
+      if (isEmailPresent != null) {
+        console.log('Wow')
+        helpers.createError(res, {
+          message: 'Email already exists, please try again'
+        })
+      } else {
+        try {
+          const savedUser = await user.save()
+          return Promise.resolve(savedUser)
+        } catch (error) {
+          // res.send(error)
+          return Promise.reject(error)
+        }
+      }
+    } else {
+      return Promise.reject(validation)
     }
   }
 }

@@ -1,7 +1,7 @@
 const shiftsController = require('./../controllers/shifts/shiftsController')
-const shiftRoutes = (app, fs, helpers, passport) => {
-  // Check Session
+const shiftRoutes = (app, fs, helpers) => {
   const shiftCtrl = shiftsController(fs, helpers)
+
   app.get('/api/shifts', (req, res) => {
     shiftCtrl.getAllShifts(req, res)
   })

@@ -30,12 +30,11 @@ app.use(
     }
   })
 )
-app.use(passport.initialize())
-app.use(passport.session())
 
-const routes = require('./routes/router')(app, fs, helpers, passport)
+const routes = require('./routes/router')(app, fs, helpers)
 
 // DB Connect
+
 mongoose.connect(
   process.env.DB_CONNECT,
   { useNewUrlParser: true, useUnifiedTopology: true },
@@ -44,7 +43,7 @@ mongoose.connect(
   }
 )
 
-// Server Init
+// Server init
 app.listen(process.env.DB_PORT, () => {
-  console.log('(Shift Manager API...)')
+  console.log('API Running...')
 })

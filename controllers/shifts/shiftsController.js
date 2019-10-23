@@ -12,7 +12,7 @@ module.exports = (fs, helpers) => {
         req.body.userID
       })
     } else {
-      helpers.createError(req, res, { message: 'No user ID found' })
+      helpers.createError(res, { message: 'No user ID found' })
     }
   }
 

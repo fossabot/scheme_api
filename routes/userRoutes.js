@@ -1,7 +1,7 @@
 const userController = require('../controllers/users/userController')
 
-const userRoutes = (app, fs, helpers, passport) => {
-  let userCtrl = userController(fs, helpers, passport)
+const userRoutes = (app, fs, helpers) => {
+  let userCtrl = userController(fs, helpers)
 
   app.post('/api/users/login', (req, res) => {
     userCtrl.login(req, res)
