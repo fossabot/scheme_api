@@ -10,6 +10,7 @@ module.exports = () => {
   function createError(res, err) {
     res
       .json({
+        success: false,
         message: err['message'],
         code: !err['code'] ? 101 : err['code']
       })

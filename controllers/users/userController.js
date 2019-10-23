@@ -16,7 +16,7 @@ module.exports = (fs, helpers, passport) => {
           user_employee_type: user.employee_type,
           user_name: user.name
         },
-        process.env.JWT_TOKEN
+        process.env.JWT_SECRET
       )
       res.header('Authorization', token).json({
         Authorisation: token

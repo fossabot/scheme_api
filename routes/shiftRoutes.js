@@ -1,12 +1,13 @@
 const shiftsController = require('./../controllers/shifts/shiftsController')
+const verifyToken = require('./../middlewares/verifyToken')
 const shiftRoutes = (app, fs, helpers) => {
   const shiftCtrl = shiftsController(fs, helpers)
 
-  app.get('/api/shifts', (req, res) => {
+  app.get('/api/shifts', verifyToken, (req, res) => {
     shiftCtrl.getAllShifts(req, res)
   })
 
-  app.get('/api/shifts/:id', (req, res) => {
+  app.get('/api/shifts/:id', verifyToken, (req, res) => {
     shiftCtrl.getShiftDetails(req, res)
   })
 }
