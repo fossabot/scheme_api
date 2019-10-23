@@ -1,62 +1,81 @@
-const userData = require('./../../db/users')
-const LocalStrategy = require('passport-local').Strategy
+const User = require('./../../models/User')
 
 module.exports = (fs, helpers, passport) => {
+  /**
+   *
+   * @param {*} req
+   * @param {*} res
+   */
   const login = (req, res) => {
-    if (!req.body['email']) {
+    let params = req.body
+    if (!params.email || !params.password) {
       helpers.createError(req, res, {
         message:
           'Failed to login, please enter your email or password please ?',
         code: 1010
       })
+    } else {
+      res.json(userManagement.login(req, null, 'login'))
     }
-    res.json({
-      user: userManagement.getUser(req),
-      type: 'success'
-    })
-    // return passport.authenticate(
-    //   'local',
-    //   { session: false },
-    //   (err, passportUser, info) => {
-    //     if (err) {
-    //       return next(err)
-    //     }
-    //     if (passportUser) {
-    //       const user = passportUser
-    //       // user.token = passportUser.generateJWT();
-    //       return res.json({ user: user })
-    //     }
-
-    //     return res.json({ status: 400 })
-    //   }
-    // )(req, res, next)
-    // userManagement.initPassport(passport)
   }
+
+  /**
+   *
+   * @param {*} req
+   * @param {*} res
+   */
   const getUserInfo = (req, res) => {}
-  const register = (req, res) => {}
-
-  let userManagement = {
-    // forgotPassword: function(req, res) {},
-    // forgotEmail: function(req, res) {},
-    getUser: function(req) {
-      return req.body.email
-        ? userData.users.find(user => user.email == req.body.email)
-        : ''
-    },
-    initPassport: function(passport) {
-      passport.use('local', { user: 'user' }, (user, done) => {
-        let authUser = this.getUser(req)
-        if (user != '') {
-          return done(null, authUser)
-        } else {
-          return done(null, { message: 'Error' })
-        }
-      })
-    }
+  /**
+   *
+   * @param {*} req
+   * @param {*} res
+   */
+  const register = async (req, res) => {
+    userManagement.register(req).then(user => {
+      res.json(user)
+    })
   }
+
   return {
     login: login,
     register: register,
     getUserInfo: getUserInfo
+  }
+}
+
+/**
+ * user management operations
+ */
+var userManagement = {
+  /**
+   * Logs in user
+   * @param {*} params
+   */
+  login: async function(params) {
+    const user = await helpers.DatabaseMethods.findOne(User, {
+      email: params.email,
+      password: params.password
+    })
+    return user
+  },
+  /**
+   * Register a new user
+   */
+  register: async function(req) {
+    let params = req.body
+
+    const user = new User({
+      name: params.name,
+      email: params.email,
+      employee_type: params.employeeType,
+      password: params.password
+    })
+
+    try {
+      const savedUser = await user.save()
+      return Promise.resolve(savedUser)
+    } catch (error) {
+      res.send(error)
+    }
   }
 }

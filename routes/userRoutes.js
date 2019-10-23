@@ -8,7 +8,7 @@ const userRoutes = (app, fs, helpers, passport) => {
   })
 
   app.post('/api/users/register', (req, res) => {
-    res.send('Register')
+    userCtrl.register(req, res)
   })
 
   app.get('/api/users/:id', (req, res) => {

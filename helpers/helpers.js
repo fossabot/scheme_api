@@ -23,7 +23,14 @@ module.exports = () => {
       })
       .end()
   }
-
+  let DatabaseMethods = {
+    findOne: async function(schema, params) {
+      let query = schema.findOne(params)
+      await query.findOne((err, res) => {
+        return Promise.resolve(res)
+      })
+    }
+  }
   let DateMethods = {
     format: function(date) {
       return moment(date, format, timezone).format(format)
@@ -84,6 +91,7 @@ transporter.sendMail(mailOptions, function(error, info){
     checkInput: checkInput,
     checkSession: checkSession,
     DateMethods: DateMethods,
-    sendEmail: sendEmail
+    sendEmail: sendEmail,
+    DatabaseMethods: DatabaseMethods
   }
 }
