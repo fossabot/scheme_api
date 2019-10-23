@@ -24,7 +24,14 @@ module.exports = (fs, helpers, passport) => {
    * @param {*} req
    * @param {*} res
    */
-  const getUserInfo = (req, res) => {}
+  const getUserInfo = (req, res) => {
+    let params = req.body
+    try {
+      res.json(helpers.DatabaseMethods.findOne(User, { id: params.userID }))
+    } catch (error) {
+      helpers.createError(req, res, error)
+    }
+  }
   /**
    *
    * @param {*} req
@@ -48,7 +55,7 @@ module.exports = (fs, helpers, passport) => {
  */
 var userManagement = {
   /**
-   * Logs in user
+   * Login user
    * @param {*} params
    */
   login: async function(params) {

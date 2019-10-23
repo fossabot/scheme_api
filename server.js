@@ -8,7 +8,6 @@ const express = require('express'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   cors = require('cors'),
-  port = 3000,
   app = express()
 
 // Env Vars
@@ -46,6 +45,6 @@ mongoose.connect(
 )
 
 // Server Init
-app.listen(port, () => {
+app.listen(process.env.DB_PORT, () => {
   console.log('(Shift Manager API...)')
 })
