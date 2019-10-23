@@ -21,10 +21,18 @@ module.exports = () => {
      * @param {String} string
      * @param {Number} saltRounds
      */
-    hash: async function(string) {
+    genHash: async function(string) {
       let salt = await bcrypt.genSalt(10)
       let hash = await bcrypt.hash(string, salt)
       return hash
+    },
+    /**
+     *
+     * @param {String} string
+     */
+    compareHash: async function(initString, stringToCompare) {
+      let isSame = await bcrypt.compare(initString, stringToCompare)
+      return isSame
     },
     /**
      *
@@ -65,22 +73,6 @@ module.exports = () => {
           return error ? error : value
         }
       }
-    },
-    /**
-     * Finds an item within the database
-     * @param {Object} res
-     * @param {Object} schema
-     * @param {Object} params
-     */
-    findOne: async function(schema, params) {
-      let query = schema.findOne(params)
-      await query.findOne((err, res) => {
-        if (err) {
-          return Promise.reject(error)
-        } else {
-          return Promise.resolve(res)
-        }
-      })
     }
   }
   let DateMethods = {

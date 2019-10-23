@@ -1,5 +1,5 @@
 const User = require('./../../models/User')
-
+const webToken = require('jsonwebtoken')
 module.exports = (fs, helpers, passport) => {
   /**
    *
@@ -8,15 +8,20 @@ module.exports = (fs, helpers, passport) => {
    */
   const login = (req, res) => {
     let params = req.body
-    if (!params.email || !params.password) {
-      helpers.createError(res, {
-        message:
-          'Failed to login, please enter your email or password please ?',
-        code: 1010
+    userManagement.login(helpers, params).then(user => {
+      const token = webToken.sign(
+        {
+          user_id: user._id,
+          user_email: user.email,
+          user_employee_type: user.employee_type,
+          user_name: user.name
+        },
+        process.env.JWT_TOKEN
+      )
+      res.header('Authorization', token).json({
+        Authorisation: token
       })
-    } else {
-      res.json(userManagement.login(req, null, 'login'))
-    }
+    })
   }
 
   /**
@@ -39,7 +44,12 @@ module.exports = (fs, helpers, passport) => {
    */
   const register = (req, res) => {
     userManagement.register(helpers, req, res).then(user => {
-      res.json(user)
+      res.json({
+        user_id: user._id,
+        user_email: user.email,
+        user_employee_type: user.employee_type,
+        user_name: user.name
+      })
     })
   }
 
@@ -56,25 +66,38 @@ module.exports = (fs, helpers, passport) => {
 var userManagement = {
   /**
    * Login user
-   * @param {*} params
+   * @param {Object} req.body
    */
-  login: async function(params) {
-    const user = await helpers.DatabaseMethods.findOne(User, {
-      email: params.email,
-      password: params.password
-    })
-    return user
+  login: async function(helpers, params) {
+    const user = await User.findOne({ email: params.email })
+    if (!user) {
+      return helpers.createError({
+        message: 'Email or password is incorrect, please try again.'
+      })
+    } else {
+      const isPasswordCorrect = await helpers.DatabaseMethods.compareHash(
+        params.password,
+        user.password
+      )
+      if (isPasswordCorrect) {
+        return user
+      } else {
+        return helpers.createError({
+          message: 'Email or password is incorrect, please try again.'
+        })
+      }
+    }
   },
   /**
    *
-   * @param {File} helpers
+   * @param {Function Body} helpers
    * @param {Object} req
    * @param {Object} res
    */
   register: async function(helpers, req, res) {
     let params = req.body
     const validation = helpers.DatabaseMethods.validate(params, 'register')
-    let hashedPassword = await helpers.DatabaseMethods.hash(params.password)
+    let hashedPassword = await helpers.DatabaseMethods.genHash(params.password)
 
     if (validation) {
       const user = new User({
@@ -84,7 +107,7 @@ var userManagement = {
         password: hashedPassword
       })
 
-      const isEmailPresent = await helpers.DatabaseMethods.findOne(User, params)
+      const isEmailPresent = await User.findOne({ email: params.email })
       if (isEmailPresent != null) {
         console.log('Wow')
         helpers.createError(res, {
@@ -93,14 +116,14 @@ var userManagement = {
       } else {
         try {
           const savedUser = await user.save()
-          return Promise.resolve(savedUser)
+          return savedUser
         } catch (error) {
           // res.send(error)
-          return Promise.reject(error)
+          return error
         }
       }
     } else {
-      return Promise.reject(validation)
+      return validation
     }
   }
 }
