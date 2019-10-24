@@ -137,11 +137,36 @@ let methods = {
     })
     return `${returnedUser['first_name']} ${returnedUser['last_name']}`
   },
-  dropShift: async function(helpers, req, res) {},
+  /**
+   * Makes shift not assigned to a user,
+   * replaces the key with null,
+   * Changes the pickup to true
+   * Changes the approved {user:0,admin:0}
+   * Sends notification to the admin to approve the drop
+   * @param {*} helpers
+   * @param {*} req
+   * @param {*} res
+   */
+  dropShift: async function(helpers, req, res) {
+    let params = req.body
+    let headers = req.header('Authorization')
+    let decode = jwt.decode(headers, process.env.JWT_SECRET)
+
+    // Send request with
+
+    let shift = Shift.findByIdAndUpdate(decode['user_id'])
+  },
+  /**
+   * Creates a shift for the user
+   * Start time and end time
+   * @param {*} helpers
+   * @param {*} req
+   * @param {*} res
+   */
   createShift: async function(helpers, req, res) {
     let params = req.body
     let headers = req.header('Authorization')
-    // let isValid = helpers.DatabaseMethods.validate(params, 'create_shift')
+    let isValid = helpers.DatabaseMethods.validate(params, 'create_shift')
     let decode = jwt.decode(headers, process.env.JWT_SECRET)
     let shiftType
     if (
@@ -160,20 +185,21 @@ let methods = {
     }
     let _startDate = helpers.DateMethods.toISO(params.start_date)
     let _endDate = helpers.DateMethods.toISO(params.end_date)
-
-    let shift = new Shift({
-      key: decode['user_id'],
-      employee_type: decode['user_employee_type'],
-      start_datetime: _startDate ? _startDate : params.start_datetime,
-      end_datetime: _endDate ? _endDate : params.end_datetime,
-      shift_type: shiftType
-    })
-    try {
-      const savedShift = await shift.save()
-      return savedShift
-    } catch (error) {
-      // helpers.createError(res, error)
-      return error
+    if (isValid) {
+      let shift = new Shift({
+        key: decode['user_id'],
+        employee_type: decode['user_employee_type'],
+        start_datetime: _startDate ? _startDate : params.start_datetime,
+        end_datetime: _endDate ? _endDate : params.end_datetime,
+        shift_type: shiftType
+      })
+      try {
+        const savedShift = await shift.save()
+        return savedShift
+      } catch (error) {
+        // helpers.createError(res, error)
+        return error
+      }
     }
   }
 }
