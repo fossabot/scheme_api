@@ -3,7 +3,7 @@ const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt')
 // Moment
 const moment = require('moment-timezone')
-const format = 'DD/MM/YYYY'
+const format = 'YYYY-MM-DD HH:mm'
 const timezone = 'Europe/London'
 const now = moment.tz(timezone)
 module.exports = () => {
@@ -124,8 +124,8 @@ module.exports = () => {
       secondDate = moment(secondDate, configFormat, timezone)
       return moment(firstDate, configFormat, timezone).isAfter(secondDate)
     },
-    toISO: function(date) {
-      return moment(date, timezone).toISOString()
+    toISO: function(date, _format) {
+      return moment(date, 'YYYY-MM-DD HH:mm', timezone).toISOString()
     }
   }
 
