@@ -44,6 +44,15 @@ module.exports = () => {
       let isError = false
 
       let validations = {
+        createShift: Joi.object({
+          start_datetime: Joi.date().required(),
+          end_datetime: Joi.date().required(),
+          shift_type: Joi.number().required()
+        }),
+        createHoliday: Joi.object({
+          start_date: Joi.date().required(),
+          end_date: Joi.date().required()
+        }),
         register: Joi.object({
           name: Joi.string()
             .min(6)
@@ -73,27 +82,50 @@ module.exports = () => {
           const { error, value } = validations.login.validate(toValidate)
           return error ? error : value
         }
+        case 'create_shift': {
+          const { error, value } = validations.createShift.validate(toValidate)
+          return error ? error : value
+        }
+        case 'create_holiday': {
+          const { error, value } = validations.createHoliday.validate(
+            toValidate
+          )
+          return error ? error : value
+        }
       }
     }
   }
   let DateMethods = {
-    format: function(date) {
-      return moment(date, format, timezone).format(format)
+    format: function(date, _format) {
+      let configFormat = _format ? _format : format
+      return moment(date, format, timezone).format(configFormat)
     },
-    isToday: function(date) {
-      return moment(date, format, timezone).isSame(new Date(), 'day')
+    isToday: function(date, _format) {
+      let configFormat = _format ? _format : format
+      return moment(date, configFormat, timezone).isSame(new Date(), 'day')
     },
-    isPast: function(date) {
-      return moment(date, format, timezone).isBefore(now)
+    isPast: function(date, _format) {
+      let configFormat = _format ? _format : format
+      return moment(date, configFormat, timezone).isBefore(now)
     },
-    isFuture: function(date) {
-      return moment(date, format, timezone).isAfter(now)
+    isFuture: function(date, _format) {
+      let configFormat = _format ? _format : format
+      return moment(date, configFormat, timezone).isAfter(now)
     },
-    isThisWeek: function(date) {
-      return moment(date, format, timezone).isBetween(
+    isThisWeek: function(date, _format) {
+      let configFormat = _format ? _format : format
+      return moment(date, configFormat, timezone).isBetween(
         now.startOf('week'),
         now.endOf('week')
       )
+    },
+    compare: function(firstDate, secondDate, _format) {
+      let configFormat = _format ? _format : format
+      secondDate = moment(secondDate, configFormat, timezone)
+      return moment(firstDate, configFormat, timezone).isAfter(secondDate)
+    },
+    toISO: function(date) {
+      return moment(date, timezone).toISOString()
     }
   }
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+// 1 (admin), 2(Normal), 3(Locumn)
 
 const userObj = new mongoose.Schema({
   name: {
