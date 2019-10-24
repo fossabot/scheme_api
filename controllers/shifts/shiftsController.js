@@ -130,6 +130,10 @@ let methods = {
       }
     }
   },
+  /**
+   *
+   * @param {*} id
+   */
   getUser: function(id) {
     let userData = require('./../../db/users')
     let returnedUser = userData.users.find(user => {
@@ -169,6 +173,8 @@ let methods = {
     let isValid = helpers.DatabaseMethods.validate(params, 'create_shift')
     let decode = jwt.decode(headers, process.env.JWT_SECRET)
     let shiftType
+
+    // Logic for determining the type of shift
     if (
       decode['user_employee_type'] == 2 ||
       decode['user_employee_type'] == 1
@@ -183,8 +189,20 @@ let methods = {
     if (!params.start_datetime || !params.end_datetime) {
       helpers.createError(res, { message: 'Please enter a date or time' })
     }
+    // Date formatting
     let _startDate = helpers.DateMethods.toISO(params.start_date)
     let _endDate = helpers.DateMethods.toISO(params.end_date)
+    let isAfterToday = helpers.DateMethods.isFuture(_startDate)
+
+    // Checking whether it's after today or not
+    if (!isAfterToday) {
+      helpers.createError(res, {
+        message:
+          'You cannot start a shift before today, please enter another date time'
+      })
+    }
+
+    // Validating the params
     if (isValid) {
       let shift = new Shift({
         key: decode['user_id'],
@@ -194,10 +212,23 @@ let methods = {
         shift_type: shiftType
       })
       try {
-        const savedShift = await shift.save()
-        return savedShift
+        // Check that the shift doesn't already exist with the datetime
+        const duplicateShift = Shift.findOne({
+          start_datetime: _startDate,
+          end_datetime: _endDate
+        })
+
+        if (!duplicateShift) {
+          const savedShift = await shift.save()
+          return savedShift
+        } else {
+          helpers.createError(res, {
+            message:
+              'Shift already exists, please enter a different date or time'
+          })
+        }
       } catch (error) {
-        // helpers.createError(res, error)
+        helpers.createError(res, error)
         return error
       }
     }
