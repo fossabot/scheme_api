@@ -8,7 +8,7 @@ module.exports = (fs, helpers, passport) => {
    */
   const login = (req, res) => {
     let params = req.body
-    userManagement.login(helpers, params).then(user => {
+    methods.login(helpers, params).then(user => {
       const token = webToken.sign(
         {
           user_id: user._id,
@@ -43,7 +43,7 @@ module.exports = (fs, helpers, passport) => {
    * @param {*} res
    */
   const register = (req, res) => {
-    userManagement.register(helpers, req, res).then(user => {
+    methods.register(helpers, req, res).then(user => {
       res.json({
         user_id: user._id,
         user_email: user.email,
@@ -52,18 +52,61 @@ module.exports = (fs, helpers, passport) => {
       })
     })
   }
+  const updateUser = (req, res) => {
+    methods.updateUser(req, res).then(response => {
+      res.json(response)
+    })
+  }
+  const removeUser = (req, res) => {
+    methods.removeUser(req).then(response => {
+      res.json(response)
+    })
+  }
 
   return {
     login: login,
     register: register,
-    getUserInfo: getUserInfo
+    getUserInfo: getUserInfo,
+    updateUser: updateUser,
+    removeUser: removeUser
   }
 }
 
-/**
- * user management operations
- */
-var userManagement = {
+var methods = {
+  /**
+   *
+   * @param {Object} req
+   */
+  updateUser: async function(req) {
+    let params = req.body
+    let header = req.header('Authorization')
+    try {
+      let userDetails = webToken.verify(header, process.env.JWT_SECRET)
+
+      let query = {}
+      for (let property in params) {
+        query[property] = params[property]
+      }
+      let update = await User.findByIdAndUpdate(userDetails['user_id'], query)
+      return update
+    } catch (error) {
+      return error
+    }
+  },
+  /**
+   *
+   * @param {Object} req
+   */
+  removeUser: async function(req) {
+    let header = req.header('Authorization')
+    let userDetails = webToken.verify(header, process.env.JWT_SECRET)
+    try {
+      let found = await User.findOneAndDelete({ _id: userDetails['user_id'] })
+      return found['user_id']
+    } catch (error) {
+      return error
+    }
+  },
   /**
    * Login user
    * @param {Object} req.body
@@ -104,6 +147,7 @@ var userManagement = {
         name: params.name,
         email: params.email,
         employee_type: params.employeeType,
+        is_admin: params.is_admin,
         password: hashedPassword
       })
 

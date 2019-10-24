@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken')
 /**
  * Checks the users token;
- * @param {*} req
- * @param {*} res
+ * @param {Object} req
+ * @param {Object} res
  */
 const isRouteAllowed = (req, res, next) => {
   const token = req.header('Authorization')

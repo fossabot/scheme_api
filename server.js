@@ -38,8 +38,8 @@ const routes = require('./routes/router')(app, fs, helpers)
 mongoose.connect(
   process.env.DB_CONNECT,
   { useNewUrlParser: true, useUnifiedTopology: true },
-  () => {
-    console.log('Connected')
+  err => {
+    !err ? console.log('Connected') : console.log(err)
   }
 )
 
