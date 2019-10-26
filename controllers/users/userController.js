@@ -9,19 +9,27 @@ module.exports = (fs, helpers, passport) => {
    */
   const login = (req, res) => {
     let params = req.body
-    methods.login(helpers, params, res).then(user => {
-      const token = jwt.sign(
-        {
-          user_id: user._id,
-          user_email: user.email,
-          user_employee_type: user.employee_type,
-          user_name: user.name
-        },
-        process.env.JWT_SECRET
-      )
-      res.header('Authorisation', token)
-      helpers.success(res, { message: 'Successfully logged in', extras: token })
-    })
+    methods
+      .login(helpers, params, res)
+      .then(user => {
+        const token = jwt.sign(
+          {
+            user_id: user._id,
+            user_email: user.email,
+            user_employee_type: user.employee_type,
+            user_name: user.name
+          },
+          process.env.JWT_SECRET
+        )
+        res.header('Authorisation', token)
+        helpers.success(res, {
+          message: 'Successfully logged in',
+          extras: token
+        })
+      })
+      .catch(err => {
+        return err
+      })
   }
 
   /**
@@ -29,9 +37,9 @@ module.exports = (fs, helpers, passport) => {
    * @param {*} req
    * @param {*} res
    */
-  const signOut = (req, res) => {
+  const logOut = (req, res) => {
     methods
-      .signOut(req, helpers, res)
+      .logOut(req, helpers, res)
       .then(response => {
         console.log(response)
         if (response) {
@@ -115,7 +123,7 @@ module.exports = (fs, helpers, passport) => {
     getUserInfo: getUserInfo,
     updateUser: updateUser,
     removeUser: removeUser,
-    signOut: signOut
+    logOut: logOut
   }
 }
 
@@ -126,7 +134,7 @@ var methods = {
   //  * @param {*} res
   //  * @param {*} helpers
   //  */
-  signOut: async function(req, helpers, res) {
+  logOut: async function(req, helpers, res) {
     let authHeader = req.header('Authorisation')
     let currentUser = jwt.decode(authHeader, process.env.JWT_SECRET)
     try {
@@ -140,11 +148,11 @@ var methods = {
             'User not signed in, you can only sign in if your are logged in.'
         })
       }
-      let userSignOut = await User.findByIdAndUpdate(
+      let userlogOut = await User.findByIdAndUpdate(
         { _id: currentUser['user_id'] },
         { is_online: false }
       )
-      return userSignOut
+      return userlogOut
     } catch (error) {
       return error
     }
@@ -203,6 +211,7 @@ var methods = {
         helpers.error(res, {
           message: 'Email or password are incorrect please, try again'
         })
+        return Promise.reject(false)
       } else {
         const isPasswordCorrect = await helpers.db.compareHash(
           params.password,

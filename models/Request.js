@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 let requestObj = new mongoose.Schema({
-  // content: {
-  //   type: String,
-  //   required: true
-  // },
   date_created: {
     type: Date,
     default: Date.now
@@ -27,7 +23,7 @@ let requestObj = new mongoose.Schema({
   },
   shift_id: {
     type: String,
-    required: true
+    default: 'New Shift'
   },
   participants: {
     type: Object,

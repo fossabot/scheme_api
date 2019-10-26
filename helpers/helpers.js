@@ -44,7 +44,14 @@ module.exports = () => {
     createRequest: async function(req, res, config) {
       let header = req.header('Authorisation')
       let currentUser = jwt.decode(header, process.env.JWT_SECRET)
+      // Change to the admins email once there is a valid one
       let defaultAdminEmail = process.env.DOCK_EMAIL_USERNAME
+      let emailConfig = {
+        from: currentUser['user_email'],
+        to: defaultAdminEmail,
+        text: `Request about ${req.header('shift_id')}`
+      }
+      let sendEmail = this.sendEmail
 
       // If they are not an admin
       if (
@@ -52,6 +59,29 @@ module.exports = () => {
         currentUser['user_employee_type'] != 1
       ) {
         let admin = await User.findOne({ employee_type: 1 })
+
+        let sentEmail = await sendEmail(emailConfig)
+        if (sentEmail['response']) {
+          // Create request in DB
+          let requestObj = new Request({
+            is_approved: {
+              admin: 0,
+              employee: 1
+            },
+            request_type: config['request_type'],
+            participants: {
+              employee: currentUser['user_id'],
+              admin: admin['_id']
+            },
+            shift_id: req.body.shift_id
+          })
+          try {
+            let res = await requestObj.save()
+            return res
+          } catch (error) {
+            return error
+          }
+        }
 
         /**
          * Things that want changed on a shift
@@ -78,13 +108,7 @@ module.exports = () => {
           })
         } else {
           // Sends an email to the admin with the params that they want to change NO DB Operations
-
-          let emailConfig = {
-            from: currentUser['user_email'],
-            to: defaultAdminEmail,
-            text: `Requesting a change for on shift ${req.header('shift_id')}`
-          }
-          let sentEmail = await this.sendEmail(emailConfig)
+          let sentEmail = await sendEmail(emailConfig)
           if (sentEmail['response']) {
             // Create request in DB
             let requestObj = new Request({

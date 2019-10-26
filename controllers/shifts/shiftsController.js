@@ -11,9 +11,7 @@ module.exports = (fs, helpers) => {
    * @param {*} res
    */
   const createShift = (req, res) => {
-    methods.createShift(helpers, req, res).then(response => {
-      res.json(response)
-    })
+    methods.createShift(helpers, req, res)
   }
   /**
    * Get all shifts
@@ -237,17 +235,7 @@ let methods = {
       }
     }
   },
-  /**
-   *
-   * @param {*} id
-   */
-  getUser: function(id) {
-    let userData = require('./../../db/users')
-    let returnedUser = userData.users.find(user => {
-      return user['id'] == id
-    })
-    return `${returnedUser['first_name']} ${returnedUser['last_name']}`
-  },
+
   /**
    * Makes shift not assigned to a user,
    * replaces the key with null,
@@ -323,23 +311,27 @@ let methods = {
 
         const duplicateShift = await Shift.findOne({
           start_datetime: _startDate,
+          key: decode['user_id'],
           end_datetime: _endDate
         })
 
         if (!duplicateShift) {
-          const savedShift = await shift.save()
-          return savedShift
+          // Saves shift (but the admin can only do that)
+          // const savedShift = await shift.save()
+          // return savedShift
+
+          // Send request for shift to admin
+          let request = await helpers.admin.createRequest(req, res, {
+            shift_type: params.shift_type
+          })
+          helpers.success(res, {
+            message: 'Shift request successfully sent to admin'
+          })
         } else {
           helpers.error(res, {
-            message:
-              'Shift already exists, please enter a different date or time'
+            message: 'Shift already exists'
           })
         }
-        // Send request for shift to admin
-        let request = helpers.admin.createRequest(req, res, {
-          shift_type: params.shift_type
-        })
-        console.log(request)
       } catch (error) {
         helpers.error(res, error)
         return error
