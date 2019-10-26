@@ -7,13 +7,10 @@ const shiftRoutes = (app, fs, helpers) => {
     shiftCtrl.getAllShifts(req, res)
   })
 
-  app.post('/api/shifts/add', verifyToken, (req, res) => {
+  app.post('/api/shifts/create', verifyToken, (req, res) => {
     shiftCtrl.createShift(req, res)
   })
 
-  app.get('/api/shifts/:id', verifyToken, (req, res) => {
-    shiftCtrl.getShiftDetails(req, res)
-  })
   app.post('/api/shifts/update', verifyToken, (req, res) => {
     shiftCtrl.updateShift(req, res)
   })

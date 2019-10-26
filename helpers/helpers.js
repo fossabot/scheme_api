@@ -53,13 +53,14 @@ module.exports = () => {
       ) {
         let admin = await User.findOne({ employee_type: 1 })
 
-        // config = {
-        //   from:"",
-        //   to:"",
-        //   content:"",
-        //   shift_id:"",
-        //   request_type:"",
-        // }
+        /**
+         * Things that want changed on a shift
+         * Config:{
+         * shift_type:,
+         * start_datetime,
+         * end_datetime,
+         * }
+         */
 
         // Create request to database from one user to another user with different reasons
         // Pickup shift, remove shift, add shift, create holiday

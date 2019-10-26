@@ -1,5 +1,6 @@
 const User = require('./../../models/User')
 const jwt = require('jsonwebtoken')
+const Shift = require('./../../models/Shift')
 module.exports = (fs, helpers, passport) => {
   /**
    *
@@ -119,7 +120,7 @@ module.exports = (fs, helpers, passport) => {
 }
 
 var methods = {
-  // /**
+  /**
   //  * Sign out the current session and delete their token and remove that they are online
   //  * @param {*} req
   //  * @param {*} res
@@ -149,7 +150,7 @@ var methods = {
     }
   },
   /**
-   *
+   * Updates a users details
    * @param {Object} req
    */
   updateUser: async function(req) {
@@ -169,7 +170,7 @@ var methods = {
     }
   },
   /**
-   *
+   * Removes a user and makes their shifts avaliable for pickup
    * @param {Object} req
    */
   removeUser: async function(req) {
@@ -177,8 +178,13 @@ var methods = {
     let userDetails = jwt.verify(header, process.env.JWT_SECRET)
     try {
       let found = await User.findByIdAndDelete({ _id: userDetails['user_id'] })
-      console.log(found)
-      return found['user_id']
+      let makeAllShiftsPickup = await Shift.updateMany(
+        { key: userDetails['user_id'] },
+        { is_pickup: true }
+      )
+      if (makeAllShiftsPickup) {
+        return found['user_id']
+      }
     } catch (error) {
       return error
     }

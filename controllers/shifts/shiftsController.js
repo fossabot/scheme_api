@@ -26,20 +26,7 @@ module.exports = (fs, helpers) => {
       type: 'success'
     })
   }
-  /**
-   * Get details of shift
-   * @param {} req
-   * @param {*} res
-   */
-  const getShiftDetails = (req, res) => {
-    if (req.body.userID && req.body.shiftID) {
-      shiftData.shifts.map(shift => {
-        req.body.userID
-      })
-    } else {
-      helpers.error(res, { message: 'No user ID found' })
-    }
-  }
+
   /**
    * Update shift
    * @param {*} req
@@ -61,19 +48,11 @@ module.exports = (fs, helpers) => {
    * @param {*} res
    */
   const removeShift = (req, res) => {
-    methods
-      .remove(req, res, helpers)
-      .then(response => {
-        res.json(response)
-      })
-      .catch(error => {
-        helpers.error(res, error)
-      })
+    methods.remove(req, res, helpers)
   }
 
   return {
     getAllShifts: getAllShifts,
-    getShiftDetails: getShiftDetails,
     createShift: createShift,
     updateShift: updateShift,
     removeShift: removeShift
@@ -91,27 +70,43 @@ let methods = {
     // Need shift ID
     let params = req.body
     let currentUser = req.header('Authorisation')
+
     if (params.shift_id && params.shift_type) {
-      // Is it their shift ?
+      // Is it your shift ?
       let isShiftYours = await Shift.findOne({
         _id: params.shift_id,
         key: currentUser['user_id']
       })
-      if (isShiftYours || current['user_employee_type'] == 1) {
+      if (isShiftYours || currentUser['user_employee_type'] == 1) {
         // Send request to admin
         let response = await helpers.admin.createRequest(req, res, {
           shift_type: params.shift_type
         })
-        console.log(response)
+      } else if (currentUser['user_employee_type'] == 1) {
+        // If admin force pickup and send request
+        let makePickup = await Shift.findByIdAndUpdate(
+          { _id: params.shift_id },
+          { is_pickup: true }
+        )
+        if (makePickup) {
+          helpers.success(res, { message: 'Shift successfully updated.' })
+        } else {
+          helpers.error(res, {
+            message: 'Error when changing shift please try again later'
+          })
+        }
       } else {
         helpers.error(res, { message: "This shift doesn't belong to you" })
       }
     } else {
-      helpers.error(res, { message: 'A shift ID is required' })
+      helpers.error(res, {
+        message:
+          'A shift ID or shift type is missing, please input these to continue'
+      })
     }
   },
   /**
-   *
+   * Update a shift and create requests accordingly
    * @param {Object} req
    * @param {Object} res
    * @param {Object} helpers
@@ -281,10 +276,9 @@ let methods = {
    */
   createShift: async function(helpers, req, res) {
     let params = req.body
-    let headers = req.header('Authorization')
-    let isValid = helpers.DatabaseMethods.validate(params, 'create_shift')
+    let headers = req.header('Authorisation')
+    let isValid = helpers.db.validate(params, 'create_shift')
     let decode = jwt.decode(headers, process.env.JWT_SECRET)
-    let shiftType
 
     // Logic for determining the type of shift
     if (
@@ -301,11 +295,12 @@ let methods = {
     if (!params.start_datetime || !params.end_datetime) {
       helpers.error(res, { message: 'Please enter a date or time' })
     }
+
     // Date formatting
     let _startDate = helpers.date.toISO(params.start_datetime)
     let _endDate = helpers.date.toISO(params.end_datetime)
     let isAfterToday = helpers.date.isFuture(_startDate)
-    console.log(isAfterToday)
+
     // Checking whether it's after today or not
     if (!isAfterToday) {
       helpers.error(res, {
@@ -340,6 +335,11 @@ let methods = {
               'Shift already exists, please enter a different date or time'
           })
         }
+        // Send request for shift to admin
+        let request = helpers.admin.createRequest(req, res, {
+          shift_type: params.shift_type
+        })
+        console.log(request)
       } catch (error) {
         helpers.error(res, error)
         return error
