@@ -29,8 +29,7 @@ module.exports = () => {
     res
       .json({
         success: true,
-        message: obj['message'],
-        extras: obj['extras']
+        obj
       })
       .end()
   }

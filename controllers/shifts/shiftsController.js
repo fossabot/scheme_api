@@ -1,17 +1,44 @@
-const shiftData = require('./../../db/shifts')
 const Shift = require('./../../models/Shift')
 const jwt = require('jsonwebtoken')
 const Request = require('./../../models/Request')
-const nodeMailer = require('nodemailer')
 
 module.exports = (fs, helpers) => {
+  /**
+   * Admins side of apporving a shift
+   * Need the following:{
+   *  employee :{
+   * user ID, email, employee type
+   * }
+   *
+   * }
+   * @param {*} req
+   * @param {*} res
+   */
+  const approveShift = (req, res) => {
+    methods
+      .approve(req, res)
+      .then(response => {
+        helpers.success(res, { extras: response })
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
+  }
+
   /**
    * Create shift
    * @param {*} req
    * @param {*} res
    */
   const createShift = (req, res) => {
-    methods.createShift(helpers, req, res)
+    methods
+      .createShift(helpers, req, res)
+      .then(response => {
+        helpers.success(res, response)
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
   }
   /**
    * Get all shifts
@@ -19,10 +46,14 @@ module.exports = (fs, helpers) => {
    * @param {*} res
    */
   const getAllShifts = (req, res) => {
-    res.json({
-      shifts: methods.getShifts(helpers),
-      type: 'success'
-    })
+    methods
+      .getShifts()
+      .then(response => {
+        helpers.success(res, { extras: response })
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
   }
 
   /**
@@ -34,7 +65,7 @@ module.exports = (fs, helpers) => {
     methods
       .update(req, res, helpers)
       .then(response => {
-        res.json(response)
+        helpers.success(res, response)
       })
       .catch(error => {
         helpers.error(res, error)
@@ -46,18 +77,39 @@ module.exports = (fs, helpers) => {
    * @param {*} res
    */
   const removeShift = (req, res) => {
-    methods.remove(req, res, helpers)
+    methods
+      .remove(req, res, helpers)
+      .then(response => {
+        helpers.success(res, response)
+      })
+      .catch(err => {
+        helpers.error(res, err)
+      })
   }
 
   return {
     getAllShifts: getAllShifts,
     createShift: createShift,
     updateShift: updateShift,
-    removeShift: removeShift
+    removeShift: removeShift,
+    approveShift: approveShift
   }
 }
 
 let methods = {
+  approve: async function(req, res) {
+    // Are you an admin ?
+    let headers = req.header('Authorisation')
+    let isAdmin = headers['user_employee_type'] == 1
+    if (isAdmin) {
+      // Send an email back to the user confirming the shift
+      // Get the shift ID
+    } else {
+      return Promise.reject(
+        'You cannot approve shifts if you are not an admin, contact your admin to become one.'
+      )
+    }
+  },
   /**
    * Makes a shift avaliable for pickup
    * @param {*} req
@@ -87,20 +139,19 @@ let methods = {
           { is_pickup: true }
         )
         if (makePickup) {
-          helpers.success(res, { message: 'Shift successfully updated.' })
+          return Promise.resolve('Shift successfully updated.')
         } else {
-          helpers.error(res, {
-            message: 'Error when changing shift please try again later'
-          })
+          return Promise.reject(
+            'Error when changing shift please try again later'
+          )
         }
       } else {
-        helpers.error(res, { message: "This shift doesn't belong to you" })
+        return Promise.reject("This shift doesn't belong to you")
       }
     } else {
-      helpers.error(res, {
-        message:
-          'A shift ID or shift type is missing, please input these to continue'
-      })
+      return Promise.reject(
+        'A shift ID or shift type is missing, please input these to continue'
+      )
     }
   },
   /**
@@ -123,116 +174,36 @@ let methods = {
           let response = await helpers.admin.createRequest(req, res, {
             shift_type: 2
           })
-          console.log(response)
+          return Promise.resolve(response)
         } else {
-          helpers.error(res, { message: "This shift doesn't belong to you" })
+          return Promise.reject("This shift doesn't belong to you")
         }
       } catch (error) {
-        return error
+        return Promise.reject(error)
       }
     } else {
-      helpers.error(res, {
-        message: 'No shift ID detected plase enter it and try again.'
-      })
+      return Promise.reject(
+        'No shift ID detected plase enter it and try again.'
+      )
     }
   },
-  getShifts: function(helpers) {
-    let dateMethods = helpers.date
-    let shiftsObj = {
-      holidays: {
-        today: [],
-        upcoming: [],
-        previous: []
-      },
-      shifts: {
-        today: [],
-        upcoming: [],
-        previous: []
-      },
-      all: []
-    }
-
-    for (let i = 0, len = shiftData.shifts.length; i < len; i++) {
-      let shift = shiftData.shifts[i]
-
-      let dateObj = {
-        start: shift['start_date'],
-        end: shift['end_date']
+  /**
+   * Gets all shifts pushes them to an array
+   * Returns that array
+   * @param {*} req
+   * @param {*} res
+   * @param {*} helpers
+   */
+  getShifts: async function() {
+    // Get all shifts
+    try {
+      let shifts = await Shift.find({})
+      if (shifts.length <= 0) {
+        return Promise.reject('No shifts found, please try again later')
       }
-      shift['dates'] = []
-      shift['dates'].push(dateObj)
-
-      let user = getUser(shift['key'])
-      shift['user_fullname'] = user
-      shift['popover'] = {
-        label: ''
-      }
-
-      shift['start_date'] = dateMethods.format(shift['start_date'], null)
-      shift['end_date'] = dateMethods.format(shift['end_date'], null)
-      let startDate = shift['start_date']
-
-      if (shift['shift_type'] == 1) {
-        this.setShiftProperties(shift, 'blue', user, dateMethods)
-        this.checkShiftDates(true, startDate, shiftsObj, dateMethods, shift)
-      } else if (shift['shift_type'] == 2) {
-        this.setShiftProperties(shift, 'green', user, dateMethods)
-        this.checkShiftDates(true, startDate, shiftsObj, dateMethods, shift)
-      } else {
-        this.setShiftProperties(shift, 'red', user, dateMethods)
-        this.checkShiftDates(false, startDate, shiftsObj, dateMethods, shift)
-      }
-      shiftsObj['all'].push(shift)
-    }
-    return {
-      shiftsObj
-    }
-  },
-  setShiftProperties: function(shift, highlightColour, user, dateMethods) {
-    let startTime = shift['start_time']
-    let endTime = shift['end_time']
-
-    if (shift['shift_type'] == 3) {
-      shift['popover']['label'] = `${user}'s Holiday until ${
-        shift['end_date']
-      } `
-    } else if (shift['shift_type'] == 2) {
-      shift['popover'][
-        'label'
-      ] = `${user}'s locum shift from  ${startTime} to ${endTime}`
-    } else {
-      shift['popover'][
-        'label'
-      ] = `${user}'s  shift from  ${startTime} to ${endTime}`
-    }
-    shift['highlight'] = highlightColour
-  },
-  checkShiftDates: function(
-    checkShift,
-    startDate,
-    shiftsObj,
-    dateMethods,
-    shift
-  ) {
-    if (checkShift) {
-      shiftsObj = shiftsObj['shifts']
-      if (dateMethods.isToday(startDate)) {
-        shiftsObj.today.push(shift)
-      } else if (dateMethods.isFuture(startDate)) {
-        shiftsObj.upcoming.push(shift)
-      } else {
-        shiftsObj.previous.push(shift)
-      }
-    } else {
-      shiftsObj = shiftsObj['holidays']
-
-      if (dateMethods.isToday(startDate)) {
-        shiftsObj.today.push(shift)
-      } else if (dateMethods.isFuture(startDate)) {
-        shiftsObj.upcoming.push(shift)
-      } else {
-        shiftsObj.previous.push(shift)
-      }
+      return Promise.resolve(shifts)
+    } catch (error) {
+      return Promise.reject(error)
     }
   },
 
@@ -281,7 +252,7 @@ let methods = {
     }
 
     if (!params.start_datetime || !params.end_datetime) {
-      helpers.error(res, { message: 'Please enter a date or time' })
+      return Promise.reject("'Please enter a date or time'")
     }
 
     // Date formatting
@@ -291,10 +262,9 @@ let methods = {
 
     // Checking whether it's after today or not
     if (!isAfterToday) {
-      helpers.error(res, {
-        message:
-          'You cannot start a shift before today, please enter another date time'
-      })
+      return Promise.reject(
+        'You cannot start a shift before today, please enter another date time'
+      )
     }
     // Validating the params
 
@@ -317,24 +287,17 @@ let methods = {
 
         if (!duplicateShift) {
           // Saves shift (but the admin can only do that)
-          // const savedShift = await shift.save()
-          // return savedShift
-
+          const savedShift = await shift.save()
           // Send request for shift to admin
           let request = await helpers.admin.createRequest(req, res, {
             shift_type: params.shift_type
           })
-          helpers.success(res, {
-            message: 'Shift request successfully sent to admin'
-          })
+          return Promise.resolve('Shift request successfully sent to admin')
         } else {
-          helpers.error(res, {
-            message: 'Shift already exists'
-          })
+          return Promise.reject('Shift already exists')
         }
       } catch (error) {
-        helpers.error(res, error)
-        return error
+        return Promise.reject(err.message)
       }
     }
   }

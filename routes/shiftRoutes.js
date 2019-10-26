@@ -17,6 +17,9 @@ const shiftRoutes = (app, fs, helpers) => {
   app.get('/api/shifts/remove', verifyToken, (req, res) => {
     shiftCtrl.removeShift(req, res)
   })
+  app.post('/api/shifts/approve', verifyToken, (req, res) => {
+    shiftCtrl.approveShift(req, res)
+  })
 }
 
 module.exports = shiftRoutes
