@@ -55,16 +55,61 @@ module.exports = (fs, helpers) => {
         helpers.error(res, error)
       })
   }
+  /**
+   * Remove shift
+   * @param {*} req
+   * @param {*} res
+   */
+  const removeShift = (req, res) => {
+    methods
+      .remove(req, res, helpers)
+      .then(response => {
+        res.json(response)
+      })
+      .catch(error => {
+        helpers.error(res, error)
+      })
+  }
 
   return {
     getAllShifts: getAllShifts,
     getShiftDetails: getShiftDetails,
     createShift: createShift,
-    updateShift: updateShift
+    updateShift: updateShift,
+    removeShift: removeShift
   }
 }
 
 let methods = {
+  /**
+   * Makes a shift avaliable for pickup
+   * @param {*} req
+   * @param {*} res
+   * @param {*} helpers
+   */
+  remove: async function(req, res, helpers) {
+    // Need shift ID
+    let params = req.body
+    let currentUser = req.header('Authorisation')
+    if (params.shift_id && params.shift_type) {
+      // Is it their shift ?
+      let isShiftYours = await Shift.findOne({
+        _id: params.shift_id,
+        key: currentUser['user_id']
+      })
+      if (isShiftYours || current['user_employee_type'] == 1) {
+        // Send request to admin
+        let response = await helpers.admin.createRequest(req, res, {
+          shift_type: params.shift_type
+        })
+        console.log(response)
+      } else {
+        helpers.error(res, { message: "This shift doesn't belong to you" })
+      }
+    } else {
+      helpers.error(res, { message: 'A shift ID is required' })
+    }
+  },
   /**
    *
    * @param {Object} req
@@ -73,11 +118,22 @@ let methods = {
    */
   update: async function(req, res, helpers) {
     if (req.body.shift_id) {
+      let params = req.body
       try {
-        let response = await helpers.admin.createRequest(req, res, {
-          shift_type: 2
+        let currentUser = req.header('Authorisation')
+
+        let isShiftYours = await Shift.findOne({
+          _id: params.shift_id,
+          key: currentUser['user_id']
         })
-        console.log(response)
+        if (isShiftYours || current['user_employee_type'] == 1) {
+          let response = await helpers.admin.createRequest(req, res, {
+            shift_type: 2
+          })
+          console.log(response)
+        } else {
+          helpers.error(res, { message: "This shift doesn't belong to you" })
+        }
       } catch (error) {
         return error
       }

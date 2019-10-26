@@ -16,7 +16,7 @@ const userObj = new mongoose.Schema({
     type: Number,
     required: true,
     default: 1,
-    max: 2
+    max: 3
   },
   password: {
     type: String,

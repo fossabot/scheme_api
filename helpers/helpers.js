@@ -29,7 +29,8 @@ module.exports = () => {
     res
       .json({
         success: true,
-        message: obj['message']
+        message: obj['message'],
+        extras: obj['extras']
       })
       .end()
   }
@@ -43,12 +44,15 @@ module.exports = () => {
     createRequest: async function(req, res, config) {
       let header = req.header('Authorisation')
       let currentUser = jwt.decode(header, process.env.JWT_SECRET)
-      console.log(currentUser, config)
       let defaultAdminEmail = process.env.DOCK_EMAIL_USERNAME
+
+      // If they are not an admin
       if (
         Object.keys(config).length > 0 &&
         currentUser['user_employee_type'] != 1
       ) {
+        let admin = await User.findOne({ employee_type: 1 })
+
         // config = {
         //   from:"",
         //   to:"",
@@ -65,8 +69,6 @@ module.exports = () => {
         let isDuplicateRequest = await Request.findOne({
           shift_id: req.header('shift_id')
         })
-        console.warn(isDuplicateRequest)
-        let admin = await User.findOne({ employee_type: 1 })
 
         if (isDuplicateRequest) {
           // Create erorr
@@ -77,9 +79,9 @@ module.exports = () => {
           // Sends an email to the admin with the params that they want to change NO DB Operations
 
           let emailConfig = {
-            from: defaultAdminEmail,
-            to: currentUser['user_email'],
-            text: 'Testing'
+            from: currentUser['user_email'],
+            to: defaultAdminEmail,
+            text: `Requesting a change for on shift ${req.header('shift_id')}`
           }
           let sentEmail = await this.sendEmail(emailConfig)
           if (sentEmail['response']) {
@@ -104,17 +106,20 @@ module.exports = () => {
             }
           }
         }
+        //If they are an admin
       } else if (currentUser['user_employee_type'] == 1) {
         let isDuplicateRequest = await Request.findOne({
           shift_id: req.body.shift_id
         })
+
         if (!isDuplicateRequest) {
+          // Send an email about the shift to the employee
           let emailConfig = {
             from: defaultAdminEmail,
             to: currentUser['user_email'],
-            text: 'Testing'
+            text: `This is an email notifying you that your shift has changed`
           }
-          await this.sendEmail(emailConfig)
+
           let requestObj = new Request({
             is_approved: {
               admin: 1,
@@ -129,6 +134,7 @@ module.exports = () => {
           })
           try {
             let res = await requestObj.save()
+            await this.sendEmail(emailConfig)
             return res
           } catch (error) {
             return error

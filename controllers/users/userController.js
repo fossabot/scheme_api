@@ -1,5 +1,5 @@
 const User = require('./../../models/User')
-const webToken = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 module.exports = (fs, helpers, passport) => {
   /**
    *
@@ -9,7 +9,7 @@ module.exports = (fs, helpers, passport) => {
   const login = (req, res) => {
     let params = req.body
     methods.login(helpers, params, res).then(user => {
-      const token = webToken.sign(
+      const token = jwt.sign(
         {
           user_id: user._id,
           user_email: user.email,
@@ -18,9 +18,8 @@ module.exports = (fs, helpers, passport) => {
         },
         process.env.JWT_SECRET
       )
-      res.header('Authorisation', token).json({
-        Authorisation: token
-      })
+      res.header('Authorisation', token)
+      helpers.success(res, { message: 'Successfully logged in', extras: token })
     })
   }
 
@@ -30,9 +29,24 @@ module.exports = (fs, helpers, passport) => {
    * @param {*} res
    */
   const signOut = (req, res) => {
-    methods.signOut(req, res, helpers).then(user => {
-      res.json(user)
-    })
+    methods
+      .signOut(req, helpers, res)
+      .then(response => {
+        console.log(response)
+        if (response) {
+          helpers.success(res, {
+            message: 'Signed Out Successfully',
+            instructions: 'Remove Token'
+          })
+        } else {
+          helpers.error(res, {
+            message: 'Failed to sign out user, please try again later'
+          })
+        }
+      })
+      .catch(err => {
+        helpers.error(res, err)
+      })
   }
 
   /**
@@ -43,27 +57,46 @@ module.exports = (fs, helpers, passport) => {
   const getUserInfo = (req, res) => {
     let params = req.body
     try {
-      res.json(helpers.DatabaseMethods.findOne(User, { id: params.userID }))
+      res.json(helpers.db.findOne(User, { id: params.userID }))
     } catch (error) {
       helpers.createError(res, error)
     }
   }
   /**
-   *
+   * Regsiter new user
    * @param {*} req
    * @param {*} res
    */
   const register = (req, res) => {
-    methods.register(helpers, req, res).then(user => {
-      res.json({
-        user_id: user._id,
-        user_email: user.email,
-        user_employee_type: user.employee_type,
-        user_name: user.name
+    methods
+      .register(helpers, req, res)
+      .then(user => {
+        if (user) {
+          const token = jwt.sign(
+            {
+              user_id: user._id,
+              user_email: user.email,
+              user_employee_type: user.employee_type,
+              user_name: user.name
+            },
+            process.env.JWT_SECRET
+          )
+          res.header('Authorisation', token)
+          helpers.success(res, {
+            message: 'Registration successful!',
+            extras: token
+          })
+        }
       })
-    })
+      .catch(err => {
+        helpers.error(res, err)
+      })
   }
-
+  /**
+   * Update user details
+   * @param {*} req
+   * @param {*} res
+   */
   const updateUser = (req, res) => {
     methods.updateUser(req, res).then(response => {
       res.json(response)
@@ -87,28 +120,43 @@ module.exports = (fs, helpers, passport) => {
 
 var methods = {
   // /**
-  //  * Sign out the current session and delete their token
+  //  * Sign out the current session and delete their token and remove that they are online
   //  * @param {*} req
   //  * @param {*} res
   //  * @param {*} helpers
   //  */
-  // signOut:function(req,res,helpers){
-  //   let decode = webToken.verify(req.headers("Authorization"),process.env.JWT_SECRET);
-  //   let found = await User.findOne(decode["user_id"]);
-  //   if(found){
-  //     webToken.
-  //   }
-
-  // },
+  signOut: async function(req, helpers, res) {
+    let authHeader = req.header('Authorisation')
+    let currentUser = jwt.decode(authHeader, process.env.JWT_SECRET)
+    try {
+      let isUserSignedIn = await User.findOne({
+        _id: currentUser['user_id'],
+        is_online: true
+      })
+      if (!isUserSignedIn) {
+        helpers.error(res, {
+          message:
+            'User not signed in, you can only sign in if your are logged in.'
+        })
+      }
+      let userSignOut = await User.findByIdAndUpdate(
+        { _id: currentUser['user_id'] },
+        { is_online: false }
+      )
+      return userSignOut
+    } catch (error) {
+      return error
+    }
+  },
   /**
    *
    * @param {Object} req
    */
   updateUser: async function(req) {
     let params = req.body
-    let header = req.header('Authorization')
+    let header = req.header('Authorisation')
     try {
-      let userDetails = webToken.verify(header, process.env.JWT_SECRET)
+      let userDetails = jwt.verify(header, process.env.JWT_SECRET)
 
       let query = {}
       for (let property in params) {
@@ -125,10 +173,11 @@ var methods = {
    * @param {Object} req
    */
   removeUser: async function(req) {
-    let header = req.header('Authorization')
-    let userDetails = webToken.verify(header, process.env.JWT_SECRET)
+    let header = req.header('Authorisation')
+    let userDetails = jwt.verify(header, process.env.JWT_SECRET)
     try {
-      let found = await User.findOneAndDelete({ _id: userDetails['user_id'] })
+      let found = await User.findByIdAndDelete({ _id: userDetails['user_id'] })
+      console.log(found)
       return found['user_id']
     } catch (error) {
       return error
@@ -139,26 +188,30 @@ var methods = {
    * @param {Object} req.body
    */
   login: async function(helpers, params, res) {
-    const user = await User.findOneAndUpdate(
-      { email: params.email },
-      { is_online: true }
-    )
-    if (!user) {
-      helpers.createError(res, {
-        message: 'Email or password are incorrect please, try again'
-      })
-    } else {
-      const isPasswordCorrect = await helpers.DatabaseMethods.compareHash(
-        params.password,
-        user.password
+    if (params.email && params.password) {
+      const user = await User.findOneAndUpdate(
+        { email: params.email },
+        { is_online: true }
       )
-      if (isPasswordCorrect) {
-        return user
-      } else {
-        helpers.createError(res, {
-          message: 'Error when loggin in please try again.'
+      if (!user) {
+        helpers.error(res, {
+          message: 'Email or password are incorrect please, try again'
         })
+      } else {
+        const isPasswordCorrect = await helpers.db.compareHash(
+          params.password,
+          user.password
+        )
+        if (isPasswordCorrect) {
+          return user
+        } else {
+          helpers.error(res, {
+            message: 'Error when loggin in please try again.'
+          })
+        }
       }
+    } else {
+      helpers.error(res, { message: 'Please provide an email or password' })
     }
   },
   /**
@@ -168,36 +221,42 @@ var methods = {
    * @param {Object} res
    */
   register: async function(helpers, req, res) {
-    let params = req.body
-    const validation = helpers.DatabaseMethods.validate(params, 'register')
-    let hashedPassword = await helpers.DatabaseMethods.genHash(params.password)
+    // Check if already authenticated
+    if (!req.header('Authorisation')) {
+      let params = req.body
+      const validation = helpers.db.validate(params, 'register')
+      let hashedPassword = await helpers.db.genHash(params.password)
 
-    if (validation) {
-      const user = new User({
-        name: params.name,
-        email: params.email,
-        employee_type: params.employeeType,
-        is_admin: params.is_admin,
-        password: hashedPassword
-      })
-
-      const isEmailPresent = await User.findOne({ email: params.email })
-      if (isEmailPresent != null) {
-        console.log('Wow')
-        helpers.createError(res, {
-          message: 'Email already exists, please try again'
+      if (validation) {
+        const user = new User({
+          name: params.name,
+          email: params.email,
+          employee_type: params.employeeType,
+          is_admin: params.is_admin,
+          password: hashedPassword,
+          is_online: true
         })
-      } else {
-        try {
-          const savedUser = await user.save()
-          return savedUser
-        } catch (error) {
-          // res.send(error)
-          return error
+
+        const isEmailPresent = await User.findOne({ email: params.email })
+        if (isEmailPresent != null) {
+          helpers.error(res, {
+            message: 'Email already exists, please try again'
+          })
+        } else {
+          try {
+            const savedUser = await user.save()
+            return savedUser
+          } catch (error) {
+            return error
+          }
         }
+      } else {
+        return validation
       }
     } else {
-      return validation
+      helpers.error(res, {
+        message: 'Already in session, please return to dashboard'
+      })
     }
   }
 }
