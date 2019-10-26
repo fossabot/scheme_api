@@ -1,13 +1,22 @@
+// Mailer
+const nodeMailer = require('nodemailer')
+const jwt = require('jsonwebtoken')
+// Models
+const Request = require('../models/Request')
+const User = require('./../models/User')
+
 // Validation
 const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt')
+
 // Moment
 const moment = require('moment-timezone')
 const format = 'YYYY-MM-DD HH:mm'
 const timezone = 'Europe/London'
 const now = moment.tz(timezone)
+
 module.exports = () => {
-  function createError(res, err) {
+  function error(res, err) {
     res
       .json({
         success: false,
@@ -16,7 +25,154 @@ module.exports = () => {
       })
       .end()
   }
-  let DatabaseMethods = {
+  function success(res, obj) {
+    res
+      .json({
+        success: true,
+        message: obj['message']
+      })
+      .end()
+  }
+
+  let admin = {
+    /**
+     * Creates a notification and will send it to the adminss email address
+     * @param {*} req
+     * @param {*} config
+     */
+    createRequest: async function(req, res, config) {
+      let header = req.header('Authorisation')
+      let currentUser = jwt.decode(header, process.env.JWT_SECRET)
+      console.log(currentUser, config)
+      let defaultAdminEmail = process.env.DOCK_EMAIL_USERNAME
+      if (
+        Object.keys(config).length > 0 &&
+        currentUser['user_employee_type'] != 1
+      ) {
+        // config = {
+        //   from:"",
+        //   to:"",
+        //   content:"",
+        //   shift_id:"",
+        //   request_type:"",
+        // }
+
+        // Create request to database from one user to another user with different reasons
+        // Pickup shift, remove shift, add shift, create holiday
+        // Set default Email account for admin to be CCD
+
+        //Check that the request with the shift ID doesnt already exist in DB
+        let isDuplicateRequest = await Request.findOne({
+          shift_id: req.header('shift_id')
+        })
+        console.warn(isDuplicateRequest)
+        let admin = await User.findOne({ employee_type: 1 })
+
+        if (isDuplicateRequest) {
+          // Create erorr
+          error(res, {
+            message: 'This request already exists, please create another one'
+          })
+        } else {
+          // Sends an email to the admin with the params that they want to change NO DB Operations
+
+          let emailConfig = {
+            from: defaultAdminEmail,
+            to: currentUser['user_email'],
+            text: 'Testing'
+          }
+          let sentEmail = await this.sendEmail(emailConfig)
+          if (sentEmail['response']) {
+            // Create request in DB
+            let requestObj = new Request({
+              is_approved: {
+                admin: 0,
+                employee: 1
+              },
+              request_type: config['request_type'],
+              participants: {
+                employee: currentUser['user_id'],
+                admin: admin['_id']
+              },
+              shift_id: req.body.shift_id
+            })
+            try {
+              let res = await requestObj.save()
+              return res
+            } catch (error) {
+              return error
+            }
+          }
+        }
+      } else if (currentUser['user_employee_type'] == 1) {
+        let isDuplicateRequest = await Request.findOne({
+          shift_id: req.body.shift_id
+        })
+        if (!isDuplicateRequest) {
+          let emailConfig = {
+            from: defaultAdminEmail,
+            to: currentUser['user_email'],
+            text: 'Testing'
+          }
+          await this.sendEmail(emailConfig)
+          let requestObj = new Request({
+            is_approved: {
+              admin: 1,
+              employee: 1
+            },
+            shift_id: req.body.shift_id,
+            request_type: config['request_type'],
+            participants: {
+              employee: currentUser['user_id'],
+              admin: admin['_id']
+            }
+          })
+          try {
+            let res = await requestObj.save()
+            return res
+          } catch (error) {
+            return error
+          }
+        } else {
+          error(res, { message: 'Request already exists' })
+        }
+      } else {
+        error(res, {
+          message: 'No config detected please try again later.'
+        })
+      }
+    },
+    /**
+     * Sends an email to the desired user
+     * @param {Object} req
+     * @param {*} res
+     * @param {*} emailContent
+     */
+    sendEmail: function(emailContent) {
+      return new Promise((resolve, reject) => {
+        nodeMailer.createTestAccount((err, account) => {
+          let transporter = nodeMailer.createTransport({
+            host: 'smtp.googlemail.com', // Gmail Host
+            port: 465, // Port
+            secure: true, // this is true as port is 465
+            auth: {
+              user: process.env.DOCK_EMAIL_USERNAME, //Gmail username
+              pass: process.env.DOCK_EMAIL_PASSWORD // Gmail password
+            }
+          })
+
+          transporter.sendMail(emailContent, (err, info) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(info)
+            }
+          })
+        })
+      })
+    }
+  }
+  let db = {
     /**
      *
      * @param {String} string
@@ -95,7 +251,7 @@ module.exports = () => {
       }
     }
   }
-  let DateMethods = {
+  let date = {
     format: function(date, _format) {
       let configFormat = _format ? _format : format
       return moment(date, format, timezone).format(configFormat)
@@ -130,8 +286,10 @@ module.exports = () => {
   }
 
   return {
-    createError: createError,
-    DateMethods: DateMethods,
-    DatabaseMethods: DatabaseMethods
+    error: error,
+    date: date,
+    db: db,
+    success: success,
+    admin: admin
   }
 }

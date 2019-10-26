@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
  * @param {Object} res
  */
 const isRouteAllowed = (req, res, next) => {
-  const token = req.header('Authorization')
+  const token = req.header('Authorisation')
   if (!token) {
     res.json({ message: 'No token detected' })
   } else {

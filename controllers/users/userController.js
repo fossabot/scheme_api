@@ -8,7 +8,7 @@ module.exports = (fs, helpers, passport) => {
    */
   const login = (req, res) => {
     let params = req.body
-    methods.login(helpers, params).then(user => {
+    methods.login(helpers, params, res).then(user => {
       const token = webToken.sign(
         {
           user_id: user._id,
@@ -18,9 +18,20 @@ module.exports = (fs, helpers, passport) => {
         },
         process.env.JWT_SECRET
       )
-      res.header('Authorization', token).json({
+      res.header('Authorisation', token).json({
         Authorisation: token
       })
+    })
+  }
+
+  /**
+   * Signs out the current user
+   * @param {*} req
+   * @param {*} res
+   */
+  const signOut = (req, res) => {
+    methods.signOut(req, res, helpers).then(user => {
+      res.json(user)
     })
   }
 
@@ -52,6 +63,7 @@ module.exports = (fs, helpers, passport) => {
       })
     })
   }
+
   const updateUser = (req, res) => {
     methods.updateUser(req, res).then(response => {
       res.json(response)
@@ -68,11 +80,26 @@ module.exports = (fs, helpers, passport) => {
     register: register,
     getUserInfo: getUserInfo,
     updateUser: updateUser,
-    removeUser: removeUser
+    removeUser: removeUser,
+    signOut: signOut
   }
 }
 
 var methods = {
+  // /**
+  //  * Sign out the current session and delete their token
+  //  * @param {*} req
+  //  * @param {*} res
+  //  * @param {*} helpers
+  //  */
+  // signOut:function(req,res,helpers){
+  //   let decode = webToken.verify(req.headers("Authorization"),process.env.JWT_SECRET);
+  //   let found = await User.findOne(decode["user_id"]);
+  //   if(found){
+  //     webToken.
+  //   }
+
+  // },
   /**
    *
    * @param {Object} req
@@ -111,11 +138,14 @@ var methods = {
    * Login user
    * @param {Object} req.body
    */
-  login: async function(helpers, params) {
-    const user = await User.findOne({ email: params.email })
+  login: async function(helpers, params, res) {
+    const user = await User.findOneAndUpdate(
+      { email: params.email },
+      { is_online: true }
+    )
     if (!user) {
-      return helpers.createError({
-        message: 'Email or password is incorrect, please try again.'
+      helpers.createError(res, {
+        message: 'Email or password are incorrect please, try again'
       })
     } else {
       const isPasswordCorrect = await helpers.DatabaseMethods.compareHash(
@@ -125,8 +155,8 @@ var methods = {
       if (isPasswordCorrect) {
         return user
       } else {
-        return helpers.createError({
-          message: 'Email or password is incorrect, please try again.'
+        helpers.createError(res, {
+          message: 'Error when loggin in please try again.'
         })
       }
     }

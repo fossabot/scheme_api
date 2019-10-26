@@ -14,6 +14,9 @@ const shiftRoutes = (app, fs, helpers) => {
   app.get('/api/shifts/:id', verifyToken, (req, res) => {
     shiftCtrl.getShiftDetails(req, res)
   })
+  app.post('/api/shifts/update', verifyToken, (req, res) => {
+    shiftCtrl.updateShift(req, res)
+  })
 }
 
 module.exports = shiftRoutes

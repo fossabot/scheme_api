@@ -1,38 +1,94 @@
 const shiftData = require('./../../db/shifts')
 const Shift = require('./../../models/Shift')
 const jwt = require('jsonwebtoken')
+const Request = require('./../../models/Request')
+const nodeMailer = require('nodemailer')
+
 module.exports = (fs, helpers) => {
+  /**
+   * Create shift
+   * @param {*} req
+   * @param {*} res
+   */
   const createShift = (req, res) => {
     methods.createShift(helpers, req, res).then(response => {
       res.json(response)
     })
   }
+  /**
+   * Get all shifts
+   * @param {*} req
+   * @param {*} res
+   */
   const getAllShifts = (req, res) => {
     res.json({
       shifts: methods.getShifts(helpers),
       type: 'success'
     })
   }
+  /**
+   * Get details of shift
+   * @param {} req
+   * @param {*} res
+   */
   const getShiftDetails = (req, res) => {
     if (req.body.userID && req.body.shiftID) {
       shiftData.shifts.map(shift => {
         req.body.userID
       })
     } else {
-      helpers.createError(res, { message: 'No user ID found' })
+      helpers.error(res, { message: 'No user ID found' })
     }
+  }
+  /**
+   * Update shift
+   * @param {*} req
+   * @param {*} res
+   */
+  const updateShift = (req, res) => {
+    methods
+      .update(req, res, helpers)
+      .then(response => {
+        res.json(response)
+      })
+      .catch(error => {
+        helpers.error(res, error)
+      })
   }
 
   return {
     getAllShifts: getAllShifts,
     getShiftDetails: getShiftDetails,
-    createShift: createShift
+    createShift: createShift,
+    updateShift: updateShift
   }
 }
 
 let methods = {
+  /**
+   *
+   * @param {Object} req
+   * @param {Object} res
+   * @param {Object} helpers
+   */
+  update: async function(req, res, helpers) {
+    if (req.body.shift_id) {
+      try {
+        let response = await helpers.admin.createRequest(req, res, {
+          shift_type: 2
+        })
+        console.log(response)
+      } catch (error) {
+        return error
+      }
+    } else {
+      helpers.error(res, {
+        message: 'No shift ID detected plase enter it and try again.'
+      })
+    }
+  },
   getShifts: function(helpers) {
-    let dateMethods = helpers.DateMethods
+    let dateMethods = helpers.date
     let shiftsObj = {
       holidays: {
         today: [],
@@ -187,16 +243,16 @@ let methods = {
     }
 
     if (!params.start_datetime || !params.end_datetime) {
-      helpers.createError(res, { message: 'Please enter a date or time' })
+      helpers.error(res, { message: 'Please enter a date or time' })
     }
     // Date formatting
-    let _startDate = helpers.DateMethods.toISO(params.start_datetime)
-    let _endDate = helpers.DateMethods.toISO(params.end_datetime)
-    let isAfterToday = helpers.DateMethods.isFuture(_startDate)
+    let _startDate = helpers.date.toISO(params.start_datetime)
+    let _endDate = helpers.date.toISO(params.end_datetime)
+    let isAfterToday = helpers.date.isFuture(_startDate)
     console.log(isAfterToday)
     // Checking whether it's after today or not
     if (!isAfterToday) {
-      helpers.createError(res, {
+      helpers.error(res, {
         message:
           'You cannot start a shift before today, please enter another date time'
       })
@@ -223,13 +279,13 @@ let methods = {
           const savedShift = await shift.save()
           return savedShift
         } else {
-          helpers.createError(res, {
+          helpers.error(res, {
             message:
               'Shift already exists, please enter a different date or time'
           })
         }
       } catch (error) {
-        helpers.createError(res, error)
+        helpers.error(res, error)
         return error
       }
     }

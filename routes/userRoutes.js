@@ -17,5 +17,8 @@ const userRoutes = (app, fs, helpers) => {
   app.post('/api/users/update', verifyToken, (req, res) => {
     userCtrl.updateUser(req, res)
   })
+  app.get('/api/users/signout', verifyToken, (req, res) => {
+    userCtrl.signOut(req, res)
+  })
 }
 module.exports = userRoutes
