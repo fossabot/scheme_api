@@ -1,6 +1,6 @@
 const Shift = require('./../../models/Shift')
 const jwt = require('jsonwebtoken')
-const Request = require('./../../models/Request')
+// const Request = require('./../../models/Request')
 
 module.exports = (fs, helpers) => {
   /**

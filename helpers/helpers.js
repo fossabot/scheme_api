@@ -1,6 +1,9 @@
 // Mailer
 const nodeMailer = require('nodemailer')
+
+// Tokens
 const jwt = require('jsonwebtoken')
+
 // Models
 const Request = require('../models/Request')
 const User = require('./../models/User')
@@ -97,7 +100,7 @@ module.exports = () => {
 
         //Check that the request with the shift ID doesnt already exist in DB
         let isDuplicateRequest = await Request.findOne({
-          shift_id: req.header('shift_id')
+          shift_id: req.body.shift_id
         })
 
         if (isDuplicateRequest) {
@@ -105,6 +108,7 @@ module.exports = () => {
           error(res, {
             message: 'This request already exists, please create another one'
           })
+          return
         } else {
           // Sends an email to the admin with the params that they want to change NO DB Operations
           let sentEmail = await sendEmail(emailConfig)

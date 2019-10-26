@@ -10,7 +10,7 @@ module.exports = (fs, helpers, passport) => {
   const login = (req, res) => {
     let params = req.body
     methods
-      .login(helpers, params, res)
+      .login(helpers, params)
       .then(user => {
         const token = jwt.sign(
           {
@@ -28,7 +28,7 @@ module.exports = (fs, helpers, passport) => {
         })
       })
       .catch(err => {
-        return err
+        helpers.error(res, err)
       })
   }
 
@@ -201,32 +201,29 @@ var methods = {
    * Login user
    * @param {Object} req.body
    */
-  login: async function(helpers, params, res) {
+  login: async function(helpers, params) {
     if (params.email && params.password) {
       const user = await User.findOneAndUpdate(
         { email: params.email },
         { is_online: true }
       )
       if (!user) {
-        helpers.error(res, {
-          message: 'Email or password are incorrect please, try again'
-        })
-        return Promise.reject(false)
+        return Promise.reject(
+          'Email or password are incorrect please, try again'
+        )
       } else {
         const isPasswordCorrect = await helpers.db.compareHash(
           params.password,
           user.password
         )
         if (isPasswordCorrect) {
-          return user
+          return Promise.resolve(user)
         } else {
-          helpers.error(res, {
-            message: 'Error when loggin in please try again.'
-          })
+          return Promise.reject('Error when loggin in please try again.')
         }
       }
     } else {
-      helpers.error(res, { message: 'Please provide an email or password' })
+      return Promise.reject('Please provide an email or password')
     }
   },
   /**
