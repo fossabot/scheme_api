@@ -1,8 +1,24 @@
 const Shift = require('./../../models/Shift')
 const jwt = require('jsonwebtoken')
+const Request = require('./../../models/Request')
 // const Request = require('./../../models/Request')
 
 module.exports = (fs, helpers) => {
+  /**
+   * Retures all the requests
+   * @param {*} req
+   * @param {*} res
+   */
+  const allRequests = (req, res) => {
+    methods
+      .returnAllRequests(req, helpers)
+      .then(response => {
+        helpers.success(res, { extras: response })
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
+  }
   /**
    * Admins side of apporving a shift
    * Need the following:{
@@ -47,7 +63,7 @@ module.exports = (fs, helpers) => {
    */
   const getAllShifts = (req, res) => {
     methods
-      .getShifts()
+      .getShifts(req, 'all')
       .then(response => {
         helpers.success(res, { extras: response })
       })
@@ -92,11 +108,52 @@ module.exports = (fs, helpers) => {
     createShift: createShift,
     updateShift: updateShift,
     removeShift: removeShift,
-    approveShift: approveShift
+    approveShift: approveShift,
+    allRequests: allRequests
   }
 }
 
 let methods = {
+  /**
+   * Return all requests that have a matching user ID
+   * @param {*} req
+   * @param {*} helpers
+   */
+  returnAllRequests: async function(req, helpers) {
+    let user = helpers.admin.decode(
+      req.header('Authorisation'),
+      process.env.JWT_SECRET
+    )
+
+    // Checks that user is an admin
+    let isUserAdmin = helpers.get.isUserAdmin(user)
+    console.log(user['user_id'])
+
+    let foundRequests = await Request.find({})
+    let personalRequests = []
+
+    if (!isUserAdmin) {
+      // Return requests that are the user ID;
+      let userID = user['user_id']
+      foundRequests.map(request => {
+        if (request['participants']['employee'] == userID) {
+          personalRequests.push(request)
+        }
+      })
+      if (personalRequests.length > 0) {
+        return Promise.resolve(personalRequests)
+      } else {
+        return Promise.reject('No request so far')
+      }
+    } else {
+      return Promise.resolve(foundRequests)
+    }
+  },
+  /**
+   *
+   * @param {*} req
+   * @param {*} res
+   */
   approve: async function(req, res) {
     // Are you an admin ?
     let headers = req.header('Authorisation')
@@ -194,16 +251,29 @@ let methods = {
    * @param {*} res
    * @param {*} helpers
    */
-  getShifts: async function() {
+  getShifts: async function(req, params) {
     // Get all shifts
-    try {
-      let shifts = await Shift.find({})
-      if (shifts.length <= 0) {
-        return Promise.reject('No shifts found, please try again later')
+    if (params == 'all') {
+      try {
+        let shifts = await Shift.find({})
+        if (shifts.length <= 0) {
+          return Promise.reject('No shifts found, please try again later')
+        }
+        return Promise.resolve(shifts)
+      } catch (error) {
+        return Promise.reject(error)
       }
-      return Promise.resolve(shifts)
-    } catch (error) {
-      return Promise.reject(error)
+    } else {
+      let headers = req.header('Authorisation')
+      let token = jwt.decode(headers, process.env.JWT_SECRET)
+      try {
+        let shifts = await Shift.find({ key: token.user_id })
+        return Promise.resolve(shifts)
+      } catch (error) {
+        return Promise.reject(
+          'Failed to retrieve shifts, please try again later'
+        )
+      }
     }
   },
 

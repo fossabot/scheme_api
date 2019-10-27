@@ -20,6 +20,9 @@ const shiftRoutes = (app, fs, helpers) => {
   app.post('/api/shifts/approve', verifyToken, (req, res) => {
     shiftCtrl.approveShift(req, res)
   })
+  app.get('/api/shifts/requests/all', verifyToken, (req, res) => {
+    shiftCtrl.allRequests(req, res)
+  })
 }
 
 module.exports = shiftRoutes

@@ -20,5 +20,11 @@ const userRoutes = (app, fs, helpers) => {
   app.get('/api/users/logout', verifyToken, (req, res) => {
     userCtrl.logOut(req, res)
   })
+  app.get('/api/users/all', verifyToken, (req, res) => {
+    userCtrl.getUsers(req, res)
+  })
+  app.get('/api/users/one', verifyToken, (req, res) => {
+    userCtrl.getUser(req, res)
+  })
 }
 module.exports = userRoutes

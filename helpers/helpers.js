@@ -32,12 +32,25 @@ module.exports = () => {
     res
       .json({
         success: true,
-        obj
+        ...obj
       })
       .end()
   }
 
+  let getters = {
+    isUserAdmin: function(user) {
+      return user['user_employee_type'] == 1
+    }
+  }
   let admin = {
+    /**
+     * decode authorisation header and return the contents;
+     * @param {*} token
+     * @param {*} secret
+     */
+    decode: function(token, secret) {
+      return jwt.decode(token, secret)
+    },
     /**
      * Creates a notification and will send it to the adminss email address
      * @param {*} req
@@ -93,10 +106,6 @@ module.exports = () => {
          * end_datetime,
          * }
          */
-
-        // Create request to database from one user to another user with different reasons
-        // Pickup shift, remove shift, add shift, create holiday
-        // Set default Email account for admin to be CCD
 
         //Check that the request with the shift ID doesnt already exist in DB
         let isDuplicateRequest = await Request.findOne({
@@ -316,6 +325,12 @@ module.exports = () => {
     },
     toISO: function(date, _format) {
       return moment(date, 'YYYY-MM-DD HH:mm', timezone).toISOString()
+    },
+    timeAgo: function(date) {
+      return moment(date).fromNow()
+    },
+    calendar: function(date) {
+      return moment(date).calendar()
     }
   }
 
@@ -324,6 +339,7 @@ module.exports = () => {
     date: date,
     db: db,
     success: success,
-    admin: admin
+    admin: admin,
+    get: getters
   }
 }

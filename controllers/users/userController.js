@@ -3,6 +3,40 @@ const jwt = require('jsonwebtoken')
 const Shift = require('./../../models/Shift')
 module.exports = (fs, helpers, passport) => {
   /**
+   * Returns the details of one user
+   * @param {*} req
+   * @param {*} res
+   */
+  const getUser = (req, res) => {
+    methods
+      .getOneUser(req, helpers)
+      .then(response => {
+        helpers.success(res, { extras: response })
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
+  }
+  /**
+   * Returns the online users
+   * @param {*} req
+   * @param {*} res
+   */
+  const getUsers = (req, res) => {
+    methods
+      .users(helpers)
+      .then(response => {
+        helpers.success(res, {
+          message: response['message'],
+          extras: response['users']
+        })
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
+  }
+
+  /**
    *
    * @param {*} req
    * @param {*} res
@@ -24,11 +58,17 @@ module.exports = (fs, helpers, passport) => {
         res.header('Authorisation', token)
         helpers.success(res, {
           message: 'Successfully logged in',
-          extras: token
+          extras: {
+            token: token,
+            user_id: user._id,
+            user_email: user.email,
+            user_employee_type: user.employee_type,
+            user_name: user.name
+          }
         })
       })
       .catch(err => {
-        helpers.error(res, err)
+        helpers.error(res, { message: err })
       })
   }
 
@@ -123,11 +163,56 @@ module.exports = (fs, helpers, passport) => {
     getUserInfo: getUserInfo,
     updateUser: updateUser,
     removeUser: removeUser,
-    logOut: logOut
+    logOut: logOut,
+    getUsers: getUsers,
+    getUser: getUser
   }
 }
 
 var methods = {
+  /**
+   * Returns one user based on ID
+   * @param {*} req
+   * @param {*} helpers
+   */
+  getOneUser: async function(req, helpers) {
+    let params = req.body
+    if (params.user_id) {
+      let foundUser = await User.findOne({ _id: params.user_id })
+      delete foundUser['password']
+      delete foundUser['registered_date']
+      return Promise.resolve(foundUser)
+    } else {
+      return Promise.reject(
+        'No user ID found, please select a user to get their details'
+      )
+    }
+  },
+  /**
+   * Returns all users
+   */
+  users: async function(helpers) {
+    try {
+      let users = await User.find({})
+      let newUsers = []
+      if (users.length > 0) {
+        for (let i = 0, len = users.length; i < len; i++) {
+          let user = users[i]
+          delete user['password']
+          delete user['registered_date']
+          newUsers.push(user)
+        }
+        return Promise.resolve({
+          message: 'Users successfully found',
+          users: newUsers
+        })
+      } else {
+        return Promise.reject('No users found, please try again later')
+      }
+    } catch (error) {
+      return Promise.reject(error['message'])
+    }
+  },
   /**
   //  * Sign out the current session and delete their token and remove that they are online
   //  * @param {*} req
