@@ -50,7 +50,7 @@ module.exports = (fs, helpers) => {
     methods
       .createShift(helpers, req, res)
       .then(response => {
-        helpers.success(res, response)
+        helpers.success(res, { extras: response })
       })
       .catch(err => {
         helpers.error(res, { message: err })
@@ -127,7 +127,6 @@ let methods = {
 
     // Checks that user is an admin
     let isUserAdmin = helpers.get.isUserAdmin(user)
-    console.log(user['user_id'])
 
     let foundRequests = await Request.find({})
     let personalRequests = []
@@ -304,71 +303,104 @@ let methods = {
    * @param {*} res
    */
   createShift: async function(helpers, req, res) {
-    let params = req.body
-    let headers = req.header('Authorisation')
-    let isValid = helpers.db.validate(params, 'create_shift')
-    let decode = jwt.decode(headers, process.env.JWT_SECRET)
-
-    // Logic for determining the type of shift
-    if (
-      decode['user_employee_type'] == 2 ||
-      decode['user_employee_type'] == 1
-    ) {
-      shiftType = 1
-    } else if (decode['user_employee_type'] == 3) {
-      shiftType = 2
-    } else if (params.shift_type) {
-      shiftType = 3
-    }
-
-    if (!params.start_datetime || !params.end_datetime) {
-      return Promise.reject("'Please enter a date or time'")
-    }
-
-    // Date formatting
-    let _startDate = helpers.date.toISO(params.start_datetime)
-    let _endDate = helpers.date.toISO(params.end_datetime)
-    let isAfterToday = helpers.date.isFuture(_startDate)
-
-    // Checking whether it's after today or not
-    if (!isAfterToday) {
-      return Promise.reject(
-        'You cannot start a shift before today, please enter another date time'
+    try {
+      let params = req.body
+      let headers = req.header('Authorisation')
+      let decode = jwt.decode(headers, process.env.JWT_SECRET)
+      let isAfterToday = helpers.date.isFuture(
+        params.start_datetime,
+        true,
+        null
       )
-    }
-    // Validating the params
+      // Logic for determining the type of shift
+      if (
+        decode['user_employee_type'] == 2 ||
+        decode['user_employee_type'] == 1
+      ) {
+        shiftType = 1
+      } else if (decode['user_employee_type'] == 3) {
+        shiftType = 2
+      } else if (params.shift_type) {
+        shiftType = 3
+      }
 
-    if (isValid) {
+      if (!params.start_datetime || !params.end_datetime) {
+        return Promise.reject("'Please enter a date or time'")
+      }
+      //Check start date is after end date
+
+      // let isEndTimeBeforeStartTime = helpers.date.isFuture(
+      //   params.end_datetime,
+      //   false,
+      //   params.start_datetime
+      // )
+      // if (!isEndTimeBeforeStartTime) {
+      //   return Promise.reject(
+      //     'Start time cannot be after end time, please change the times'
+      //   )
+      // }
+
+      // // Checking whether it's after today or not
+      // if (!isAfterToday) {
+      //   return Promise.reject(
+      //     'You cannot start a shift before today, please enter another date time'
+      //   )
+      // }
+
+      // Validating the params
       let shift = new Shift({
         key: decode['user_id'],
         employee_type: decode['user_employee_type'],
-        start_datetime: _startDate ? _startDate : params.start_datetime,
-        end_datetime: _endDate ? _endDate : params.end_datetime,
-        shift_type: shiftType
+        start_datetime: params.start_datetime,
+        end_datetime: params.end_datetime,
+        shift_type: shiftType,
+        flag: params.flag
       })
-      try {
-        // Check that the shift doesn't already exist with the datetime
 
-        const duplicateShift = await Shift.findOne({
-          start_datetime: _startDate,
-          key: decode['user_id'],
-          end_datetime: _endDate
-        })
+      // Check that the shift doesn't already exist with the datetime
+      const duplicateShift = await Shift.findOne({
+        start_datetime: params.start_datetime,
+        key: decode['user_id'],
+        end_datetime: params.end_datetime
+      })
 
-        if (!duplicateShift) {
-          // Saves shift (but the admin can only do that)
-          const savedShift = await shift.save()
-          // Send request for shift to admin
-          let request = await helpers.admin.createRequest(req, res, {
-            shift_type: params.shift_type
-          })
-          return Promise.resolve('Shift request successfully sent to admin')
+      if (!duplicateShift) {
+        const savedShift = await shift.save()
+        if (savedShift) {
+          // Config for requests
+          let config = {
+            shift_type: params.shift_type,
+            shift_id: savedShift['_id']
+          }
+          let requestType = config['request_type']
+          if (params.flag == 'new ') {
+            requestType = 1
+          } else if (params.flag == 'editted_shift') {
+            requestType = 2
+          } else if (params.flag == 'new holiday') {
+            requestType = 3
+          } else {
+            requestType = 4
+          }
+
+          let request = await helpers.admin.createRequest(req, res, config)
+          if (request) {
+            return Promise.resolve(request)
+          }
         } else {
-          return Promise.reject('Shift already exists')
+          return Promise.reject(
+            'Error either during creating the request or shift'
+          )
         }
-      } catch (error) {
-        return Promise.reject(err.message)
+        // Saves shift (but the admin can only do that)
+
+        // Send request for shift to admin
+      } else {
+        return Promise.reject('Shift already exists')
       }
+    } catch (error) {
+      console.log(error)
+      return Promise.reject(error)
     }
   }
 }

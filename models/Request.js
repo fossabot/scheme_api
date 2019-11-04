@@ -16,7 +16,7 @@ let requestObj = new mongoose.Schema({
       employee: 0
     }
   },
-  // 1 shift 0 holiday
+  // 1 creating new shift 2 Editting shift 3 holiday 4 editting holiday
   request_type: {
     type: String,
     default: 1

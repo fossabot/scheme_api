@@ -16,7 +16,7 @@ const bcrypt = require('bcrypt')
 const moment = require('moment-timezone')
 const format = 'YYYY-MM-DD HH:mm'
 const timezone = 'Europe/London'
-const now = moment.tz(timezone)
+const now = moment.tz(timezone).toISOString()
 
 module.exports = () => {
   function error(res, err) {
@@ -43,6 +43,7 @@ module.exports = () => {
     }
   }
   let admin = {
+    HTMLTemplate: function() {},
     /**
      * decode authorisation header and return the contents;
      * @param {*} token
@@ -61,10 +62,12 @@ module.exports = () => {
       let currentUser = jwt.decode(header, process.env.JWT_SECRET)
       // Change to the admins email once there is a valid one
       let defaultAdminEmail = process.env.DOCK_EMAIL_USERNAME
+      //Shift ID
+      let shiftID = req.body.shift_id ? req.body.shift_id : config['shift_id']
       let emailConfig = {
         from: currentUser['user_email'],
         to: defaultAdminEmail,
-        text: `Request about ${req.header('shift_id')}`
+        text: `Request about ${shiftID}`
       }
       let sendEmail = this.sendEmail
 
@@ -73,12 +76,12 @@ module.exports = () => {
         Object.keys(config).length > 0 &&
         currentUser['user_employee_type'] != 1
       ) {
-        let admin = await User.findOne({ employee_type: 1 })
+        let admin = await User.find({ employee_type: 1 })
 
         let sentEmail = await sendEmail(emailConfig)
-        if (sentEmail['response']) {
+        if (sentEmail['response'] && admin) {
           // Create request in DB
-          let requestObj = new Request({
+          let requestBody = {
             is_approved: {
               admin: 0,
               employee: 1
@@ -88,14 +91,18 @@ module.exports = () => {
               employee: currentUser['user_id'],
               admin: admin['_id']
             },
-            shift_id: req.body.shift_id
-          })
+            shift_id: shiftID
+          }
+
+          let requestObj = new Request(requestBody)
           try {
             let res = await requestObj.save()
             return res
           } catch (error) {
             return error
           }
+        } else {
+          console.log('error bad')
         }
 
         /**
@@ -109,7 +116,7 @@ module.exports = () => {
 
         //Check that the request with the shift ID doesnt already exist in DB
         let isDuplicateRequest = await Request.findOne({
-          shift_id: req.body.shift_id
+          shift_id: shiftID
         })
 
         if (isDuplicateRequest) {
@@ -133,7 +140,7 @@ module.exports = () => {
                 employee: currentUser['user_id'],
                 admin: admin['_id']
               },
-              shift_id: req.body.shift_id
+              shift_id: shiftID
             })
             try {
               let res = await requestObj.save()
@@ -146,7 +153,7 @@ module.exports = () => {
         //If they are an admin
       } else if (currentUser['user_employee_type'] == 1) {
         let isDuplicateRequest = await Request.findOne({
-          shift_id: req.body.shift_id
+          shift_id: shiftID
         })
 
         if (!isDuplicateRequest) {
@@ -307,9 +314,12 @@ module.exports = () => {
       let configFormat = _format ? _format : format
       return moment(date, configFormat, timezone).isBefore(now)
     },
-    isFuture: function(date, _format) {
-      let configFormat = _format ? _format : format
-      return moment(date, configFormat, timezone).isAfter(now)
+    isFuture: function(date, isNow, afterDate) {
+      if (isNow) {
+        return moment(date, timezone).isAfter(now)
+      } else {
+        return moment(date, timezone).isAfter(afterDate)
+      }
     },
     isThisWeek: function(date, _format) {
       let configFormat = _format ? _format : format

@@ -19,11 +19,11 @@ const shiftObj = new mongoose.Schema({
       user: 1
     }
   },
-  start_datetime: {
+  startDate: {
     type: Date,
     required: true
   },
-  end_datetime: {
+  endDate: {
     type: Date,
     required: true
   },
@@ -35,6 +35,10 @@ const shiftObj = new mongoose.Schema({
   is_pickup: {
     type: Boolean,
     default: false
+  },
+  flag: {
+    type: String,
+    required: true
   }
 })
 module.exports = mongoose.model('Shift', shiftObj)
