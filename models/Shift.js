@@ -8,10 +8,7 @@ const shiftObj = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  employee_type: {
-    type: Number,
-    required: true
-  },
+
   is_approved: {
     type: Object,
     default: {
@@ -36,9 +33,12 @@ const shiftObj = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  flag: {
-    type: String,
-    required: true
+  repeat_days: {
+    type: Object
+    // default: {
+    //   repeat_days: [1, 5],
+    //   reapeat_for: 1
+    // }
   }
 })
 module.exports = mongoose.model('Shift', shiftObj)

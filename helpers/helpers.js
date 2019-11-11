@@ -64,6 +64,7 @@ module.exports = () => {
       let defaultAdminEmail = process.env.DOCK_EMAIL_USERNAME
       //Shift ID
       let shiftID = req.body.shift_id ? req.body.shift_id : config['shift_id']
+
       let emailConfig = {
         from: currentUser['user_email'],
         to: defaultAdminEmail,
