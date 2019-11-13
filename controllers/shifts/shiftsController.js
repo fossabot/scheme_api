@@ -81,11 +81,7 @@ module.exports = (fs, helpers) => {
 }
 
 let methods = {
-  /**
-   * Return all requests that have a matching user ID
-   * @param {*} req
-   * @param {*} helpers
-   */
+ 
   returnAllRequests: async function(req, helpers) {
     try {
       let requests = await Request.find({})
@@ -96,11 +92,7 @@ let methods = {
       return Promise.reject(error)
     }
   },
-  /**
-   *
-   * @param {*} req
-   * @param {*} res
-   */
+
   approve: async function(req, res) {
     // Are you an admin ?
     let headers = req.header('Authorisation')
@@ -113,12 +105,7 @@ let methods = {
       )
     }
   },
-  /**
-   * Makes a shift avaliable for pickup
-   * @param {*} req
-   * @param {*} res
-   * @param {*} helpers
-   */
+
   remove: async function(req, res, helpers) {
     // Need shift ID
     let params = req.body
@@ -154,12 +141,7 @@ let methods = {
       )
     }
   },
-  /**
-   * Update a shift and create requests accordingly
-   * @param {Object} req
-   * @param {Object} res
-   * @param {Object} helpers
-   */
+ 
   update: async function(req, res, helpers) {
     if (req.body.shift_id) {
       let params = req.body
@@ -187,13 +169,7 @@ let methods = {
       )
     }
   },
-  /**
-   * Gets all shifts pushes them to an array
-   * Returns that array
-   * @param {*} req
-   * @param {*} res
-   * @param {*} helpers
-   */
+
   getShifts: async function(req, params) {
     // Get all shifts
     if (params == 'all') {
@@ -220,16 +196,7 @@ let methods = {
     }
   },
 
-  /**
-   * Makes shift not assigned to a user,
-   * replaces the key with null,
-   * Changes the pickup to true
-   * Changes the approved {user:0,admin:0}
-   * Sends notification to the admin to approve the drop
-   * @param {*} helpers
-   * @param {*} req
-   * @param {*} res
-   */
+
   dropShift: async function(helpers, req, res) {
     let params = req.body
     let headers = req.header('Authorization')
@@ -239,13 +206,7 @@ let methods = {
 
     let shift = Shift.findByIdAndUpdate(decode['user_id'])
   },
-  /**
-   * Creates a shift for the user
-   * Start time and end time
-   * @param {*} helpers
-   * @param {*} req
-   * @param {*} res
-   */
+
   createShift: async function(helpers, req, res) {
     try {
       let params = req.body
