@@ -202,6 +202,9 @@ module.exports = () => {
 
     sendEmail: function(emailContent) {
       return new Promise((resolve, reject) => {
+        if (!emailContent.to) {
+          emailContent.to = process.env.defaultAdminEmail
+        }
         nodeMailer.createTestAccount((err, account) => {
           let transporter = nodeMailer.createTransport({
             host: 'smtp.googlemail.com', // Gmail Host

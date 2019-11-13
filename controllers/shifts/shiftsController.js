@@ -2,6 +2,16 @@ const Shift = require('./../../models/Shift')
 const Request = require('./../../models/Request')
 
 module.exports = (fs, helpers) => {
+  const pickUpShift = (req, res) => {
+    methods
+      .pickupShift(req, helpers)
+      .then(response => {
+        helpers.success(res, { extras: response })
+      })
+      .catch(err => {
+        helpers.error(res, { message: err })
+      })
+  }
   const allRequests = (req, res) => {
     methods
       .returnAllRequests(req, helpers)
@@ -74,7 +84,8 @@ module.exports = (fs, helpers) => {
     updateShift: updateShift,
     removeShift: removeShift,
     approveShift: approveShift,
-    allRequests: allRequests
+    allRequests: allRequests,
+    pickUpShift: pickUpShift
   }
 }
 
@@ -102,21 +113,49 @@ let methods = {
       )
     }
   },
+  pickupShift: async function(req, res, helpers) {
+    let params = req.body
+    let shiftID = params.shift_id
+    let currentUser = helpers.admin.decode(req.header('Authorisation'))
+    let currentUserID = currentUser.user_id
+    let shiftType
+    employeeType = currentUser.user_employee_type
+    if (params.shift_type) {
+      shiftType = params.shift_type
+    }
+    shiftType = employeeType
 
+    // Get shift with that shift ID
+    try {
+      let updateShift = await Shift.findOneAndUpdate(
+        { _id: shiftID, shify_type: shiftType },
+        { key: currentUserID }
+      )
+      let emailConfig = {
+        from: currentUser.user_email,
+        text: `${currentUser.user_name} has picked up a shift`
+      }
+      let updateShiftRequest = await helpers.admin.sendEmail(emailConfig)
+      return Promise.resolve(updateShift)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
   remove: async function(req, res, helpers) {
     // Need shift ID
     let params = req.body
-    let currentUser = req.header('Authorisation')
+    let isAdmin = helpers.getters.isUserAdmin(currentUser)
+    let shiftID, shiftType
 
-    if (params.shift_id && params.shift_type) {
+    if (shiftID && shiftType) {
       // Is it your shift ?
 
-      if (isShiftYours || currentUser['user_employee_type'] == 1) {
+      if (isShiftYours || isAdmin) {
         // Send request to admin
         let response = await helpers.admin.createRequest(req, res, {
           shift_type: params.shift_type
         })
-      } else if (currentUser['user_employee_type'] == 1) {
+      } else if (isAdmin) {
         // If admin force pickup and send request
         let makePickup = await Shift.findByIdAndUpdate(
           { _id: params.shift_id },

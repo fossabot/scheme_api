@@ -10,7 +10,9 @@ const shiftRoutes = (app, fs, helpers) => {
   app.post('/api/shifts/create', verifyToken, (req, res) => {
     shiftCtrl.createShift(req, res)
   })
-
+  app.post('/api/shifts/pickup', verifyToken, (req, res) => {
+    shiftCtrl.pickUpShift(req, res)
+  })
   app.post('/api/shifts/update', verifyToken, (req, res) => {
     shiftCtrl.updateShift(req, res)
   })
