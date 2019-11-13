@@ -257,8 +257,8 @@ let methods = {
             shift_id: savedShift['_id'],
             currentUser: decode,
             dates: {
-              start: startDate,
-              end: endDate
+              start: helpers.date.format(startDate, 'DD MMMM HH:MM'),
+              end: helpers.date.format(endDate, 'DD MMMM HH:MM')
             }
           }
 
