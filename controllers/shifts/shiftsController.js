@@ -1,7 +1,5 @@
 const Shift = require('./../../models/Shift')
-const jwt = require('jsonwebtoken')
 const Request = require('./../../models/Request')
-// const Request = require('./../../models/Request')
 
 module.exports = (fs, helpers) => {
   const allRequests = (req, res) => {
@@ -81,7 +79,6 @@ module.exports = (fs, helpers) => {
 }
 
 let methods = {
- 
   returnAllRequests: async function(req, helpers) {
     try {
       let requests = await Request.find({})
@@ -141,7 +138,7 @@ let methods = {
       )
     }
   },
- 
+
   update: async function(req, res, helpers) {
     if (req.body.shift_id) {
       let params = req.body
@@ -184,7 +181,7 @@ let methods = {
       }
     } else {
       let headers = req.header('Authorisation')
-      let token = jwt.decode(headers, process.env.JWT_SECRET)
+      let token = helpers.admin.decode(headers)
       try {
         let shifts = await Shift.find({ key: token.user_id })
         return Promise.resolve(shifts)
@@ -196,11 +193,10 @@ let methods = {
     }
   },
 
-
   dropShift: async function(helpers, req, res) {
     let params = req.body
     let headers = req.header('Authorization')
-    let decode = jwt.decode(headers, process.env.JWT_SECRET)
+    let decode = helpers.admin.decode(headers)
 
     // Send request with
 
@@ -211,67 +207,66 @@ let methods = {
     try {
       let params = req.body
       let headers = req.header('Authorisation')
-      let decode = jwt.decode(headers, process.env.JWT_SECRET)
+      let decode = helpers.admin.decode(headers)
       let assignedTo = params.assigned_to
         ? params.assigned_to
         : decode['user_id']
       let repeatDays = params.repeat_days
+      let startDate = params.startDate
+      let endDate = params.endDate
+      let employeeType = decode.user_employee_type
+      let shiftType, flag
 
       // Logic for determining the type of shift
-      if (
-        decode['user_employee_type'] == 2 ||
-        decode['user_employee_type'] == 1
-      ) {
+      if (employeeType == 2 || employeeType == 1) {
         shiftType = 1
-      } else if (decode['user_employee_type'] == 3) {
+      } else if (employeeType == 3) {
         shiftType = 2
       } else if (params.shift_type) {
         shiftType = 3
       }
 
-      if (!params.startDate || !params.endDate) {
+      if (!startDate || !endDate) {
         return Promise.reject("'Please enter a date or time'")
       }
 
-      let shiftObj = {
+      let mongoShift = {
         key: assignedTo,
-        startDate: params.startDate,
-        endDate: params.endDate,
+        startDate: startDate,
+        endDate: endDate,
         shift_type: shiftType
       }
       if (repeatDays) {
-        shiftObj['repeat_days'] = repeatDays
+        mongoShift['repeat_days'] = repeatDays
       }
-      // Validating the params
-      let shift = new Shift(shiftObj)
+      let shift = new Shift(mongoShift)
 
       // Check that the shift doesn't already exist with the datetime
       const duplicateShift = await Shift.findOne({
-        startDate: params.startDate,
+        startDate: startDate,
         key: assignedTo,
-        endDate: params.endDate
+        endDate: endDate
       })
 
       if (!duplicateShift) {
         const savedShift = await shift.save()
         if (savedShift) {
           // Config for requests
-          let config = {
-            shift_type: shiftType,
-            shift_id: savedShift['_id']
-          }
-          let requestType = config['request_type']
-          if (params.flag == 'new ') {
-            requestType = 1
-          } else if (params.flag == 'editted_shift') {
-            requestType = 2
-          } else if (params.flag == 'new holiday') {
-            requestType = 3
-          } else {
-            requestType = 4
+          let requestConfig = {
+            request_type: shiftType,
+            shift_id: savedShift['_id'],
+            currentUser: decode,
+            dates: {
+              start: startDate,
+              end: endDate
+            }
           }
 
-          let request = await helpers.admin.createRequest(req, res, config)
+          let request = await helpers.admin.createRequest(
+            req,
+            res,
+            requestConfig
+          )
 
           if (request) {
             return Promise.resolve(request)
@@ -281,9 +276,6 @@ let methods = {
             'Error either during creating the request or shift'
           )
         }
-        // Saves shift (but the admin can only do that)
-
-        // Send request for shift to admin
       } else {
         return Promise.reject('Shift already exists')
       }
