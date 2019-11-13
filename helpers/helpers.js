@@ -50,7 +50,7 @@ module.exports = () => {
       let endDate = config.dates.end
 
       let requestString,
-        base = `${name} is`
+        base = `${name} is `
       dateString = `from ${startDate} to ${endDate}`
       switch (requestType) {
         case 1: {
