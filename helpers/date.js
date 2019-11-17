@@ -1,43 +1,37 @@
 // Moment
-const moment = require('moment-timezone')
-const format = 'YYYY-MM-DD HH:mm'
+const moment = require('moment')
+const format = 'D MMMM HH:MM'
 const timezone = 'Europe/London'
-const now = moment.tz(timezone).toISOString()
+const now = moment().toISOString()
 
 module.exports = {
   format: function(date, _format) {
     let configFormat = _format ? _format : format
-    return moment(date, format, timezone).format(configFormat)
+    return moment(date).format(configFormat)
   },
   isToday: function(date, _format) {
-    let configFormat = _format ? _format : format
-    return moment(date, configFormat, timezone).isSame(new Date(), 'day')
+    return moment(date).isSame(new Date(), 'day')
   },
   isPast: function(date, _format) {
-    let configFormat = _format ? _format : format
-    return moment(date, configFormat, timezone).isBefore(now)
+    return moment(date).isBefore(now)
   },
   isFuture: function(date, isNow, afterDate) {
     if (isNow) {
-      return moment(date, timezone).isAfter(now)
+      return moment(date).isAfter(now)
     } else {
-      return moment(date, timezone).isAfter(afterDate)
+      return moment(date).isAfter(afterDate)
     }
   },
   isThisWeek: function(date, _format) {
-    let configFormat = _format ? _format : format
-    return moment(date, configFormat, timezone).isBetween(
-      now.startOf('week'),
-      now.endOf('week')
-    )
+    return moment(date).isBetween(now.startOf('week'), now.endOf('week'))
   },
   compare: function(firstDate, secondDate, _format) {
     let configFormat = _format ? _format : format
     secondDate = moment(secondDate, configFormat, timezone)
-    return moment(firstDate, configFormat, timezone).isAfter(secondDate)
+    return moment(firstDate).isAfter(secondDate)
   },
   toISO: function(date, _format) {
-    return moment(date, 'YYYY-MM-DD HH:mm', timezone).toISOString()
+    return moment(date).toISOString()
   },
   timeAgo: function(date) {
     return moment(date).fromNow()

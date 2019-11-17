@@ -35,10 +35,12 @@ module.exports = {
     return requestString
   },
 
-  decode: function(token) {
+  decode(token) {
     return jwt.decode(token, process.env.JWT_SECRET)
   },
-
+  /**
+   * Sends email and request from employee to admin
+   */
   createRequest: async function(req, res, config) {
     let currentUser = config.currentUser
     let defaultAdminEmail = process.env.DOCK_EMAIL_USERNAME
@@ -146,11 +148,18 @@ module.exports = {
           }
         })
         try {
-          let res = await mongoRequestObj.save()
-          await this.sendEmail(emailConfig)
-          return res
+          let response = mongoRequestObj.save()
+          let sendEmail = this.sendEmail(emailConfig)
+
+          await Promise.all([response, sendEmail])
+            .then(response => {
+              return Promise.resolve(res, response)
+            })
+            .catch(err => {
+              return Promise.reject(res, response)
+            })
         } catch (error) {
-          return error
+          return Promise.reject(res, error)
         }
       } else {
         error(res, { message: 'Request already exists' })
@@ -162,29 +171,27 @@ module.exports = {
     }
   },
 
-  sendEmail: function(emailContent) {
-    return new Promise((resolve, reject) => {
-      if (!emailContent.to) {
-        emailContent.to = process.env.defaultAdminEmail
-      }
-      nodeMailer.createTestAccount((err, account) => {
-        let transporter = nodeMailer.createTransport({
-          host: 'smtp.googlemail.com', // Gmail Host
-          port: 465, // Port
-          secure: true, // this is true as port is 465
-          auth: {
-            user: process.env.DOCK_EMAIL_USERNAME, //Gmail username
-            pass: process.env.DOCK_EMAIL_PASSWORD // Gmail password
-          }
-        })
+  sendEmail: async function(emailContent) {
+    if (!emailContent.hasOwnProperty('to')) {
+      emailContent['to'] = process.env.DOCK_EMAIL_USERNAME
+    }
+    nodeMailer.createTestAccount((err, account) => {
+      let transporter = nodeMailer.createTransport({
+        host: 'smtp.googlemail.com', // Gmail Host
+        port: 465, // Port
+        secure: true, // this is true as port is 465
+        auth: {
+          user: process.env.DOCK_EMAIL_USERNAME, //Gmail username
+          pass: process.env.DOCK_EMAIL_PASSWORD // Gmail password
+        }
+      })
 
-        transporter.sendMail(emailContent, (err, info) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(info)
-          }
-        })
+      transporter.sendMail(emailContent, (err, info) => {
+        if (err) {
+          return Promise.reject(err)
+        } else {
+          return Promise.resolve('Email successfully sent')
+        }
       })
     })
   }

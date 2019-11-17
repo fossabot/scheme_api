@@ -1,9 +1,9 @@
 const userRoutes = require('./userRoutes')
 const shiftRoutes = require('./shiftRoutes')
 
-const appRouter = (app, fs, helpers) => {
-  userRoutes(app, fs, helpers)
-  shiftRoutes(app, fs, helpers)
+const appRouter = (app, helpers) => {
+  userRoutes(app, helpers)
+  shiftRoutes(app, helpers)
 }
 
 module.exports = appRouter

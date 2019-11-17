@@ -1,5 +1,5 @@
 module.exports = {
-  isUserAdmin: function(user) {
+  isUserAdmin(user) {
     return user['user_employee_type'] == 1
   }
 }

@@ -24,7 +24,7 @@ module.exports = {
     return isSame
   },
 
-  validate: function(toValidate, event) {
+  validate(toValidate, event) {
     let isError = false
 
     let validations = {

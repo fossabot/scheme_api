@@ -1,7 +1,7 @@
 const userController = require('../controllers/users/userController')
 const verifyToken = require('./../middlewares/verifyToken')
-const userRoutes = (app, fs, helpers) => {
-  let userCtrl = userController(fs, helpers)
+const userRoutes = (app, helpers) => {
+  let userCtrl = userController(helpers)
 
   app.post('/api/users/login', (req, res) => {
     userCtrl.login(req, res)

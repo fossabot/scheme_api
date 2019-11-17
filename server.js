@@ -1,12 +1,10 @@
 const express = require('express'),
   session = require('express-session'),
-  fs = require('fs'),
   bodyParser = require('body-parser'),
   compression = require('compression'),
   helpers = require('./helpers/helpers')(),
   dotenv = require('dotenv'),
   mongoose = require('mongoose'),
-  passport = require('passport'),
   cors = require('cors'),
   app = express()
 
@@ -31,13 +29,18 @@ app.use(
   })
 )
 
-const routes = require('./routes/router')(app, fs, helpers)
+const routes = require('./routes/router')(app, helpers)
 
 // DB Connect
 
 mongoose.connect(
   process.env.DB_CONNECT,
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: true,
+    useCreateIndex: true
+  },
   err => {
     !err ? console.log('Connected') : console.log(err)
   }
