@@ -3,31 +3,33 @@ const date = require('./date')
 const db = require('./db')
 const getters = require('./getters')
 
-module.exports = () => {
-  function error(res, err) {
+module.exports = {
+  error(res, err) {
+    let error
+    if (typeof err == 'object' && err.hasOwnProperty('message')) {
+      error = err
+    } else if (typeof err == 'string') {
+      error = { message: err }
+    }
+
+    console.log(err)
     res
       .json({
         success: false,
-        message: err['message'],
-        code: !err['code'] ? 101 : err['code']
+        error
       })
       .end()
-  }
-  function success(res, obj) {
+  },
+  success(res, obj) {
     res
       .json({
         success: true,
-        ...obj
+        obj
       })
       .end()
-  }
-
-  return {
-    error: error,
-    date: date,
-    db: db,
-    success: success,
-    admin: admin,
-    get: getters
-  }
+  },
+  admin,
+  date,
+  db,
+  getters
 }

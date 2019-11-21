@@ -9,7 +9,6 @@ const requestMethods = {
         { is_approved: { admin: 1 } }
       )
       if (foundShift) {
-        // Modify the requests to be multidirectional
         return Promise.resolve(foundShift)
       } else {
         return Promise.reject('Failed to update shift, please try again later.')
@@ -31,7 +30,7 @@ const requestMethods = {
 }
 
 module.exports = {
-  requestMethods,
+  ...requestMethods,
 
   pickupShift: async function(req, helpers) {
     let params = req.body
@@ -71,31 +70,19 @@ module.exports = {
     }
   },
 
-  update: async function(req, res, helpers) {
-    if (req.body.shift_id) {
-      let params = req.body
-      try {
-        let currentUser = req.header('Authorisation')
-
-        let isShiftYours = await Shift.findOne({
-          _id: params.shift_id,
-          key: currentUser['user_id']
-        })
-        if (isShiftYours || current['user_employee_type'] == 1) {
-          let response = await helpers.admin.createRequest(req, res, {
-            shift_type: 2
-          })
-          return Promise.resolve(response)
-        } else {
-          return Promise.reject("This shift doesn't belong to you")
-        }
-      } catch (error) {
-        return Promise.reject(error)
-      }
-    } else {
-      return Promise.reject(
-        'No shift ID detected plase enter it and try again.'
+  /**
+   * Update a shift with new object
+   */
+  update: async function(req) {
+    const shiftID = req.body.shift_id
+    const newShiftContent = req.body.shift_content
+    try {
+      const updatedShift = await Shift.updateOne(
+        { _id: shiftID },
+        { ...newShiftContent }
       )
+    } catch (error) {
+      return Promise.reject('Error when updating shift, please try again')
     }
   },
 
@@ -203,7 +190,6 @@ module.exports = {
       if (!duplicateShift) {
         const savedShift = await shift.save()
         if (savedShift) {
-          // Config for requests
           let requestConfig = {
             request_type: shiftType,
             shift_id: savedShift['_id'],

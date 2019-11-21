@@ -1,4 +1,17 @@
+const User = require('./../../models/User')
 module.exports = {
+  upgradePermissions: async function(req) {
+    const changedUserID = req.body.user_id
+    try {
+      const changeUser = await User.updateOne(
+        { _id: changedUserID },
+        { employee_type: 1 }
+      )
+      return Promise.resolve(changeUser)
+    } catch (error) {
+      return Promise.reject('Failed to update user, please try again')
+    }
+  },
   /**
    * Returns one user based on ID
    * @param {*} req
@@ -40,11 +53,11 @@ module.exports = {
     }
   },
   /**
-    //  * Sign out the current session and delete their token and remove that they are online
-    //  * @param {*} req
-    //  * @param {*} res
-    //  * @param {*} helpers
-    //  */
+    Sign out the current session and delete their token and remove that they are online
+    * @param {*} req
+    * @param {*} res
+    * @param {*} helpers
+  **/
   logOut: async function(req, res) {
     let authHeader = req.header('Authorisation')
     let currentUser = jwt.decode(authHeader, process.env.JWT_SECRET)
@@ -122,10 +135,18 @@ module.exports = {
           'Email or password are incorrect please, try again'
         )
       } else {
-        const isPasswordCorrect = await helpers.db.compareHash(
-          params.password,
-          user.password
-        )
+        // Check passwords
+        let isPasswordCorrect
+        if (user.password) {
+          isPasswordCorrect = await helpers.db.compareHash(
+            params.password,
+            user.password
+          )
+        } else {
+          return Promise.reject(
+            'Failed to get password please try again later.'
+          )
+        }
         if (isPasswordCorrect) {
           return Promise.resolve(user)
         } else {
@@ -161,24 +182,30 @@ module.exports = {
 
         const isEmailPresent = await User.findOne({ email: params.email })
         if (isEmailPresent != null) {
-          helpers.error(res, {
-            message: 'Email already exists, please try again'
-          })
+          return Promise.reject('Email already exists')
         } else {
           try {
             const savedUser = await user.save()
-            return savedUser
+            return Promise.resolve(savedUser)
           } catch (error) {
-            return error
+            return Promise.reject(error)
           }
         }
       } else {
         return validation
       }
     } else {
-      helpers.error(res, {
-        message: 'Already in session, please return to dashboard'
+      return Promise.reject('Already in session, please return to dashboard')
+    }
+  },
+  test: async function(helpers) {
+    try {
+      const response = helpers.db.query('findOne', User, {
+        find: { email: 'adenaikyomi@gmail.com' }
       })
+      return Promise.resolve(response)
+    } catch (error) {
+      return Promise.reject(error)
     }
   }
 }

@@ -1,12 +1,15 @@
-const express = require('express'),
-  session = require('express-session'),
-  bodyParser = require('body-parser'),
-  compression = require('compression'),
-  helpers = require('./helpers/helpers')(),
-  dotenv = require('dotenv'),
-  mongoose = require('mongoose'),
-  cors = require('cors'),
-  app = express()
+const express = require('express')
+const bodyParser = require('body-parser')
+const compression = require('compression')
+const dotenv = require('dotenv')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const app = express()
+
+const shiftRouter = require('./routes/shiftRouter')
+const userRouter = require('./routes/userRouter')
+const requestRouter = require('./routes/requestRouter')
+const verifyToken = require('./middlewares/verifyToken')
 
 // Env Vars
 dotenv.config()
@@ -17,19 +20,10 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 app.use(compression())
 
-app.use(
-  session({
-    secret: 'ssshhhhh',
-    saveUninitialized: true,
-    resave: true,
-    cookie: {
-      secure: true,
-      maxAge: 6000000000
-    }
-  })
-)
-
-const routes = require('./routes/router')(app, helpers)
+// Routing
+app.use('/api/users', userRouter)
+app.use('/api/shifts', verifyToken, shiftRouter)
+app.use('/api/requests', verifyToken, requestRouter)
 
 // DB Connect
 

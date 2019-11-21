@@ -1,88 +1,78 @@
 const methods = require('./shiftMethods')
-module.exports = helpers => {
-  const pickUpShift = (req, res) => {
-    methods
-      .pickupShift(req, helpers)
-      .then(response => {
-        helpers.success(res, { extras: response })
-      })
-      .catch(err => {
-        helpers.error(res, { message: err })
-      })
-  }
-  const allRequests = (req, res) => {
-    methods
-      .returnAllRequests(req, helpers)
-      .then(response => {
-        helpers.success(res, { extras: response })
-      })
-      .catch(err => {
-        helpers.error(res, { message: err })
-      })
-  }
+const helpers = require('./../../helpers/helpers')
 
-  const approveShift = (req, res) => {
-    methods
-      .approve(req, res)
-      .then(response => {
-        helpers.success(res, { extras: response })
-      })
-      .catch(err => {
-        helpers.error(res, { message: err })
-      })
-  }
+exports.pickUpShift = (req, res) => {
+  methods
+    .pickupShift(req, helpers)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
+}
+exports.allRequests = (req, res) => {
+  methods
+    .returnAllRequests(req, helpers)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
+}
 
-  const createShift = (req, res) => {
-    methods
-      .createShift(helpers, req, res)
-      .then(response => {
-        helpers.success(res, { extras: response })
-      })
-      .catch(err => {
-        helpers.error(res, { message: err })
-      })
-  }
+exports.approveShift = (req, res) => {
+  methods
+    .approve(req, res)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
+}
 
-  const getAllShifts = (req, res) => {
-    methods
-      .getShifts(req, 'all')
-      .then(response => {
-        helpers.success(res, { extras: response })
-      })
-      .catch(err => {
-        helpers.error(res, { message: err })
-      })
-  }
+exports.createShift = (req, res) => {
+  methods
+    .createShift(helpers, req, res)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
+}
 
-  const updateShift = (req, res) => {
-    methods
-      .update(req, res, helpers)
-      .then(response => {
-        helpers.success(res, response)
-      })
-      .catch(error => {
-        helpers.error(res, error)
-      })
-  }
+exports.getAllShifts = (req, res) => {
+  methods
+    .getShifts(req, 'all')
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
+}
 
-  const dropShift = (req, res) => {
-    methods
-      .dropShift(req, res, helpers)
-      .then(response => {
-        helpers.success(res, response)
-      })
-      .catch(err => {
-        helpers.error(res, { message: err })
-      })
-  }
+exports.updateShift = (req, res) => {
+  methods
+    .update(req)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
+}
 
-  return {
-    getAllShifts: getAllShifts,
-    createShift: createShift,
-    updateShift: updateShift,
-    dropShift: dropShift,
-    approveShift: approveShift,
-    allRequests: allRequests,
-    pickUpShift: pickUpShift
-  }
+exports.dropShift = (req, res) => {
+  methods
+    .dropShift(req, res, helpers)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(err => {
+      helpers.error(res, err)
+    })
 }
