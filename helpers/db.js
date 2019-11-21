@@ -3,9 +3,10 @@ const bcrypt = require('bcrypt')
 
 module.exports = {
   query: async function(action, model, params) {
+    const queries = require('./queries')(model, params)
     switch (action) {
       case 'findOne': {
-        return new queries(model, params).findOne()
+        return queries.findOne()
         break
       }
 
@@ -25,33 +26,26 @@ module.exports = {
   }
 }
 
-function queries(model, params) {
-  this.model = model
-  this.params = params
-  this.findOne = async function() {
-    try {
-      const response = this.model.findOne(this.params.find)
-      return Promise.resolve(response)
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  }
+// function queries(model, params) {
+//   this.model = model
+//   this.params = params
+//   this.findOne = async function() {
 
-  this.updateOne = async function() {
-    try {
-      const response = this.model.updateOne(this.params.find)
-      return Promise.resolve(response)
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  }
+//   this.updateOne = async function() {
+//     try {
+//       const response = this.model.updateOne(this.params.find)
+//       return Promise.resolve(response)
+//     } catch (error) {
+//       return Promise.reject(error)
+//     }
+//   }
 
-  this.deleteOne = async function() {
-    try {
-      const response = this.model.deleteOne(this.params.find)
-      return Promise.resolve(response)
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  }
-}
+//   this.deleteOne = async function() {
+//     try {
+//       const response = this.model.deleteOne(this.params.find)
+//       return Promise.resolve(response)
+//     } catch (error) {
+//       return Promise.reject(error)
+//     }
+//   }
+// }
