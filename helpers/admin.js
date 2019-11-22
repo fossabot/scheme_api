@@ -2,6 +2,10 @@ const jwt = require('jsonwebtoken')
 const nodeMailer = require('nodemailer')
 
 module.exports = {
+  sign(obj) {
+    const token = jwt.sign(obj, process.env.JWT_SECRET)
+    return token
+  },
   decode(req) {
     let authHeader = req.header('Authorisation')
     return jwt.decode(authHeader, process.env.JWT_SECRET)

@@ -34,35 +34,13 @@ exports.getUsers = (req, res) => {
 }
 
 exports.login = (req, res) => {
-  let params = req.body
   methods
-    .login(helpers, params)
-    .then(user => {
-      const token = jwt.sign(
-        {
-          id: user._id,
-          email: user.email,
-          employee_type: user.employee_type,
-          name: user.name
-        },
-        process.env.JWT_SECRET
-      )
-
-      res.header('Authorisation', token)
-
-      helpers.success(res, {
-        message: 'Successfully logged in',
-        extras: {
-          token: token,
-          id: user._id,
-          email: user.email,
-          employee_type: user.employee_type,
-          name: user.name
-        }
-      })
+    .login(req, helpers)
+    .then(response => {
+      res.header('Authorisation', helpers.admin.sign(response))
     })
-    .catch(err => {
-      helpers.error(res, err)
+    .catch(error => {
+      helpers.error(res, error)
     })
 }
 
@@ -79,26 +57,13 @@ exports.logOut = (req, res, helpers) => {
 
 exports.register = (req, res) => {
   methods
-    .register(helpers, req, res)
+    .register(req, helpers)
     .then(response => {
-      if (user) {
-        const token = jwt.sign(
-          {
-            user_id: user._id,
-            user_email: user.email,
-            user_employee_type: user.employee_type,
-            user_name: user.name
-          },
-          process.env.JWT_SECRET
-        )
-        res.header('Authorisation', token)
-        helpers.success(res, {
-          extras: token
-        })
-      }
+      res.header('Authorisation', helpers.admin.sign(response.user))
+      helpers.success(res, response.message)
     })
-    .catch(err => {
-      helpers.error(res, err)
+    .catch(error => {
+      helpers.error(res, error)
     })
 }
 

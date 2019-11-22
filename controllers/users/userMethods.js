@@ -100,7 +100,8 @@ module.exports = {
     }
   },
 
-  login: async function(helpers, params) {
+  login: async function(req, helpers) {
+    const params = req.body
     if (params.email && params.password) {
       const user = await User.updateOne(
         { email: params.email },
@@ -111,7 +112,6 @@ module.exports = {
           'Email or password are incorrect please, try again'
         )
       } else {
-        // Check passwords
         let isPasswordCorrect
         if (user.password) {
           isPasswordCorrect = await helpers.db.compareHash(
@@ -134,39 +134,33 @@ module.exports = {
     }
   },
 
-  register: async function(helpers, req, res) {
-    // Check if already authenticated
-    if (!req.header('Authorisation')) {
-      let params = req.body
-      const validation = helpers.db.validate(params, 'register')
-      let hashedPassword = await helpers.db.genHash(params.password)
+  register: async function(req, res) {
+    const params = req.body
 
-      if (validation) {
-        const user = new User({
-          name: params.name,
-          email: params.email,
-          employee_type: params.employeeType,
-          is_admin: params.is_admin,
-          password: hashedPassword,
-          is_online: true
-        })
+    const email = params.email
+    const password = params.password
+    const name = params.name
 
-        const isEmailPresent = await User.findOne({ email: params.email })
-        if (isEmailPresent != null) {
-          return Promise.reject('Email already exists')
-        } else {
-          try {
-            const savedUser = await user.save()
-            return Promise.resolve(savedUser)
-          } catch (error) {
-            return Promise.reject(error)
-          }
-        }
-      } else {
-        return validation
-      }
+    const isDuplicate = await User.findOne({ email: email })
+    if (isDuplicate) {
+      return Promise.reject('User already exists, please try again later')
     } else {
-      return Promise.reject('Already in session, please return to dashboard')
+      const hashedPwd = helpers.db.genHash(password)
+      const newUser = {
+        email: email,
+        password: password,
+        employee_type: 1,
+        name: name
+      }
+      try {
+        const createdUser = new User(params).save()
+        return Promise.resolve({
+          user: createdUser,
+          message: 'User successfully registered'
+        })
+      } catch (error) {
+        return Promise.reject(error)
+      }
     }
   }
 }
