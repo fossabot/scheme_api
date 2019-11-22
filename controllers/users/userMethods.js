@@ -197,15 +197,5 @@ module.exports = {
     } else {
       return Promise.reject('Already in session, please return to dashboard')
     }
-  },
-  test: async function(helpers) {
-    try {
-      const response = helpers.db.query('findOne', User, {
-        find: { email: 'adenaikyomi@gmail.com' }
-      })
-      return Promise.resolve(response)
-    } catch (error) {
-      return Promise.reject(error)
-    }
   }
 }

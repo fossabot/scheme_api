@@ -122,14 +122,3 @@ exports.removeUser = (req, res) => {
       helpers.error(res, err)
     })
 }
-
-exports.test = (req, res) => {
-  methods
-    .test(helpers)
-    .then(response => {
-      helpers.success(res, response)
-    })
-    .catch(err => {
-      helpers.error(res, err)
-    })
-}

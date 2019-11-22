@@ -1,37 +1,6 @@
 const Shift = require('./../../models/Shift')
-const Request = require('./../../models/Request')
-const requestMethods = {
-  approve: async function(req, res) {
-    let params = req.body
-    try {
-      let foundShift = await Shift.findByIdAndUpdate(
-        { _id: params._id },
-        { is_approved: { admin: 1 } }
-      )
-      if (foundShift) {
-        return Promise.resolve(foundShift)
-      } else {
-        return Promise.reject('Failed to update shift, please try again later.')
-      }
-    } catch (error) {
-      return Promise.reject(res, error)
-    }
-  },
-  returnAllRequests: async function(req, helpers) {
-    try {
-      let requests = await Request.find({})
-      if (requests.length > 0) {
-        return Promise.resolve(requests)
-      }
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  }
-}
 
 module.exports = {
-  ...requestMethods,
-
   pickupShift: async function(req, helpers) {
     let params = req.body
     let shiftID = params.shift_id
@@ -65,7 +34,6 @@ module.exports = {
         return Promise.reject('Failed to pickup shift, please try again later')
       }
     } catch (error) {
-      console.log(error)
       return Promise.reject('Failed to pickup shift, please try again later')
     }
   },
@@ -150,11 +118,11 @@ module.exports = {
       let assignedTo = params.assigned_to
         ? params.assigned_to
         : decode['user_id']
-      let repeatDays = params.repeat_days
+      let repeatDays = params.repeatDays
       let startDate = params.startDate
       let endDate = params.endDate
       let employeeType = decode.user_employee_type
-      let shiftType, flag
+      let shiftType
 
       // Logic for determining the type of shift
       if (employeeType == 2 || employeeType == 1) {
@@ -189,36 +157,10 @@ module.exports = {
 
       if (!duplicateShift) {
         const savedShift = await shift.save()
-        if (savedShift) {
-          let requestConfig = {
-            request_type: shiftType,
-            shift_id: savedShift['_id'],
-            currentUser: decode,
-            dates: {
-              start: helpers.date.format(startDate),
-              end: helpers.date.format(endDate)
-            }
-          }
-
-          let request = await helpers.admin.createRequest(
-            req,
-            res,
-            requestConfig
-          )
-
-          if (request) {
-            return Promise.resolve(request)
-          }
-        } else {
-          return Promise.reject(
-            'Error either during creating the request or shift'
-          )
-        }
       } else {
         return Promise.reject('Shift already exists')
       }
     } catch (error) {
-      console.log(error)
       return Promise.reject(error)
     }
   }

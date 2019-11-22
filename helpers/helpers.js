@@ -12,7 +12,7 @@ module.exports = {
       error = { message: err }
     }
 
-    console.log(err)
+    console.error(err)
     res
       .json({
         success: false,

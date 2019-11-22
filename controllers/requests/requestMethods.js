@@ -8,5 +8,40 @@ module.exports = {
     } catch (error) {
       return Promise.reject(error)
     }
+  },
+  declineRequest: async function(req, helpers) {
+    try {
+      const params = req.params
+      const declinedObj = {
+        is_approved: {
+          admin: 1
+        }
+      }
+      const request = await Request.updateOne(
+        { _id: params.request_id },
+        declinedObj
+      )
+      return Promise.resolve()
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+
+  approveRequest: async function(req, helpers) {
+    const params = req.params
+    const approveObj = {
+      is_approved: {
+        admin: 1
+      }
+    }
+    try {
+      const request = await Request.updateOne(
+        { _id: params.request_id },
+        approveObj
+      )
+      return Promise.resolve()
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
