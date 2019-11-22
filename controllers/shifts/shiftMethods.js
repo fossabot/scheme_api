@@ -2,12 +2,12 @@ const Shift = require('./../../models/Shift')
 
 module.exports = {
   pickupShift: async function(req, helpers) {
-    let params = req.body
-    let shiftID = params.shift_id
-    let currentUser = helpers.admin.decode(req.header('Authorisation'))
-    let currentUserID = currentUser.user_id
+    const params = req.body
+    const shiftID = params.shift_id
+    const currentUser = helpers.admin.decode(req.header('Authorisation'))
+    const currentUserID = currentUser.user_id
     let shiftType
-    employeeType = currentUser.user_employee_type
+    const employeeType = currentUser.user_employee_type
     if (params.shift_type) {
       shiftType = params.shift_type
     }
@@ -70,7 +70,7 @@ module.exports = {
       let headers = req.header('Authorisation')
       let token = helpers.admin.decode(headers)
       try {
-        let shifts = await Shift.find({ key: token.user_id })
+        let shifts = await Shift.find({ key: token._id })
         return Promise.resolve(shifts)
       } catch (error) {
         return Promise.reject(

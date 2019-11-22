@@ -1,26 +1,26 @@
-const shiftCtrl = require('../controllers/shifts/shiftsController')
+const shift = require('../controllers/shifts/shiftsController')
 const verifyToken = require('../middlewares/verifyToken')
 const express = require('express')
 const router = express.Router()
 
 router.get('/all', verifyToken, (req, res) => {
-  shiftCtrl.getAllShifts(req, res)
+  shift.getAllShifts(req, res)
 })
 
 router.post('/create', verifyToken, (req, res) => {
-  shiftCtrl.createShift(req, res)
+  shift.createShift(req, res)
 })
 router.post('/pickup', verifyToken, (req, res) => {
-  shiftCtrl.pickUpShift(req, res)
+  shift.pickUpShift(req, res)
 })
 router.post('/update', verifyToken, (req, res) => {
-  shiftCtrl.updateShift(req, res)
+  shift.updateShift(req, res)
 })
 router.post('/drop', verifyToken, (req, res) => {
-  shiftCtrl.dropShift(req, res)
+  shift.dropShift(req, res)
 })
 router.post('/remove', verifyToken, (req, res) => {
-  shiftCtrl.removeShift(req, res)
+  shift.removeShift(req, res)
 })
 
 module.exports = router

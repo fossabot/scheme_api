@@ -11,7 +11,7 @@ module.exports = {
   },
   declineRequest: async function(req, helpers) {
     try {
-      const params = req.params
+      const params = req.body
       const declinedObj = {
         is_approved: {
           admin: 1
@@ -28,7 +28,7 @@ module.exports = {
   },
 
   approveRequest: async function(req, helpers) {
-    const params = req.params
+    const params = req.body
     const approveObj = {
       is_approved: {
         admin: 1
