@@ -10,5 +10,8 @@ router.get('/all', (req, res) => {
 router.post('/update', (req, res) => {
   client.updateClient(req, res)
 })
+router.delete('/delete', (req, res) => {
+  client.deleteClient(req, res)
+})
 
 module.exports = router

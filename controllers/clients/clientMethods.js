@@ -1,5 +1,15 @@
 const Client = require('./../../models/Client')
 module.exports = {
+  deleteClient: async function(req) {
+    const params = req.body
+    const shiftID = params.shift_id
+    try {
+      const deletedShift = await Client.deleteOne({ _id: shiftID })
+      return Promise.resolve('Shift successfully deleted')
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
   createClient: async function(req) {
     const params = req.body
     const name = params.name
@@ -16,7 +26,7 @@ module.exports = {
     }
     try {
       const client = await Client.findOne({ name: name })
-      if (client.length <= 0) {
+      if (!client) {
         const client = await new Client(createClient).save()
         return Promise.resolve(client)
       } else {
@@ -32,7 +42,7 @@ module.exports = {
     try {
       const clients = await Client.find({})
       if (clients.length > 0) {
-        return Promise.resolve(client)
+        return Promise.resolve(clients)
       } else {
         return Promise.reject(
           'No clients detected, please create one to display them.'

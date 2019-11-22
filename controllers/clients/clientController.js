@@ -32,3 +32,14 @@ exports.updateClient = (req, res) => {
       helpers.error(res, error)
     })
 }
+
+exports.deleteClient = (req, res) => {
+  methods
+    .deleteClient(req)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(error => {
+      helpers.error(res, error)
+    })
+}
