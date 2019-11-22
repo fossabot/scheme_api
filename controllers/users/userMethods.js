@@ -148,12 +148,12 @@ module.exports = {
       const hashedPwd = helpers.db.genHash(password)
       const newUser = {
         email: email,
-        password: password,
+        password: hashedPwd,
         employee_type: 1,
         name: name
       }
       try {
-        const createdUser = new User(params).save()
+        const createdUser = new User(newUser).save()
         return Promise.resolve({
           user: createdUser,
           message: 'User successfully registered'
