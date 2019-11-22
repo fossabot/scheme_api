@@ -38,6 +38,7 @@ exports.login = (req, res) => {
     .login(req, helpers)
     .then(response => {
       res.header('Authorisation', helpers.admin.sign(response))
+      helpers.success(res, response)
     })
     .catch(error => {
       helpers.error(res, error)
