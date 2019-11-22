@@ -3,7 +3,7 @@ const helpers = require('./../../helpers/helpers')
 
 exports.upgradePermissions = (req, res) => {
   methods
-    .upgradePermissions(req, res)
+    .updatePermissions(req, res)
     .then(response => {
       helpers.success(res, response)
     })
@@ -66,7 +66,7 @@ exports.login = (req, res) => {
     })
 }
 
-exports.logOut = (req, res) => {
+exports.logOut = (req, res, helpers) => {
   methods
     .logOut(req, res)
     .then(response => {

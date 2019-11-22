@@ -35,8 +35,9 @@ module.exports = {
     return requestString
   },
 
-  decode(token) {
-    return jwt.decode(token, process.env.JWT_SECRET)
+  decode(req) {
+    let authHeader = req.header('Authorisation')
+    return jwt.decode(authHeader, process.env.JWT_SECRET)
   },
   /**
    * Sends email and request from employee to admin

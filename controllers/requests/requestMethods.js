@@ -9,37 +9,16 @@ module.exports = {
       return Promise.reject(error)
     }
   },
-  declineRequest: async function(req, helpers) {
-    try {
-      const params = req.body
-      const declinedObj = {
-        is_approved: {
-          admin: 1
-        }
-      }
-      const request = await Request.updateOne(
-        { _id: params.request_id },
-        declinedObj
-      )
-      return Promise.resolve()
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  },
 
-  approveRequest: async function(req, helpers) {
+  updateRequest: async function(req) {
     const params = req.body
-    const approveObj = {
-      is_approved: {
-        admin: 1
-      }
-    }
+    const requestChanges = params.request_body
     try {
       const request = await Request.updateOne(
         { _id: params.request_id },
-        approveObj
+        requestChanges
       )
-      return Promise.resolve()
+      return Promise.resolve('Request successfully updated')
     } catch (error) {
       return Promise.reject(error)
     }

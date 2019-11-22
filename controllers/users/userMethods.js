@@ -1,28 +1,21 @@
 const User = require('./../../models/User')
 module.exports = {
-  upgradePermissions: async function(req) {
-    const changedUserID = req.body.user_id
+  updatePermissions: async function(req) {
+    const userID = req.body._id
+    const changes = req.body.request_body
     try {
-      const changeUser = await User.updateOne(
-        { _id: changedUserID },
-        { employee_type: 1 }
-      )
-      return Promise.resolve(changeUser)
+      const changeUser = await User.updateOne({ _id: userID }, changes)
+      return Promise.resolve('User permissions successfully updated')
     } catch (error) {
       return Promise.reject('Failed to update user, please try again')
     }
   },
-  /**
-   * Returns one user based on ID
-   * @param {*} req
-   * @param {*} helpers
-   */
-  getOneUser: async function(req, helpers) {
+
+  getOneUser: async function(req) {
     let params = req.body
-    if (params.user_id) {
+    if (params._id) {
       let foundUser = await User.findOne({ _id: params.user_id })
       delete foundUser['password']
-      delete foundUser['registered_date']
       return Promise.resolve(foundUser)
     } else {
       return Promise.reject(
@@ -30,9 +23,7 @@ module.exports = {
       )
     }
   },
-  /**
-   * Returns all users
-   */
+
   getAllUsers: async function() {
     try {
       let users = await User.find({})
@@ -52,15 +43,9 @@ module.exports = {
       return Promise.reject(error)
     }
   },
-  /**
-    Sign out the current session and delete their token and remove that they are online
-    * @param {*} req
-    * @param {*} res
-    * @param {*} helpers
-  **/
-  logOut: async function(req, res) {
-    let authHeader = req.header('Authorisation')
-    let currentUser = jwt.decode(authHeader, process.env.JWT_SECRET)
+
+  logOut: async function(req, helpers) {
+    let currentUser = helpers.db.decode(req)
     try {
       let isUserSignedIn = await User.findOne({
         _id: currentUser['user_id'],
@@ -80,10 +65,7 @@ module.exports = {
       return Promise.reject(error)
     }
   },
-  /**
-   * Updates a users details
-   * @param {Object} req
-   */
+
   updateUser: async function(req) {
     let params = req.body
     let header = req.header('Authorisation')
@@ -100,10 +82,7 @@ module.exports = {
       return Promise.reject(error)
     }
   },
-  /**
-   * Removes a user and makes their shifts avaliable for pickup
-   * @param {Object} req
-   */
+
   removeUser: async function(req) {
     let header = req.header('Authorisation')
     let userDetails = jwt.verify(header, process.env.JWT_SECRET)
@@ -120,10 +99,7 @@ module.exports = {
       return error
     }
   },
-  /**
-   * Login user
-   * @param {Object} req.body
-   */
+
   login: async function(helpers, params) {
     if (params.email && params.password) {
       const user = await User.updateOne(
@@ -157,12 +133,7 @@ module.exports = {
       return Promise.reject('Please provide an email or password')
     }
   },
-  /**
-   *
-   * @param {Function Body} helpers
-   * @param {Object} req
-   * @param {Object} res
-   */
+
   register: async function(helpers, req, res) {
     // Check if already authenticated
     if (!req.header('Authorisation')) {

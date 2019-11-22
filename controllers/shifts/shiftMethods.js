@@ -4,7 +4,7 @@ module.exports = {
   pickupShift: async function(req, helpers) {
     const params = req.body
     const shiftID = params.shift_id
-    const currentUser = helpers.admin.decode(req.header('Authorisation'))
+    const currentUser = helpers.admin.decode(req)
     const currentUserID = currentUser.user_id
     let shiftType
     const employeeType = currentUser.user_employee_type
@@ -67,8 +67,7 @@ module.exports = {
         return Promise.reject(error)
       }
     } else {
-      let headers = req.header('Authorisation')
-      let token = helpers.admin.decode(headers)
+      let token = helpers.admin.decode(req)
       try {
         let shifts = await Shift.find({ key: token._id })
         return Promise.resolve(shifts)
@@ -80,23 +79,23 @@ module.exports = {
     }
   },
 
-  dropShift: async function(req, res, helpers) {
+  dropShift: async function(req, helpers) {
     let params = req.body
-    let headers = req.header('Authorisation')
-    let decode = helpers.admin.decode(headers)
+
+    let decode = helpers.admin.decode(req)
 
     // Send request with
     try {
       let shift = await Shift.findOneAndUpdate({
         _id: params.shift_id,
-        key: decode['user_id'],
+        key: decode._id,
         is_pickup: false,
         shift_type: decode.user_employee_type
       })
       if (shift.n > 0) {
         helpers.admin.sendEmail({
-          from: decode.user_email,
-          text: `${decode.user_name} dropped a shift from ${helpers.date.format(
+          from: decode.email,
+          text: `${decode.name} dropped a shift from ${helpers.date.format(
             shift.startDate,
             'DD MMMM HH:MM'
           )} to ${helpers.date.format(shift.endDate, 'DD MMMM HH:MM')}`
@@ -113,15 +112,12 @@ module.exports = {
   createShift: async function(helpers, req, res) {
     try {
       let params = req.body
-      let headers = req.header('Authorisation')
-      let decode = helpers.admin.decode(headers)
-      let assignedTo = params.assigned_to
-        ? params.assigned_to
-        : decode['user_id']
+      let decode = helpers.admin.decode(req)
+      let assignedTo = params.assigned_to ? params.assigned_to : decode._id
       let repeatDays = params.repeatDays
       let startDate = params.startDate
       let endDate = params.endDate
-      let employeeType = decode.user_employee_type
+      let employeeType = decode.employee_type
       let shiftType
 
       // Logic for determining the type of shift

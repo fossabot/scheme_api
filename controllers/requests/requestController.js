@@ -10,19 +10,9 @@ exports.getAllRequests = (req, res) => {
     .catch(err => helpers.error(res, err))
 }
 
-exports.approveRequest = (req, res) => {
+exports.updateRequest = (req, res) => {
   methods
-    .approveRequest(req, helpers)
-    .then(response => {
-      helpers.success(res, response)
-    })
-    .catch(error => {
-      helpers.error(res, error)
-    })
-}
-exports.declineRequest = (req, res) => {
-  methods
-    .declineRequest(req, helpers)
+    .updateRequest(req, helpers)
     .then(response => {
       helpers.success(res, response)
     })
