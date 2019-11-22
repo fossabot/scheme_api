@@ -150,10 +150,12 @@ module.exports = {
         email: email,
         password: hashedPwd,
         employee_type: 1,
-        name: name
+        name: name,
+        is_online: true
       }
       try {
         const createdUser = new User(newUser).save()
+
         return Promise.resolve({
           user: createdUser,
           message: 'User successfully registered'
