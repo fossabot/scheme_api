@@ -2,9 +2,9 @@ const User = require('./../../models/User')
 module.exports = {
   updatePermissions: async function(req) {
     const userID = req.body._id
-    const changes = req.body.request_body
+    const userUpdate = req.body.user_update
     try {
-      const changeUser = await User.updateOne({ _id: userID }, changes)
+      const updatedUser = await User.updateOne({ _id: userID }, userUpdate)
       return Promise.resolve('User permissions successfully updated')
     } catch (error) {
       return Promise.reject('Failed to update user, please try again')
@@ -14,7 +14,7 @@ module.exports = {
   getOneUser: async function(req) {
     let params = req.body
     if (params._id) {
-      let foundUser = await User.findOne({ _id: params.user_id })
+      let foundUser = await User.findOne({ _id: params._id })
       delete foundUser['password']
       return Promise.resolve(foundUser)
     } else {
@@ -53,7 +53,7 @@ module.exports = {
         _id: currentUser['user_id'],
         is_online: true
       })
-      if (!isUserSignedIn) {]
+      if (!isUserSignedIn) {
         return Promise.reject(
           'User not signed in, you can only sign in if your are logged in.'
         )
@@ -70,16 +70,11 @@ module.exports = {
 
   updateUser: async function(req) {
     let params = req.body
-    let header = req.header('Authorisation')
+    const userID = params._id
+    const userUpdate = params.user_update
     try {
-      let userDetails = jwt.verify(header, process.env.JWT_SECRET)
-
-      let query = {}
-      for (let property in params) {
-        query[property] = params[property]
-      }
-      let update = await User.findByIdAndUpdate(userDetails['user_id'], query)
-      return Promise.resolve(update)
+      const updatedUser = await User.updateOne({ _id: userID }, userUpdate)
+      return Promise.resolve('User successfully updated')
     } catch (error) {
       return Promise.reject(error)
     }

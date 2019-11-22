@@ -12,11 +12,11 @@ module.exports = {
 
   updateRequest: async function(req) {
     const params = req.body
-    const requestChanges = params.request_body
+    const requestUpdate = params.request_update
     try {
       const request = await Request.updateOne(
         { _id: params.request_id },
-        requestChanges
+        requestUpdate
       )
       return Promise.resolve('Request successfully updated')
     } catch (error) {

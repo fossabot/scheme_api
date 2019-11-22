@@ -1,115 +1,30 @@
 const Shift = require('./../../models/Shift')
 
 module.exports = {
-  pickupShift: async function(req, helpers) {
+  update: async function(req) {
     const params = req.body
     const shiftID = params.shift_id
-    const currentUser = helpers.admin.decode(req)
-    const currentUserID = currentUser.user_id
-    let shiftType
-    const employeeType = currentUser.user_employee_type
-    if (params.shift_type) {
-      shiftType = params.shift_type
-    }
-    shiftType = employeeType
-
-    // Get shift with that shift ID
+    const shiftUpdate = params.shift_update
     try {
-      let updateShift = await Shift.updateOne(
-        { _id: shiftID, shift_type: shiftType, is_pickup: true },
-        { key: currentUserID }
-      )
-      if (updateShift.n > 0) {
-        let emailConfig = {
-          from: currentUser.user_email,
-          text: `${currentUser.user_name} has picked up a shift`
-        }
-        try {
-          let updateShiftRequest = await helpers.admin.sendEmail(emailConfig)
-          return Promise.resolve(updateShiftRequest)
-        } catch (error) {
-          return Promise.reject(error)
-        }
-      } else {
-        return Promise.reject('Failed to pickup shift, please try again later')
-      }
-    } catch (error) {
-      return Promise.reject('Failed to pickup shift, please try again later')
-    }
-  },
-
-  /**
-   * Update a shift with new object
-   */
-  update: async function(req) {
-    const shiftID = req.body.shift_id
-    const newShiftContent = req.body.shift_content
-    try {
-      const updatedShift = await Shift.updateOne(
-        { _id: shiftID },
-        { ...newShiftContent }
-      )
+      const updatedShift = await Shift.updateOne({ _id: shiftID }, shiftUpdate)
     } catch (error) {
       return Promise.reject('Error when updating shift, please try again')
     }
   },
 
-  getShifts: async function(req, params) {
-    // Get all shifts
-    if (params == 'all') {
-      try {
-        let shifts = await Shift.find({})
-        if (shifts.length <= 0) {
-          return Promise.reject('No shifts found, please try again later')
-        }
-        return Promise.resolve(shifts)
-      } catch (error) {
-        return Promise.reject(error)
-      }
-    } else {
-      let token = helpers.admin.decode(req)
-      try {
-        let shifts = await Shift.find({ key: token._id })
-        return Promise.resolve(shifts)
-      } catch (error) {
-        return Promise.reject(
-          'Failed to retrieve shifts, please try again later'
-        )
-      }
-    }
-  },
-
-  dropShift: async function(req, helpers) {
-    let params = req.body
-
-    let decode = helpers.admin.decode(req)
-
-    // Send request with
+  get: async function(req, params) {
     try {
-      let shift = await Shift.findOneAndUpdate({
-        _id: params.shift_id,
-        key: decode._id,
-        is_pickup: false,
-        shift_type: decode.user_employee_type
-      })
-      if (shift.n > 0) {
-        helpers.admin.sendEmail({
-          from: decode.email,
-          text: `${decode.name} dropped a shift from ${helpers.date.format(
-            shift.startDate,
-            'DD MMMM HH:MM'
-          )} to ${helpers.date.format(shift.endDate, 'DD MMMM HH:MM')}`
-        })
-        return Promise.resolve()
-      } else {
-        return Promise.reject('Failed to update shift, please try again later')
+      let shifts = await Shift.find({})
+      if (shifts.length <= 0) {
+        return Promise.reject('No shifts found, please try again later')
       }
+      return Promise.resolve(shifts)
     } catch (error) {
-      return Promise.reject('Failed to update shift, please try again')
+      return Promise.reject(error)
     }
   },
 
-  createShift: async function(helpers, req, res) {
+  create: async function(helpers, req, res) {
     try {
       let params = req.body
       let decode = helpers.admin.decode(req)

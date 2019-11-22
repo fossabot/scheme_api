@@ -6,10 +6,10 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
 
-const shiftRouter = require('./routes/shiftRouter')
-const userRouter = require('./routes/userRouter')
-const requestRouter = require('./routes/requestRouter')
-const clientRouter = require('./routes/clientRouter')
+const shiftRoutes = require('./routes/shiftRoutes')
+const userRoutes = require('./routes/userRoutes')
+const requestRoutes = require('./routes/requestRoutes')
+const clientRoutes = require('./routes/clientRoutes')
 
 const verifyToken = require('./middlewares/verifyToken')
 
@@ -23,10 +23,10 @@ app.use(cors())
 app.use(compression())
 
 // Routing
-app.use('/api/users', userRouter)
-app.use('/api/shifts', verifyToken, shiftRouter)
-app.use('/api/requests', verifyToken, requestRouter)
-app.use('/api/client', verifyToken, clientController)
+app.use('/api/users', userRoutes)
+app.use('/api/shifts', verifyToken, shiftRoutes)
+app.use('/api/requests', verifyToken, requestRoutes)
+app.use('/api/clients', clientRoutes)
 
 // DB Connect
 

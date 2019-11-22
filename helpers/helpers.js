@@ -20,11 +20,11 @@ module.exports = {
       })
       .end()
   },
-  success(res, obj) {
+  success(res, success) {
     res
       .json({
         success: true,
-        obj
+        success
       })
       .end()
   },

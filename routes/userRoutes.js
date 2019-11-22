@@ -1,4 +1,4 @@
-const user = require('./../controllers/users/userController')
+const user = require('../controllers/users/userController')
 const express = require('express')
 const router = express.Router()
 
@@ -24,10 +24,6 @@ router.get('/all', (req, res) => {
 })
 router.get('/one', (req, res) => {
   user.getOneUser(req, res)
-})
-
-router.post('/permissions', (req, res) => {
-  user.updatePermissions(req, res)
 })
 
 module.exports = router

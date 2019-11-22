@@ -1,16 +1,6 @@
 const methods = require('./userMethods')
 const helpers = require('./../../helpers/helpers')
 
-exports.upgradePermissions = (req, res) => {
-  methods
-    .updatePermissions(req, res)
-    .then(response => {
-      helpers.success(res, response)
-    })
-    .catch(err => {
-      helpers.error(res, err)
-    })
-}
 exports.getOneUser = (req, res) => {
   methods
     .getOneUser(req, helpers)
