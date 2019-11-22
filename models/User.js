@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 // 1 (admin), 2(Normal), 3(Locumn)
 
-const userObj = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -32,9 +32,14 @@ const userObj = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  client_id: {
+    type: String,
+    max: 1024,
+    required: true
+  },
   is_admin: {
     type: Boolean,
     default: false
   }
 })
-module.exports = mongoose.model('User', userObj)
+module.exports = mongoose.model('User', userSchema)

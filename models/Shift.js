@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const shiftObj = new mongoose.Schema({
+const shiftSchema = new mongoose.Schema({
   key: {
     type: String,
     required: true
@@ -41,4 +41,4 @@ const shiftObj = new mongoose.Schema({
     // }
   }
 })
-module.exports = mongoose.model('Shift', shiftObj)
+module.exports = mongoose.model('Shift', shiftSchema)

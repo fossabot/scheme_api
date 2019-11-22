@@ -24,9 +24,11 @@ module.exports = {
     }
   },
 
-  getAllUsers: async function() {
+  getAllUsers: async function(req) {
+    const params = req.body
+    const clientID = params.client_id
     try {
-      let users = await User.find({})
+      let users = await User.find({ client_id: clientID })
       let newUsers = []
       if (users.length > 0) {
         for (let i = 0, len = users.length; i < len; i++) {

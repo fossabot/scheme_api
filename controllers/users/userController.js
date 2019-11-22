@@ -11,7 +11,7 @@ exports.upgradePermissions = (req, res) => {
       helpers.error(res, err)
     })
 }
-exports.getUser = (req, res) => {
+exports.getOneUser = (req, res) => {
   methods
     .getOneUser(req, helpers)
     .then(response => {
@@ -22,9 +22,9 @@ exports.getUser = (req, res) => {
     })
 }
 
-exports.getUsers = (req, res) => {
+exports.getAllUsers = (req, res) => {
   methods
-    .getAllUsers()
+    .getAllUsers(req)
     .then(response => {
       helpers.success(res, response)
     })

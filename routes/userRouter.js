@@ -20,10 +20,10 @@ router.get('/logout', (req, res) => {
   user.logOut(req, res)
 })
 router.get('/all', (req, res) => {
-  user.getUsers(req, res)
+  user.getAllUsers(req, res)
 })
 router.get('/one', (req, res) => {
-  user.getUser(req, res)
+  user.getOneUser(req, res)
 })
 
 router.post('/permissions', (req, res) => {
