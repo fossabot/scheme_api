@@ -1,9 +1,17 @@
 const mongoose = require('mongoose')
 
 const clientSchema = mongoose.Schema({
-  image: {
+  logo: {
     type: String,
     required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  registration_date: {
+    type: Date,
+    default: Date.now
   }
 })
 

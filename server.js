@@ -9,6 +9,8 @@ const app = express()
 const shiftRouter = require('./routes/shiftRouter')
 const userRouter = require('./routes/userRouter')
 const requestRouter = require('./routes/requestRouter')
+const clientRouter = require('./routes/clientRouter')
+
 const verifyToken = require('./middlewares/verifyToken')
 
 // Env Vars
@@ -24,6 +26,7 @@ app.use(compression())
 app.use('/api/users', userRouter)
 app.use('/api/shifts', verifyToken, shiftRouter)
 app.use('/api/requests', verifyToken, requestRouter)
+app.use('/api/client', verifyToken, clientController)
 
 // DB Connect
 

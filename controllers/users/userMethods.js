@@ -53,7 +53,7 @@ module.exports = {
         _id: currentUser['user_id'],
         is_online: true
       })
-      if (!isUserSignedIn) {
+      if (!isUserSignedIn) {]
         return Promise.reject(
           'User not signed in, you can only sign in if your are logged in.'
         )
