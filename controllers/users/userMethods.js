@@ -1,16 +1,5 @@
 const User = require('./../../models/User')
 module.exports = {
-  updatePermissions: async function(req) {
-    const userID = req.body._id
-    const userUpdate = req.body.user_update
-    try {
-      const updatedUser = await User.updateOne({ _id: userID }, userUpdate)
-      return Promise.resolve('User permissions successfully updated')
-    } catch (error) {
-      return Promise.reject('Failed to update user, please try again')
-    }
-  },
-
   getOneUser: async function(req) {
     let params = req.body
     if (params._id) {
@@ -131,35 +120,43 @@ module.exports = {
     }
   },
 
-  register: async function(req, res) {
-    const params = req.body
+  register: async function(req, helpers) {
+    try {
+      const params = req.body
 
-    const email = params.email
-    const password = params.password
-    const name = params.name
-
-    const isDuplicate = await User.findOne({ email: email })
-    if (isDuplicate) {
-      return Promise.reject('User already exists, please try again later')
-    } else {
-      const hashedPwd = helpers.db.genHash(password)
-      const newUser = {
-        email: email,
-        password: hashedPwd,
-        employee_type: 1,
-        name: name,
-        is_online: true
+      const email = params.email
+      const password = params.password
+      const name = params.name
+      const employeeType = params.employee_type
+      const clientID = params.client_id
+      if (!email || !password || !name || !clientID) {
+        return Promise.reject('Missing parameters, please try again')
       }
-      try {
-        const createdUser = new User(newUser).save()
 
-        return Promise.resolve({
-          user: createdUser,
-          message: 'User successfully registered'
-        })
-      } catch (error) {
-        return Promise.reject(error)
+      const isDuplicate = await User.findOne({ email: email })
+      if (isDuplicate) {
+        return Promise.reject('User already exists, please try again later')
+      } else {
+        const hashedPwd = await helpers.db.genHash(password)
+        const mongoUser = {
+          email: email,
+          password: hashedPwd,
+          employee_type: employeeType,
+          name: name,
+          is_online: true,
+          client_id: clientID
+        }
+
+        const newUser = new User(mongoUser)
+        const createdUser = await newUser.save()
+        delete mongoUser.password
+        const token = helpers.admin.sign(mongoUser)
+        delete createdUser.password
+        return Promise.resolve({ user: createdUser, token: token })
       }
+    } catch (error) {
+      console.log(error)
+      return Promise.reject(error)
     }
   }
 }

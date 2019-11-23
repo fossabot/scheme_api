@@ -50,8 +50,8 @@ exports.register = (req, res) => {
   methods
     .register(req, helpers)
     .then(response => {
-      res.header('Authorisation', helpers.admin.sign(response.user))
-      helpers.success(res, response.message)
+      res.header('Authorisation', response.token)
+      helpers.success(res, response.user)
     })
     .catch(error => {
       helpers.error(res, error)
