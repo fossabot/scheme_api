@@ -14,7 +14,7 @@ exports.createShift = (req, res) => {
 
 exports.getAllShifts = (req, res) => {
   methods
-    .getShifts(req, 'all')
+    .get(req, 'all')
     .then(response => {
       helpers.success(res, response)
     })

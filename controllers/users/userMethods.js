@@ -16,6 +16,9 @@ module.exports = {
   getAllUsers: async function(req) {
     const params = req.body
     const clientID = params.client_id
+    if (!clientID) {
+      return Promise.reject('Missing paramters, please try again later')
+    }
     try {
       let users = await User.find({ client_id: clientID })
       let newUsers = []

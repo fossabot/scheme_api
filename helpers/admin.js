@@ -1,6 +1,10 @@
 const jwt = require('jsonwebtoken')
 const nodeMailer = require('nodemailer')
+const uuid = require('uuid/v1')
 module.exports = {
+  genID() {
+    return uuid()
+  },
   sign(obj) {
     const token = jwt.sign(obj, process.env.JWT_SECRET)
     return token
