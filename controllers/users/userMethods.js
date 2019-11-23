@@ -155,7 +155,6 @@ module.exports = {
         return Promise.resolve({ user: createdUser, token: token })
       }
     } catch (error) {
-      console.log(error)
       return Promise.reject(error)
     }
   }
