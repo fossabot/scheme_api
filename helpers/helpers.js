@@ -6,18 +6,22 @@ const socket = require('./socket')
 let responseObj = {
   success: {
     success: true,
-    message: ''
+    message: '',
+    content: ''
   },
   error: {
     error: true,
-    message: ''
+    message: '',
+    content: ''
   }
 }
 
 module.exports = {
   error(res, err) {
     console.log(err)
-    const conditions = typeof err == 'object' && err.hasOwnProperty('message')
+    const conditions =
+      typeof err == 'object' ||
+      (typeof err == 'array' && err.hasOwnProperty('message'))
     if (conditions) {
       responseObj.error.message = err.message
     } else if (typeof err == 'string') {
@@ -28,13 +32,24 @@ module.exports = {
   },
   success(res, success) {
     const conditions =
-      typeof success == 'object' && success.hasOwnProperty('message')
+      typeof success == 'object' ||
+      (typeof success == 'array' && success.hasOwnProperty('message'))
     if (conditions) {
       responseObj.success.message = success.message
+      responseObj.success.content = success
     } else if (typeof success == 'string') {
       responseObj.success.message = success
     }
     res.json(responseObj.success).end()
+  },
+  validate(req, res, key) {
+    const params = req.body
+    if (!params[key]) {
+      this.error(res, 'Missing paramter please try again')
+      return false
+    } else {
+      return true
+    }
   },
   admin,
   date,

@@ -4,7 +4,11 @@ module.exports = {
   getAllRequests: async function() {
     try {
       const requests = await Request.find({})
-      return Promise.resolve(requests)
+      if (requests.length > 0) {
+        return Promise.resolve(requests)
+      } else {
+        return Promise.reject('No requests found, please try again later')
+      }
     } catch (error) {
       return Promise.reject(error)
     }

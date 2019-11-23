@@ -16,23 +16,13 @@ module.exports = {
   getAllUsers: async function(req) {
     const params = req.body
     const clientID = params.client_id
-    if (!clientID) {
-      return Promise.reject('Missing paramters, please try again later')
-    }
+    // console.log(params)
+    // if (!clientID) {
+    //   return Promise.reject('Missing paramters, please try again later')
+    // }
     try {
-      let users = await User.find({ client_id: clientID })
-      let newUsers = []
-      if (users.length > 0) {
-        for (let i = 0, len = users.length; i < len; i++) {
-          let user = users[i]
-          delete user['password']
-          delete user['registered_date']
-          newUsers.push(user)
-        }
-        return Promise.resolve(users)
-      } else {
-        return Promise.reject('No users found, please try again later')
-      }
+      let users = await User.find({})
+      return Promise.resolve(users)
     } catch (error) {
       return Promise.reject(error)
     }

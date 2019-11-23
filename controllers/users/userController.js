@@ -14,7 +14,7 @@ exports.getOneUser = (req, res) => {
 
 exports.getAllUsers = (req, res) => {
   methods
-    .getAllUsers(req)
+    .getAllUsers(req, res, helpers)
     .then(response => {
       helpers.success(res, response)
     })

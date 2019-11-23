@@ -5,12 +5,12 @@ const chats = require('./../controllers/chats/chatController')
 router.post('/send', (req, res) => {
   chats.sendMessage(req, res)
 })
-router.get('/init', (req, res) => {
+router.get('/begin', (req, res) => {
   chats.init(req, res)
 })
 
 router.get('/getAll', (req, res) => {
-  chats.getChats(req, res)
+  chats.getChatTranscript(req, res)
 })
 
 module.exports = router

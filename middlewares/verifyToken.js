@@ -1,16 +1,14 @@
 const jwt = require('jsonwebtoken')
-
+const helpers = require('./../helpers/helpers')
 const isRouteAllowed = (req, res, next) => {
-  const token = req.header('Authorisation')
+  const token = req.header('authorization')
   if (!token) {
-    res.json({ message: 'No token detected' })
+    helpers.error(res, 'No token detected')
   } else {
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
-        return res.json({
-          success: false,
-          message: 'Failed to authenticate token.'
-        })
+        helpers.error(res, err)
+        return
       } else {
         // if everything is good, save to request for use in other routes
         req.decoded = decoded
