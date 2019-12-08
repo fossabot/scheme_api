@@ -10,7 +10,11 @@ router.get('/begin', (req, res) => {
 })
 
 router.get('/getAll', (req, res) => {
-  chats.getChatTranscript(req, res)
+  chats.getAllChats(req, res)
+})
+
+router.get('/transcript', (req, res) => {
+  chats.getChatTranscripts(req, res)
 })
 
 module.exports = router

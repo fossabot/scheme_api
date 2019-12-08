@@ -82,7 +82,7 @@ module.exports = {
   login: async function(req, helpers) {
     const params = req.body
     if (params.email && params.password) {
-      const user = await User.updateOne(
+      const user = await User.findOneAndUpdate(
         { email: params.email },
         { is_online: true }
       )
@@ -105,7 +105,9 @@ module.exports = {
         if (isPasswordCorrect) {
           return Promise.resolve(user)
         } else {
-          return Promise.reject('Error when loggin in please try again.')
+          return Promise.reject(
+            'Email or password are incorrect please, try again'
+          )
         }
       }
     } else {
@@ -142,9 +144,16 @@ module.exports = {
 
         const newUser = new User(mongoUser)
         const createdUser = await newUser.save()
-        delete mongoUser.password
-        const token = helpers.admin.sign(mongoUser)
-        delete createdUser.password
+
+        const secureUser = {
+          _id: createdUser._id,
+          email: createdUser.email,
+          name: createdUser.name,
+          employee_type: createdUser.employee_type,
+          registration_date: createdUser.registration_date
+        }
+
+        const token = helpers.admin.sign(secureUser)
         return Promise.resolve({ user: createdUser, token: token })
       }
     } catch (error) {

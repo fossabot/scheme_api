@@ -23,9 +23,20 @@ exports.sendMessage = (req, res) => {
     })
 }
 
-exports.getChatTranscript = (req, res) => {
+exports.getAllChats = (req, res) => {
   methods
-    .getChatTranscript(req)
+    .getAllChats(req)
+    .then(response => {
+      helpers.success(res, response)
+    })
+    .catch(error => {
+      helpers.error(res, error)
+    })
+}
+
+exports.getChatTranscripts = (req, res) => {
+  methods
+    .getChatTranscripts(req)
     .then(response => {
       helpers.success(res, response)
     })

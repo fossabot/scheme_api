@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const Message = mongoose.Schema({
-  content: {
+  message_content: {
     type: String,
     required: true
   },
@@ -9,21 +9,20 @@ const Message = mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  attachmenets: {
+  message_attachments: {
     type: String
   },
-  transcript_id: {
+  sender: {
     type: String,
     required: true
   },
-  participants: {
-    type: Object
-    /**
-     * {
-     *  sender:id,
-     *  reciever:id
-     * }
-     */
+  recipient: {
+    type: String,
+    required: true
+  },
+  is_read: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -2,7 +2,6 @@ const helpers = require('../../helpers/helpers')
 const Message = require('../../models/Message')
 
 module.exports = {
-  send: async function(req) {},
   init: async function(req) {
     try {
       const connection = await helpers.socket.startConnection()
@@ -11,14 +10,42 @@ module.exports = {
       return Promise.reject(error)
     }
   },
-  getChatTranscript: async function(req) {
+  // ######################################
+  getChatTranscripts: async function(req) {
     const params = req.body
-    const transcriptID = params.transcript_id
+    const sender = helpers.admin.decode(req)._id
+    const recipient = params.recipient_id
+
     try {
-      const messageTranscript = await Message.find({
-        transcript_id: transcriptID
+      const chatTranscripts = await Message.find({
+        sender: sender,
+        recipient: recipient
       })
-      return Promise.resolve(messageTranscript)
+      const len = chatTranscripts.length
+      let messages = []
+      for (let i = 0; i < len; i++) {
+        const chat = chatTranscripts[i].toObject();
+        
+      }
+      return Promise.resolve(chatTranscripts)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  getAllChats: async function(req) {
+    try {
+      const allChats = await Message.find({
+        sender: helpers.admin.decode(req)._id
+      })
+      const len = allChats.length
+      let newChats = []
+      for (let i = 0; i < len; i++) {
+        let chat = allChats[i].toObject()
+        delete chat.sender
+        newChats.push(chat)
+      }
+
+      return Promise.resolve(newChats)
     } catch (error) {
       return Promise.reject(error)
     }
@@ -27,20 +54,20 @@ module.exports = {
     const params = req.body
     const content = params.message_content
     const attachements = params.message_attachements
-      ? params.message_attachements
-      : null
-    const transcriptID = params.transcript_id
+    const recipient = params.recipient_id
+    const sender = helpers.admin.decode(req)._id
 
-    // Add the message to DB
     const monogoMessage = {
       message_content: content,
       message_attachements: attachements,
-      transcript_id: transcriptID
+
+      sender: sender,
+      recipient: recipient
     }
     try {
-      const newMessage = new Message(monogoMessage)
+      let newMessage = new Message(monogoMessage)
       newMessage = await newMessage.save()
-      return Promise.resolve(response)
+      return Promise.resolve(newMessage)
     } catch (error) {
       return Promise.reject(error)
     }
