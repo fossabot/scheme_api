@@ -40,6 +40,14 @@ const userSchema = new mongoose.Schema({
   is_admin: {
     type: Boolean,
     default: false
+  },
+  gender: {
+    type: String,
+    required: true
+  },
+  date_of_birth: {
+    required: true,
+    type: Date
   }
 })
 module.exports = mongoose.model('User', userSchema)

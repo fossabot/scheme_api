@@ -121,13 +121,21 @@ module.exports = {
 
       const email = params.email
       const password = params.password
+      const service = params.service
       const name = params.name
       const employeeType = params.employee_type
-      const clientID = params.client_id
+      const clientID = params.client_id || 123
       if (!email || !password || !name || !clientID) {
         return Promise.reject('Missing parameters, please try again')
       }
-
+      switch (service) {
+        case 'google': {
+        }
+        case 'facebook': {
+        }
+        case 'linkedin': {
+        }
+      }
       const isDuplicate = await User.findOne({ email: email })
       if (isDuplicate) {
         return Promise.reject('User already exists, please try again later')
@@ -139,7 +147,9 @@ module.exports = {
           employee_type: employeeType,
           name: name,
           is_online: true,
-          client_id: clientID
+          client_id: clientID,
+          gender: gender,
+          date_of_birth: dateOfBirth
         }
 
         const newUser = new User(mongoUser)
@@ -154,6 +164,7 @@ module.exports = {
         }
 
         const token = helpers.admin.sign(secureUser)
+
         return Promise.resolve({ user: createdUser, token: token })
       }
     } catch (error) {
