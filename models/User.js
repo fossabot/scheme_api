@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
   client_id: {
     type: String,
     max: 1024,
-    required: true
+    required: false
   },
   is_admin: {
     type: Boolean,

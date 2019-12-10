@@ -37,8 +37,9 @@ module.exports = {
     if (conditions) {
       responseObj.success.message = success.message
       responseObj.success.content = success
-    } else if (typeof success == 'string') {
-      responseObj.success.message = success
+    }
+    if (typeof success == 'string') {
+      responseObj.success.content = success
     }
     res.json(responseObj.success).end()
   },

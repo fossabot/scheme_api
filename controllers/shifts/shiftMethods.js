@@ -15,10 +15,9 @@ module.exports = {
   get: async function(req, params) {
     try {
       let shifts = await Shift.find({})
-      if (shifts.length <= 0) {
-        return Promise.reject('No shifts found, please try again later')
+      if (shifts.length > 0) {
+        return Promise.resolve(shifts)
       }
-      return Promise.resolve(shifts)
     } catch (error) {
       return Promise.reject(error)
     }

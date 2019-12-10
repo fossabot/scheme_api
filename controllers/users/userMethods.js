@@ -86,7 +86,7 @@ module.exports = {
         { email: params.email },
         { is_online: true }
       )
-      if (user.n <= 0) {
+      if (!user) {
         return Promise.reject(
           'Email or password are incorrect please, try again'
         )
@@ -103,7 +103,11 @@ module.exports = {
           )
         }
         if (isPasswordCorrect) {
-          return Promise.resolve(user)
+          const userObj = user.toObject()
+          delete userObj.password
+
+          const token = helpers.admin.sign(userObj)
+          return Promise.resolve({ user: userObj, token: token })
         } else {
           return Promise.reject(
             'Email or password are incorrect please, try again'
@@ -118,29 +122,33 @@ module.exports = {
   register: async function(req, helpers) {
     try {
       const params = req.body
-
       const email = params.email
       const password = params.password
-      const service = params.service
+      const service = params.service || null
       const name = params.name
       const employeeType = params.employee_type
       const clientID = params.client_id || 123
-      if (!email || !password || !name || !clientID) {
+      const dateOfBirth = helpers.date.toISO(params.date_of_birth)
+      const gender = params.gender
+      const hashedPwd = await helpers.db.genHash(password)
+
+      if (!email || !password || !name) {
         return Promise.reject('Missing parameters, please try again')
       }
-      switch (service) {
-        case 'google': {
-        }
-        case 'facebook': {
-        }
-        case 'linkedin': {
+      if (service) {
+        switch (service) {
+          case 'google': {
+          }
+          case 'facebook': {
+          }
+          case 'linkedin': {
+          }
         }
       }
       const isDuplicate = await User.findOne({ email: email })
       if (isDuplicate) {
         return Promise.reject('User already exists, please try again later')
       } else {
-        const hashedPwd = await helpers.db.genHash(password)
         const mongoUser = {
           email: email,
           password: hashedPwd,
