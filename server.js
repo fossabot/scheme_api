@@ -10,6 +10,8 @@ const shiftRoutes = require('./routes/shiftRoutes')
 const userRoutes = require('./routes/userRoutes')
 const requestRoutes = require('./routes/requestRoutes')
 const clientRoutes = require('./routes/clientRoutes')
+const messengerRoutes = require('./routes/messengerRoutes')
+
 const verifyToken = require('./middlewares/verifyToken')
 
 // Env Vars
@@ -26,6 +28,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/shifts', verifyToken, shiftRoutes)
 app.use('/api/requests', verifyToken, requestRoutes)
 app.use('/api/clients', clientRoutes)
+app.use('/api/messenger', verifyToken, messengerRoutes)
 
 // DB Connect
 mongoose.connect(
