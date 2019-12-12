@@ -21,14 +21,13 @@ module.exports = {
         _id: transcript_id
       })
       if (foundTranscript.length > 0) {
-        await new Messenger.message(mongoMessage).save()
+        const success = await new Messenger.message(mongoMessage).save()
+        return Promise.resolve(success)
       } else {
         return Promise.reject(
           'No transcript with that ID found, please start a new chat'
         )
       }
-
-      return Promise.resolve('Message successfully sent')
     } catch (error) {
       return Promise.resolve(error)
     }
@@ -74,6 +73,15 @@ module.exports = {
         user_1: mongoMessage.sender_id,
         user_2: mongoMessage.reciever_id,
         created_at: new Date()
+      }
+
+      // Check exists
+      const duplicate = await Messenger.transcript.find({
+        user_1: mongoTranscript.user_1,
+        user_2: mongoTranscript.user_2
+      })
+      if (duplicate.length > 0) {
+        return Promise.resolve('Chat already exists')
       }
 
       const transcript = await new Messenger.transcript(mongoTranscript).save()
