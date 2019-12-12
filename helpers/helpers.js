@@ -16,9 +16,12 @@ let responseObj = {
 
 module.exports = {
   error(res, err) {
-    // new Error(err)
     console.log(err)
-    responseObj.error.content = err.message
+
+    responseObj.error.content = err.hasOwnProperty('message')
+      ? err.message
+      : err
+
     res.json(responseObj.error).end()
   },
   success(res, success) {

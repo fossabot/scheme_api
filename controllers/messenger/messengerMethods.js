@@ -16,7 +16,18 @@ module.exports = {
         reciever_id: reciever,
         transcript_id: transcript_id
       }
-      await new Messenger.message(mongoMessage).save()
+      // Find transcript first
+      const foundTranscript = await Messenger.transcript.find({
+        _id: transcript_id
+      })
+      if (foundTranscript.length > 0) {
+        await new Messenger.message(mongoMessage).save()
+      } else {
+        return Promise.reject(
+          'No transcript with that ID found, please start a new chat'
+        )
+      }
+
       return Promise.resolve('Message successfully sent')
     } catch (error) {
       return Promise.resolve(error)
@@ -60,10 +71,8 @@ module.exports = {
         reciever_id: reciever
       }
       const mongoTranscript = {
-        participants: {
-          user_1: mongoMessage.sender_id,
-          user_2: mongoMessage.reciever_id
-        },
+        user_1: mongoMessage.sender_id,
+        user_2: mongoMessage.reciever_id,
         created_at: new Date()
       }
 
@@ -78,7 +87,11 @@ module.exports = {
   getMessages: async function(req) {
     try {
       const params = req.body
+      console.log(params)
       const transcript = params.transcript_id
+      if (!transcript) {
+        return Promise.reject('Please provide a transcript ID')
+      }
 
       const messages = await Messenger.message.find({
         transcript_id: transcript
@@ -92,13 +105,35 @@ module.exports = {
   getAll: async function(req) {
     try {
       const currentUser = req.user._id
-      const transcriptConditon = [
-        { participants: { user_1: currentUser } },
-        { participants: { user_2: currentUser } }
-      ]
+      const transcriptConditons = {
+        isUser1: { user_1: currentUser },
+        isUser2: { user_2: currentUser }
+      }
 
-      const chats = await Messenger.transcript.find().or(transcriptConditon)
-      return Promise.resolve(chats)
+      const _isUser1 = await Messenger.transcript.findOne(
+        transcriptConditons.isUser1
+      )
+      const _isUser2 = await Messenger.transcript.findOne(
+        transcriptConditons.isUser2
+      )
+
+      const response = await Promise.all([_isUser1, _isUser2])
+      const len = response.length
+      let completeResponses = []
+
+      for (let i = 0; i < len; i++) {
+        let item = response[i]
+        if (item) {
+          item = item.toObject()
+          const lastMessage = await Messenger.message.find({
+            transcript_id: item._id
+          })
+
+          item.message = lastMessage[lastMessage.length - 1]
+          completeResponses.push(item)
+        }
+      }
+      return Promise.resolve(completeResponses)
     } catch (error) {
       return Promise.reject(error)
     }

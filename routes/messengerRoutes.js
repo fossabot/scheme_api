@@ -10,7 +10,7 @@ router.get('/transcripts', (req, res) => {
 router.get('/messages', (req, res) => {
   messenger.getMessages(req, res)
 })
-router.post('/sendMessage', (req, res) => {
+router.post('/send', (req, res) => {
   messenger.sendMessage(req, res)
 })
 router.post('/readMessage', (req, res) => {

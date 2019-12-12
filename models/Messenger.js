@@ -34,8 +34,12 @@ const messageModel = mongoose.Schema({
   }
 })
 const transcriptModel = mongoose.Schema({
-  participants: {
-    type: Object,
+  user_1: {
+    type: String,
+    required: true
+  },
+  user_2: {
+    type: String,
     required: true
   },
   created_at: {
