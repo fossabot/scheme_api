@@ -51,6 +51,7 @@ module.exports = {
         helpers.error(res, error)
       })
   },
+
   getMessages: (req, res) => {
     methods
       .getMessages(req)

@@ -7,7 +7,7 @@ router.post('/start', (req, res) => {
 router.get('/transcripts', (req, res) => {
   messenger.getAll(req, res)
 })
-router.get('/messages', (req, res) => {
+router.post('/messages', (req, res) => {
   messenger.getMessages(req, res)
 })
 router.post('/send', (req, res) => {
@@ -16,4 +16,5 @@ router.post('/send', (req, res) => {
 router.post('/readMessage', (req, res) => {
   messenger.readMessage(req, res)
 })
+
 module.exports = router

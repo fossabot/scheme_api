@@ -84,10 +84,10 @@ module.exports = {
       return Promise.reject(error)
     }
   },
+
   getMessages: async function(req) {
     try {
       const params = req.body
-      console.log(params)
       const transcript = params.transcript_id
       if (!transcript) {
         return Promise.reject('Please provide a transcript ID')

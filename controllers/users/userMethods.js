@@ -81,41 +81,33 @@ module.exports = {
 
   login: async function(req, helpers) {
     const params = req.body
-    if (params.email && params.password) {
-      const user = await User.findOneAndUpdate(
-        { email: params.email },
-        { is_online: true }
-      )
-      if (!user) {
+    const user = await User.findOneAndUpdate(
+      { email: params.email },
+      { is_online: true }
+    )
+    if (!user) {
+      return Promise.reject('Email or password are incorrect please, try again')
+    } else {
+      let isPasswordCorrect
+      if (user.password) {
+        isPasswordCorrect = await helpers.db.compareHash(
+          params.password,
+          user.password
+        )
+      } else {
+        return Promise.reject('Failed to get password please try again later.')
+      }
+      if (isPasswordCorrect) {
+        const userObj = user.toObject()
+        delete userObj.password
+
+        const token = helpers.admin.sign(userObj)
+        return Promise.resolve({ user: userObj, token: token })
+      } else {
         return Promise.reject(
           'Email or password are incorrect please, try again'
         )
-      } else {
-        let isPasswordCorrect
-        if (user.password) {
-          isPasswordCorrect = await helpers.db.compareHash(
-            params.password,
-            user.password
-          )
-        } else {
-          return Promise.reject(
-            'Failed to get password please try again later.'
-          )
-        }
-        if (isPasswordCorrect) {
-          const userObj = user.toObject()
-          delete userObj.password
-
-          const token = helpers.admin.sign(userObj)
-          return Promise.resolve({ user: userObj, token: token })
-        } else {
-          return Promise.reject(
-            'Email or password are incorrect please, try again'
-          )
-        }
       }
-    } else {
-      return Promise.reject('Please provide an email or password')
     }
   },
 
