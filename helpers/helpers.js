@@ -6,41 +6,23 @@ const socket = require('./socket')
 let responseObj = {
   success: {
     success: true,
-    message: '',
     content: ''
   },
   error: {
     error: true,
-    message: '',
     content: ''
   }
 }
 
 module.exports = {
   error(res, err) {
+    // new Error(err)
     console.log(err)
-    const conditions =
-      typeof err == 'object' ||
-      (typeof err == 'array' && err.hasOwnProperty('message'))
-    if (conditions) {
-      responseObj.error.message = err.message
-    } else if (typeof err == 'string') {
-      responseObj.error.message = err
-    }
-
+    responseObj.error.content = err.message
     res.json(responseObj.error).end()
   },
   success(res, success) {
-    const conditions =
-      typeof success == 'object' ||
-      (typeof success == 'array' && success.hasOwnProperty('message'))
-    if (conditions) {
-      responseObj.success.message = success.message
-      responseObj.success.content = success
-    }
-    if (typeof success == 'string') {
-      responseObj.success.content = success
-    }
+    responseObj.success.content = success
     res.json(responseObj.success).end()
   },
   validate(req, res, key) {
