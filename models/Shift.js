@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const shiftSchema = new mongoose.Schema({
-  key: {
+  assigned_to: {
     type: String,
     required: true
   },
@@ -24,7 +24,7 @@ const shiftSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  // 1 (Normal), 2(Locumn), 3(Holiday)
+  // 1 (Normal), 2(Locumn), 3(Holiday) 4(Time OfF) 5 Sick Leave
   shift_type: {
     type: Number,
     required: true
@@ -33,8 +33,10 @@ const shiftSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+
   repeat_days: {
-    type: Object
+    type: Object,
+    default: null
     // default: {
     //   repeat_days: [1, 5],
     //   reapeat_for: 1

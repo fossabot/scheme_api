@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const helpers = require('./../helpers/helpers')
 const isRouteAllowed = (req, res, next) => {
-  const token = req.header('authorization')
+  const token = req.header('authorisation')
   if (!token) {
     helpers.error(res, 'No token detected')
   } else {

@@ -3,7 +3,7 @@ const helpers = require('./../../helpers/helpers')
 module.exports = {
   createShift: (req, res) => {
     methods
-      .createShift(helpers, req, res)
+      .createShift(req)
       .then(response => {
         helpers.success(res, response)
       })
@@ -14,7 +14,7 @@ module.exports = {
 
   getAllShifts: (req, res) => {
     methods
-      .get(req, 'all')
+      .getShift(req)
       .then(response => {
         helpers.success(res, response)
       })
@@ -25,7 +25,7 @@ module.exports = {
 
   updateShift: (req, res) => {
     methods
-      .update(req)
+      .updateShift(req)
       .then(response => {
         helpers.success(res, response)
       })
