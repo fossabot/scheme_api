@@ -37,10 +37,7 @@ const userSchema = new mongoose.Schema({
     max: 1024,
     required: false
   },
-  is_admin: {
-    type: Boolean,
-    default: false
-  },
+
   gender: {
     type: String,
     required: true
