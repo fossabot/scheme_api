@@ -9,7 +9,7 @@ const messageModel = mongoose.Schema({
     default: Date.now
   },
   attachments: {
-    type: String
+    type: Array
   },
   is_read: {
     type: Boolean,

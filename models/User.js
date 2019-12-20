@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 255
   },
+  phone_number: {
+    type: Number
+  },
+  address: {
+    type: Object
+  },
   employee_type: {
     type: Number,
     required: true,
