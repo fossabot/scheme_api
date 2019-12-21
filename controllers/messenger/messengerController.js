@@ -1,6 +1,16 @@
 const methods = require('./messengerMethods')
 const helpers = require('./../../helpers/helpers')
 module.exports = {
+  deleteTranscript: (req, res) => {
+    methods
+      .deleteTranscript(req)
+      .then(response => {
+        helpers.success(res, response)
+      })
+      .catch(error => {
+        helpers.error(res, error)
+      })
+  },
   startChat: (req, res) => {
     methods
       .startChat(req)

@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const messenger = require('./../controllers/messenger/messengerController')
+router.delete('/transcripts', (req, res) => {
+  messenger.deleteTranscript(req, res)
+})
 router.post('/start', (req, res) => {
   messenger.startChat(req, res)
 })

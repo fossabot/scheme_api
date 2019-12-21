@@ -1,7 +1,7 @@
 const Shift = require('./../../models/Shift')
 
 module.exports = {
-  updateShift: async function(req) {
+  updateShift: async req => {
     const params = req.body
     const shiftID = params.shift_id
     const shiftUpdate = params.shift_update
@@ -12,7 +12,7 @@ module.exports = {
     }
   },
 
-  getShift: async function(req) {
+  getShift: async req => {
     try {
       let shifts = await Shift.find({})
       return Promise.resolve(shifts)
@@ -21,7 +21,7 @@ module.exports = {
     }
   },
 
-  createShift: async function(req) {
+  createShift: async req => {
     try {
       let params = req.body
       const user = req.user

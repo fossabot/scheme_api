@@ -1,7 +1,16 @@
 const Messenger = require('../../models/Messenger')
 
 module.exports = {
-  sendMessage: async function(req) {
+  deleteTranscript: async req => {
+    try {
+      const transcriptID = req.body.transcript_id
+      await Messenger.transcript.findByIdAndDelete({ _id: transcriptID })
+      return Promise.resolve('Transcript successfully deleted')
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  sendMessage: async req => {
     try {
       const params = req.body
       const transcript_id = params.transcript_id
@@ -32,7 +41,7 @@ module.exports = {
       return Promise.resolve(error)
     }
   },
-  editMessage: async function(req) {
+  editMessage: async req => {
     try {
       const params = req.body
       const message_id = params.message_id
@@ -46,7 +55,7 @@ module.exports = {
       return Promise.resolve(error)
     }
   },
-  deleteMessage: async function(req) {
+  deleteMessage: async req => {
     try {
       const params = req.body
       const message_id = params.message_id
@@ -56,7 +65,7 @@ module.exports = {
       return Promise.resolve(error)
     }
   },
-  startChat: async function(req) {
+  startChat: async req => {
     try {
       const params = req.body
       const currentUser = req.user._id
@@ -93,7 +102,7 @@ module.exports = {
     }
   },
 
-  getMessages: async function(req) {
+  getMessages: async req => {
     try {
       const params = req.body
       const transcript = params.transcript_id
@@ -109,8 +118,8 @@ module.exports = {
       return Promise.error(error)
     }
   },
-  readMessage: async function(req) {},
-  getAll: async function(req) {
+  readMessage: async req => {},
+  getAll: async req => {
     try {
       const currentUser = req.user._id
       const transcriptConditons = {

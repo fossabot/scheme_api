@@ -1,6 +1,6 @@
 const User = require('./../../models/User')
 module.exports = {
-  getOneUser: async function(req) {
+  getOneUser: async req => {
     let params = req.body
     if (params._id) {
       let foundUser = await User.findOne({ _id: params._id })
@@ -13,7 +13,7 @@ module.exports = {
     }
   },
 
-  getAllUsers: async function(req) {
+  getAllUsers: async req => {
     const params = req.body
     const clientID = params.client_id
     // console.log(params)
@@ -28,7 +28,7 @@ module.exports = {
     }
   },
 
-  logOut: async function(req, helpers) {
+  logOut: async (req, helpers) => {
     let currentUser = helpers.db.decode(req)
     try {
       let isUserSignedIn = await User.findOne({
@@ -50,7 +50,7 @@ module.exports = {
     }
   },
 
-  updateUser: async function(req) {
+  updateUser: async req => {
     let params = req.body
     const userID = params._id
     const userUpdate = params.user_update
@@ -62,7 +62,7 @@ module.exports = {
     }
   },
 
-  removeUser: async function(req) {
+  removeUser: async req => {
     let header = req.header('Authorisation')
     let userDetails = jwt.verify(header, process.env.JWT_SECRET)
     try {
@@ -79,7 +79,7 @@ module.exports = {
     }
   },
 
-  login: async function(req, helpers) {
+  login: async (req, helpers) => {
     const params = req.body
     const user = await User.findOneAndUpdate(
       { email: params.email },
@@ -111,7 +111,7 @@ module.exports = {
     }
   },
 
-  register: async function(req, helpers) {
+  register: async (req, helpers) => {
     try {
       const params = req.body
       const email = params.email
