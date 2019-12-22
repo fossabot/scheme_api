@@ -21,8 +21,7 @@ const userSchema = new mongoose.Schema({
   employee_type: {
     type: Number,
     required: true,
-    default: 1,
-    max: 3
+    default: 2
   },
   password: {
     type: String,

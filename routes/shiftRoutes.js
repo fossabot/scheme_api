@@ -3,16 +3,19 @@ const verifyToken = require('../middlewares/verifyToken')
 const express = require('express')
 const router = express.Router()
 
-router.get('/all', verifyToken, (req, res) => {
+router.get('/all', (req, res) => {
   shift.getAllShifts(req, res)
 })
 
-router.post('/create', verifyToken, (req, res) => {
+router.post('/create', (req, res) => {
   shift.createShift(req, res)
 })
 
-router.post('/update', verifyToken, (req, res) => {
+router.post('/update', (req, res) => {
   shift.updateShift(req, res)
+})
+router.delete('/delete', (req, res) => {
+  shift.deleteShift(req, res)
 })
 
 module.exports = router

@@ -11,6 +11,7 @@ const isRouteAllowed = (req, res, next) => {
         return
       } else {
         req.user = decoded
+        req.isAdmin = req.user.employee_type == 1
         next()
       }
     })

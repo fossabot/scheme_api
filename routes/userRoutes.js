@@ -6,7 +6,9 @@ const router = express.Router()
 router.post('/login', (req, res) => {
   user.login(req, res)
 })
-
+router.get('/notifications', verifyToken, (req, res) => {
+  user.getNotifications(req, res)
+})
 router.post('/register', (req, res) => {
   user.register(req, res)
 })
