@@ -26,6 +26,7 @@ module.exports = {
   },
   success(res, success) {
     responseObj.success.content = success
+
     res.json(responseObj.success).end()
   },
   validate(req, res, key) {

@@ -10,7 +10,9 @@ router.post('/login', (req, res) => {
 router.post('/register', (req, res) => {
   user.register(req, res)
 })
-
+router.post('/newemployee', (req, res) => {
+  user.updateNewEmployee(req, res)
+})
 router.post('/remove', (req, res) => {
   user.removeUser(req, res)
 })

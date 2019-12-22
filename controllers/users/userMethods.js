@@ -1,4 +1,5 @@
 const User = require('./../../models/User')
+const helpers = require('./../../helpers/helpers')
 module.exports = {
   getOneUser: async req => {
     let params = req.body
@@ -18,7 +19,7 @@ module.exports = {
     const clientID = params.client_id
 
     try {
-      const properties = 'name email employee_type date_of_birth is_online'
+      const properties = 'name email employee_type is_online _id'
       let users = await User.find({ _id: { $ne: req.user._id } }, properties)
 
       return Promise.resolve(users)
@@ -77,6 +78,7 @@ module.exports = {
 
   login: async (req, helpers) => {
     const params = req.body
+
     const user = await User.findOneAndUpdate(
       { email: params.email },
       { is_online: true }
@@ -116,10 +118,10 @@ module.exports = {
       const name = params.name
       const employeeType = params.employee_type
       const clientID = params.client_id || 123
-      const dateOfBirth = helpers.date.toISO(params.date_of_birth)
+      const dateOfBirth = params.date_of_birth
       const gender = params.gender
       const hashedPwd = await helpers.db.genHash(password)
-
+      const adminGen = params.admin_gen
       if (!email || !password || !name) {
         return Promise.reject('Missing parameters, please try again')
       }
@@ -145,7 +147,8 @@ module.exports = {
           is_online: true,
           client_id: clientID,
           gender: gender,
-          date_of_birth: dateOfBirth
+          date_of_birth: dateOfBirth,
+          admin_gen: adminGen
         }
 
         const newUser = new User(mongoUser)
@@ -158,10 +161,15 @@ module.exports = {
           employee_type: createdUser.employee_type,
           registration_date: createdUser.registration_date
         }
+        let returnData = {}
 
         const token = helpers.admin.sign(secureUser)
-
-        return Promise.resolve({ user: createdUser, token: token })
+        if (adminGen) {
+          returnData = 'Employee successfully created'
+        } else {
+          returnData = { user: createdUser, token: token }
+        }
+        return Promise.resolve(returnData)
       }
     } catch (error) {
       return Promise.reject(error)

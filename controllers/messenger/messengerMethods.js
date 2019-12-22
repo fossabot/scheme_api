@@ -5,6 +5,7 @@ module.exports = {
     try {
       const transcriptID = req.body.transcript_id
       await Messenger.transcript.findByIdAndDelete({ _id: transcriptID })
+      await Messenger.message.deleteMany({ transcript_id: transcriptID })
       return Promise.resolve('Transcript successfully deleted')
     } catch (error) {
       return Promise.reject(error)

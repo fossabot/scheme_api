@@ -1,6 +1,16 @@
 const methods = require('./userMethods')
 const helpers = require('./../../helpers/helpers')
 module.exports = {
+  updateNewEmployee: (req, res) => {
+    methods
+      .updateNewEmployee(req, helpers)
+      .then(response => {
+        helpers.success(res, response)
+      })
+      .catch(err => {
+        helpers.error(res, err)
+      })
+  },
   getOneUser: (req, res) => {
     methods
       .getOneUser(req, helpers)

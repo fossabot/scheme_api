@@ -4,9 +4,13 @@ module.exports = {
   updateShift: async req => {
     const params = req.body
     const shiftID = params.shift_id
-    const shiftUpdate = params.shift_update
+    const updateParams = params.shift_update
     try {
-      const updatedShift = await Shift.updateOne({ _id: shiftID }, shiftUpdate)
+      const updatedShift = await Shift.findByIdAndUpdate(
+        { _id: shiftID },
+        updateParams
+      )
+      return Promise.resolve(updatedShift)
     } catch (error) {
       return Promise.reject('Error when updating shift, please try again')
     }
