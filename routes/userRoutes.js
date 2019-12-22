@@ -1,5 +1,6 @@
 const user = require('../controllers/users/userController')
 const express = require('express')
+const verifyToken = require('./../middlewares/verifyToken')
 const router = express.Router()
 
 router.post('/login', (req, res) => {
@@ -16,10 +17,10 @@ router.post('/remove', (req, res) => {
 router.post('/update', (req, res) => {
   user.updateUser(req, res)
 })
-router.get('/logout', (req, res) => {
+router.get('/logout', verifyToken, (req, res) => {
   user.logOut(req, res)
 })
-router.get('/all', (req, res) => {
+router.get('/all', verifyToken, (req, res) => {
   user.getAllUsers(req, res)
 })
 router.get('/one', (req, res) => {

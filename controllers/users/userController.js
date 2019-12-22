@@ -34,14 +34,14 @@ module.exports = {
       })
   },
 
-  logOut: (req, res, helpers) => {
+  logOut: (req, res) => {
     methods
       .logOut(req, res)
       .then(response => {
         helpers.success(res, response)
       })
-      .catch(err => {
-        helpers.error(res, err)
+      .catch(error => {
+        helpers.error(res, error)
       })
   },
 

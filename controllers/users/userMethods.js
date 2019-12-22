@@ -16,23 +16,22 @@ module.exports = {
   getAllUsers: async req => {
     const params = req.body
     const clientID = params.client_id
-    // console.log(params)
-    // if (!clientID) {
-    //   return Promise.reject('Missing paramters, please try again later')
-    // }
+
     try {
-      let users = await User.find({})
+      const properties = 'name email employee_type date_of_birth is_online'
+      let users = await User.find({ _id: { $ne: req.user._id } }, properties)
+
       return Promise.resolve(users)
     } catch (error) {
       return Promise.reject(error)
     }
   },
 
-  logOut: async (req, helpers) => {
-    let currentUser = helpers.db.decode(req)
+  logOut: async req => {
+    let currentUser = req.user._id
     try {
       let isUserSignedIn = await User.findOne({
-        _id: currentUser['user_id'],
+        _id: currentUser,
         is_online: true
       })
       if (!isUserSignedIn) {
@@ -40,11 +39,8 @@ module.exports = {
           'User not signed in, you can only sign in if your are logged in.'
         )
       }
-      let userlogOut = await User.findByIdAndUpdate(
-        { _id: currentUser['user_id'] },
-        { is_online: false }
-      )
-      return Promise.resolve(userlogOut)
+      await User.findByIdAndUpdate({ _id: currentUser }, { is_online: false })
+      return Promise.resolve('User successfully logged out.')
     } catch (error) {
       return Promise.reject(error)
     }
