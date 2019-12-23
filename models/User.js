@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema({
   admin_gen: {
     type: Boolean,
     default: false
+  },
+  preferences: {
+    type: Object,
+    required: false
   }
 })
 module.exports = mongoose.model('User', userSchema)

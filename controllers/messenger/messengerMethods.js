@@ -1,5 +1,5 @@
 const Messenger = require('../../models/Messenger')
-
+const Notification = require('../../models/Notification')
 module.exports = {
   deleteTranscript: async req => {
     try {
@@ -26,12 +26,20 @@ module.exports = {
         reciever_id: reciever,
         transcript_id: transcript_id
       }
+      let mongoNotification = {
+        message: '',
+        url: '/messenger/send',
+        content: content,
+        for: reciever,
+        type: 'message'
+      }
       // Find transcript first
       const foundTranscript = await Messenger.transcript.find({
         _id: transcript_id
       })
       if (foundTranscript.length > 0) {
         const success = await new Messenger.message(mongoMessage).save()
+        await new Notification(mongoNotification).save()
         return Promise.resolve(success)
       } else {
         return Promise.reject(

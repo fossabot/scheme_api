@@ -4,7 +4,7 @@ const User = require('./../../models/User')
 module.exports = {
   deleteShift: async req => {
     try {
-      const shiftID = req.body.shift_id
+      const shiftID = req.body.id
       await Shift.findByIdAndDelete({ _id: shiftID })
       return Promise.resolve('Shift successfully deleted')
     } catch (error) {
@@ -13,24 +13,32 @@ module.exports = {
   },
   updateShift: async req => {
     const params = req.body
-    const shiftID = params.shift_id
-    const updateParams = params.shift_update
-    console.log(updateParams)
+    const shiftID = params.id
+    const updateParams = params.update
 
     // Check if admin & create notification for admins to approve
-    if (req.isAdmin) {
-      let admins = await User.find({ employee_type: 1 })
-      let len = admins.length
-      let msg = `${req.user.name} requesting changes to their shift`
-      for (let i = 0; i < len; i++) {
-        const admin = admins[i]
-        await new Notification({
-          title: '',
-          message: msg,
-          for: admin._id,
-          content: updateParams
-        }).save()
+    if (!req.isAdmin) {
+      let admins = await User.find({ employee_type: 1 }, '_id')
+      let msg = `${req.user.name} is requesting changes to their shift`
+      let sameShiftNotifications = await Notification.findOne({
+        content: { id: shiftID },
+        requested_by: req.user._id
+      })
+      if (sameShiftNotifications && sameShiftNotifications.length >= 2) {
+        return Promise.reject(
+          'You have made the maximum shift change requests for this shift.'
+        )
       }
+
+      await new Notification({
+        title: '',
+        message: msg,
+        for: admins,
+        content: { id: shiftID, update: updateParams },
+        type: 'approve',
+        url: '/shifts/update',
+        requested_by: req.user._id
+      }).save()
     } else {
       try {
         const updatedShift = await Shift.findByIdAndUpdate(

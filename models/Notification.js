@@ -10,16 +10,28 @@ let notificationModel = mongoose.Schema({
     type: String,
     default: 'info'
   },
-  for: {
-    type: String,
-    required: true
-  },
+  for: [
+    {
+      user_id: String
+    }
+  ],
   is_read: {
-    type: String,
+    type: Boolean,
     default: false
   },
   content: {
-    type: Array | Object
+    type: Object
+  },
+  url: {
+    type: String
+  },
+  requested_by: {
+    type: String,
+    required: false
+  },
+  created_at: {
+    default: Date.now,
+    type: Date
   }
 })
 

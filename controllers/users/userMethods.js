@@ -1,15 +1,6 @@
 const User = require('./../../models/User')
 const helpers = require('./../../helpers/helpers')
-const Notification = require('./../../models/Notification')
 module.exports = {
-  getNotifications: async req => {
-    try {
-      const allNotifications = await Notification.find({ for: req.user._id })
-      return Promise.resolve(allNotifications)
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  },
   getOneUser: async req => {
     let params = req.body
     if (params._id) {

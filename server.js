@@ -11,6 +11,7 @@ const userRoutes = require('./routes/userRoutes')
 const requestRoutes = require('./routes/requestRoutes')
 const clientRoutes = require('./routes/clientRoutes')
 const messengerRoutes = require('./routes/messengerRoutes')
+const notificationRoutes = require('./routes/notificationRoutes')
 
 const verifyToken = require('./middlewares/verifyToken')
 
@@ -29,6 +30,7 @@ app.use('/api/shifts', verifyToken, shiftRoutes)
 app.use('/api/requests', verifyToken, requestRoutes)
 app.use('/api/clients', clientRoutes)
 app.use('/api/messenger', verifyToken, messengerRoutes)
+app.use('/api/notifications', verifyToken, notificationRoutes)
 
 // DB Connect
 mongoose.connect(
