@@ -131,19 +131,11 @@ module.exports = {
   getAll: async req => {
     try {
       const currentUser = req.user._id
-      const transcriptConditons = {
-        isUser1: { user_1: currentUser },
-        isUser2: { user_2: currentUser }
-      }
 
-      const _isUser1 = await Messenger.transcript.findOne(
-        transcriptConditons.isUser1
-      )
-      const _isUser2 = await Messenger.transcript.findOne(
-        transcriptConditons.isUser2
-      )
+      const response = await Messenger.transcript.find({
+        $or: [{ user_1: currentUser }, { user_2: currentUser }]
+      })
 
-      const response = await Promise.all([_isUser1, _isUser2])
       const len = response.length
       let completeResponses = []
 

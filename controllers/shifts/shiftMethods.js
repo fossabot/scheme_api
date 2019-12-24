@@ -1,6 +1,22 @@
 const Shift = require('./../../models/Shift')
 const Notification = require('./../../models/Notification')
 const User = require('./../../models/User')
+async function getAdmins() {
+  let admins = await User.find({ employee_type: 1 }, '_id')
+  return admins
+}
+async function createNotification(config) {
+  /**
+   * title: '',
+    message: msg,
+    for: admins,
+    content: { id: shiftID, update: updateParams },
+    type: 'approve',
+    url: '/shifts/update',
+    requested_by: req.user._id
+   */
+  await new Notification(config).save()
+}
 module.exports = {
   deleteShift: async req => {
     try {
@@ -18,7 +34,6 @@ module.exports = {
 
     // Check if admin & create notification for admins to approve
     if (!req.isAdmin) {
-      let admins = await User.find({ employee_type: 1 }, '_id')
       let msg = `${req.user.name} is requesting changes to their shift`
       let sameShiftNotifications = await Notification.findOne({
         content: { id: shiftID },
@@ -30,15 +45,15 @@ module.exports = {
         )
       }
 
-      await new Notification({
+      await createNotification({
         title: '',
         message: msg,
-        for: admins,
+        for: await getAdmins(),
         content: { id: shiftID, update: updateParams },
         type: 'approve',
         url: '/shifts/update',
         requested_by: req.user._id
-      }).save()
+      })
     } else {
       try {
         const updatedShift = await Shift.findByIdAndUpdate(
@@ -72,7 +87,7 @@ module.exports = {
       let employeeType = user.employee_type
       let shiftType = !params.shift_type ? employeeType : params.shift_type
       let isApprvoed = {}
-      if (req.user.employee_type == 1) {
+      if (req.isAdmin) {
         isApprvoed = {
           admin: 1,
           user: 1
@@ -102,8 +117,26 @@ module.exports = {
 
       if (!duplicateShift) {
         let shift = new Shift(mongoShift)
-        const savedShift = await shift.save()
-        return Promise.resolve(savedShift)
+        if (req.isAdmin) {
+          const savedShift = await shift.save()
+          return Promise.resolve(savedShift)
+        } else {
+          let admins = await getAdmins()
+          let msg = `${req.user.name} has made a request`
+
+          await createNotification({
+            message: msg,
+            for: admins,
+            content: { method: 'POST', data: mongoShift },
+            type: 'approve',
+            url: '/shifts/create',
+            requested_by: req.user._id
+          })
+
+          return Promise.resolve(
+            'Request successfully sent to admins for approval'
+          )
+        }
       } else {
         return Promise.reject('Shift already exists')
       }
