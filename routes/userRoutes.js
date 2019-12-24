@@ -2,7 +2,6 @@ const user = require('../controllers/users/userController')
 const express = require('express')
 const verifyToken = require('./../middlewares/verifyToken')
 const router = express.Router()
-
 router.post('/login', (req, res) => {
   user.login(req, res)
 })

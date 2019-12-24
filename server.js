@@ -5,6 +5,7 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
+const passport = require('passport')
 
 const shiftRoutes = require('./routes/shiftRoutes')
 const userRoutes = require('./routes/userRoutes')
@@ -12,6 +13,7 @@ const requestRoutes = require('./routes/requestRoutes')
 const clientRoutes = require('./routes/clientRoutes')
 const messengerRoutes = require('./routes/messengerRoutes')
 const notificationRoutes = require('./routes/notificationRoutes')
+const serviceRoutes = require('./routes/serviceRoutes')
 
 const verifyToken = require('./middlewares/verifyToken')
 
@@ -23,14 +25,16 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 app.use(compression())
+app.use(passport.initialize())
 
 // Routing
-app.use('/api/users', userRoutes)
-app.use('/api/shifts', verifyToken, shiftRoutes)
-app.use('/api/requests', verifyToken, requestRoutes)
-app.use('/api/clients', clientRoutes)
-app.use('/api/messenger', verifyToken, messengerRoutes)
-app.use('/api/notifications', verifyToken, notificationRoutes)
+app.use('/users', userRoutes)
+app.use('/shifts', verifyToken, shiftRoutes)
+app.use('/requests', verifyToken, requestRoutes)
+app.use('/clients', clientRoutes)
+app.use('/messenger', verifyToken, messengerRoutes)
+app.use('/notifications', verifyToken, notificationRoutes)
+app.use('/auth', serviceRoutes)
 
 // DB Connect
 mongoose.connect(

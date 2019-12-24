@@ -1,5 +1,10 @@
 const mongoose = require('mongoose')
 const shiftSchema = new mongoose.Schema({
+  created_at: {
+    type: Date,
+    default: Date.now,
+    index: { expires: '1m' }
+  },
   assigned_to: {
     type: String,
     required: true

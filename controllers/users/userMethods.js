@@ -1,5 +1,6 @@
 const User = require('./../../models/User')
 const helpers = require('./../../helpers/helpers')
+
 module.exports = {
   getOneUser: async req => {
     let params = req.body
@@ -76,26 +77,29 @@ module.exports = {
     }
   },
 
-  login: async (req, helpers) => {
+  login: async (req, helpers, service) => {
     const params = req.body
-
-    const user = await User.findOneAndUpdate(
-      { email: params.email },
-      { is_online: true }
-    )
+    console.log(params)
+    const user = await User.findOne({ email: params.email })
+    console.log(user)
     if (!user) {
       return Promise.reject('Email or password are incorrect please, try again')
     } else {
-      let isPasswordCorrect
-      if (user.password) {
-        isPasswordCorrect = await helpers.db.compareHash(
-          params.password,
-          user.password
-        )
-      } else {
-        return Promise.reject('Failed to get password please try again later.')
+      let isPasswordCorrect = false
+
+      if (!service) {
+        if (user.password) {
+          isPasswordCorrect = await helpers.db.compareHash(
+            params.password,
+            user.password
+          )
+        } else {
+          return Promise.reject(
+            'Failed to get password please try again later.'
+          )
+        }
       }
-      if (isPasswordCorrect) {
+      if (service || isPasswordCorrect) {
         const userObj = user.toObject()
         delete userObj.password
 
@@ -114,7 +118,6 @@ module.exports = {
       const params = req.body
       const email = params.email
       const password = params.password
-      const service = params.service || null
       const name = params.name
       const employeeType = params.employee_type
       const clientID = params.client_id || 123
@@ -125,16 +128,7 @@ module.exports = {
       if (!email || !password || !name) {
         return Promise.reject('Missing parameters, please try again')
       }
-      if (service) {
-        switch (service) {
-          case 'google': {
-          }
-          case 'facebook': {
-          }
-          case 'linkedin': {
-          }
-        }
-      }
+
       const isDuplicate = await User.findOne({ email: email })
       if (isDuplicate) {
         return Promise.reject('User already exists, please try again later')
