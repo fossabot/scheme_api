@@ -27,7 +27,10 @@ module.exports = {
   success(res, success) {
     responseObj.success.content = success
 
-    res.json(responseObj.success).end()
+    res
+      .status(200)
+      .json(responseObj.success)
+      .end()
   },
   validate(req, res, key) {
     const params = req.body

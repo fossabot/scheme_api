@@ -5,6 +5,7 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
+const morgan = require("morgan");
 const passport = require('passport')
 
 const shiftRoutes = require('./routes/shiftRoutes')
@@ -14,7 +15,6 @@ const clientRoutes = require('./routes/clientRoutes')
 const messengerRoutes = require('./routes/messengerRoutes')
 const notificationRoutes = require('./routes/notificationRoutes')
 const serviceRoutes = require('./routes/serviceRoutes')
-
 const verifyToken = require('./middlewares/verifyToken')
 
 // Env Vars
@@ -26,6 +26,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 app.use(compression())
 app.use(passport.initialize())
+app.use(morgan('combined'))
+
 
 // Test
 app.get('/test', (req, res) => {
@@ -61,5 +63,8 @@ mongoose.connect(
 
 // Server init
 app.listen(7070, () => {
-  console.log('API Running...')
+  console.log(
+    `Scheme server started on Port ${app.get(
+      'port'
+    )} | Environment : ${app.get('env')}`
 })
