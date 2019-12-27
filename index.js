@@ -51,6 +51,6 @@ mongoose.connect(
 )
 
 // Server init
-app.listen(9000, () => {
+app.listen(7070, () => {
   console.log('API Running...')
 })
