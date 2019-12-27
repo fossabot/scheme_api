@@ -51,6 +51,6 @@ mongoose.connect(
 )
 
 // Server init
-app.listen(process.env.PORT || 5000, () => {
+app.listen(9000, () => {
   console.log('API Running...')
 })
