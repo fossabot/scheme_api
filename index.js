@@ -5,7 +5,7 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
-const morgan = require("morgan");
+const morgan = require('morgan')
 const passport = require('passport')
 
 const shiftRoutes = require('./routes/shiftRoutes')
@@ -27,7 +27,6 @@ app.use(cors())
 app.use(compression())
 app.use(passport.initialize())
 app.use(morgan('combined'))
-
 
 // Test
 app.get('/test', (req, res) => {
@@ -64,7 +63,8 @@ mongoose.connect(
 // Server init
 app.listen(7070, () => {
   console.log(
-    `Scheme server started on Port ${app.get(
-      'port'
-    )} | Environment : ${app.get('env')}`
+    `Scheme server started on Port ${app.get('port')} | Environment : ${app.get(
+      'env'
+    )}`
+  )
 })
