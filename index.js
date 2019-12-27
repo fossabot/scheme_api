@@ -63,8 +63,8 @@ mongoose.connect(
 // Server init
 app.listen(7070, () => {
   console.log(
-    `Scheme server started on Port ${app.get('port')} | Environment : ${app.get(
-      'env'
-    )}`
+    `Scheme server started on Port ${app.get('port')} | Environment : ${
+      process.env.NODE_ENV
+    }`
   )
 })
