@@ -57,6 +57,14 @@ const userSchema = new mongoose.Schema({
   },
   preferences: {
     type: Object,
+    default: {
+      general: {
+        live_schedule: false,
+        live_notifications: false,
+        live_dashboard: false,
+        notifications: false
+      }
+    },
     required: false
   }
 })
