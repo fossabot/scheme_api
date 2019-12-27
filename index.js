@@ -61,7 +61,7 @@ mongoose.connect(
 )
 
 // Server init
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 7070, () => {
   console.log(
     `Scheme server started on Port ${process.env.PORT} | Environment : ${process.env.NODE_ENV}`
   )
