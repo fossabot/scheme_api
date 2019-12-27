@@ -3,18 +3,14 @@ const nodeMailer = require('nodemailer')
 module.exports = {
   sign(obj) {
     const token = jwt.sign({ data: obj }, process.env.JWT_SECRET, {
-      expiresIn: '1h'
+      expiresIn: '2h'
     })
     return token
-  },
-  decode(req) {
-    let authHeader = req.header('authorization')
-    return jwt.decode(authHeader, process.env.JWT_SECRET)
   },
 
   sendEmail: async function(emailContent) {
     if (!emailContent.hasOwnProperty('to')) {
-      emailContent['to'] = process.env.DOCK_EMAIL_USERNAME
+      emailContent.to = process.env.DOCK_EMAIL_USERNAME
     }
     nodeMailer.createTestAccount((err, account) => {
       let transporter = nodeMailer.createTransport({
