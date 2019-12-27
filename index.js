@@ -1,7 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
@@ -18,7 +17,7 @@ const serviceRoutes = require('./routes/serviceRoutes')
 const verifyToken = require('./middlewares/verifyToken')
 
 // Env Vars
-dotenv.config()
+if (process.env.NODE_ENV !== 'production') require('dotenv').config()
 
 // Middlewares
 app.use(bodyParser.json())
