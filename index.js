@@ -27,6 +27,15 @@ app.use(cors())
 app.use(compression())
 app.use(passport.initialize())
 
+// Test
+app.get('/test', (req, res) => {
+  res
+    .json({
+      message: 'Hello'
+    })
+    .end()
+})
+
 // Routing
 app.use('/users', userRoutes)
 app.use('/shifts', verifyToken, shiftRoutes)
