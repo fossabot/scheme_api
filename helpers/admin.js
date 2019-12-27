@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken')
 const nodeMailer = require('nodemailer')
 module.exports = {
   sign(obj) {
-    const token = jwt.sign(obj, process.env.JWT_SECRET)
+    const token = jwt.sign({ data: obj }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    })
     return token
   },
   decode(req) {

@@ -7,6 +7,9 @@ const isRouteAllowed = (req, res, next) => {
   } else {
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
+        if (err.name == 'TokenExpiredError') {
+          helpers.error(res, 'Tokenn expired, please refresh by relogging in')
+        }
         helpers.error(res, err)
         return
       } else {
