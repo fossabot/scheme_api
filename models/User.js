@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  preferences: {
+  settings: {
     type: Object,
     default: {
       general: {
