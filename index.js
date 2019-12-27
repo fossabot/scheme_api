@@ -62,5 +62,7 @@ mongoose.connect(
 
 // Server init
 app.listen(7070, () => {
-  console.log(`Scheme api started | Environment : ${process.env.NODE_ENV}`)
+  console.log(
+    `Running | Environment : ${process.env.NODE_ENV || 'Development'}`
+  )
 })
