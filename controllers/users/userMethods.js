@@ -129,9 +129,10 @@ module.exports = {
 
   login: async (req, helpers, service) => {
     const params = req.body
-    console.log(params)
-    const user = await User.findOne({ email: params.email })
-    console.log(user)
+    const user = await User.findOneAndUpdate(
+      { email: params.email },
+      { is_online: true }
+    )
     if (!user) {
       return Promise.reject('Email or password are incorrect please, try again')
     } else {
