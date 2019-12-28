@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 255
   },
+  verified: {
+    type: Boolean,
+    default: false
+  },
   phone_number: {
     type: Number
   },

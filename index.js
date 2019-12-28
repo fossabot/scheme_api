@@ -56,7 +56,9 @@ mongoose.connect(
     useCreateIndex: true
   },
   err => {
-    !err ? console.log('Connected') : console.log(err)
+    !err
+      ? console.log('Database Status: Connected')
+      : console.log(`Database Status: Error ${err}`)
   }
 )
 

@@ -1,20 +1,47 @@
 const User = require('./../../models/User')
 const helpers = require('./../../helpers/helpers')
+const verifier = require('email-verify')
 
+let verifyEmail = (email, errmsg) => {
+  return new Promise((resolve, reject) => {
+    verifier.verify(email, (err, info) => {
+      if (err) reject(err.message)
+      else {
+        if (info.success) {
+          resolve(info.success)
+        } else {
+          reject(errmsg)
+        }
+      }
+    })
+  })
+}
 module.exports = {
-  getOneUser: async req => {
+  verifyUser: async req => {
     let params = req.body
-    if (params._id) {
-      let foundUser = await User.findOne({ _id: params._id })
-      delete foundUser['password']
-      return Promise.resolve(foundUser)
-    } else {
-      return Promise.reject(
-        'No user ID found, please select a user to get their details'
-      )
+    let email = params.email
+    let errmsg = 'Failed to verify email, please enter a valid email.'
+    let successmsg = 'Email successfully verified.'
+    try {
+      let verifiedEmail = await verifyEmail(email, errmsg)
+
+      if (verifiedEmail) {
+        let verfiedUser = await User.findOneAndUpdate(
+          { email: email },
+          { verified: true }
+        )
+        if (verfiedUser) {
+          return Promise.resolve(successmsg)
+        } else {
+          return Promise.reject(errmsg)
+        }
+      } else {
+        return Promise.reject(errmsg)
+      }
+    } catch (e) {
+      return Promise.reject(e)
     }
   },
-
   getAllUsers: async req => {
     const params = req.body
     const clientID = params.client_id

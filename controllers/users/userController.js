@@ -11,9 +11,10 @@ module.exports = {
         helpers.error(res, err)
       })
   },
-  getOneUser: (req, res) => {
+
+  verifyUser: (req, res) => {
     methods
-      .getOneUser(req, helpers)
+      .verifyUser(req, helpers)
       .then(response => {
         helpers.success(res, response)
       })

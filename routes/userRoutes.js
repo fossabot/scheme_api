@@ -12,6 +12,9 @@ router.post('/register', (req, res) => {
 router.post('/newemployee', (req, res) => {
   user.updateNewEmployee(req, res)
 })
+router.post('/verify', (req, res) => {
+  user.verifyUser(req, res)
+})
 router.post('/remove', (req, res) => {
   user.removeUser(req, res)
 })
@@ -23,9 +26,6 @@ router.get('/logout', verifyToken, (req, res) => {
 })
 router.get('/all', verifyToken, (req, res) => {
   user.getAllUsers(req, res)
-})
-router.get('/one', (req, res) => {
-  user.getOneUser(req, res)
 })
 
 module.exports = router
