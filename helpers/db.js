@@ -8,7 +8,7 @@ module.exports = {
   },
 
   compareHash(string, compareString) {
-    var decryptedString = sc.decrypt(string)
+    let decryptedString = sc.decrypt(string)
     let isSame = decryptedString.trim() == compareString.trim()
     return isSame
   }
