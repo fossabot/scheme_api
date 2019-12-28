@@ -14,7 +14,7 @@ router.post('/register', (req, res) => {
 router.post('/newemployee', (req, res) => {
   user.updateNewEmployee(req, res)
 })
-router.post('/verify', (req, res) => {
+router.post('/verify', verifyToken, (req, res) => {
   user.verifyUser(req, res)
 })
 router.post('/remove', (req, res) => {

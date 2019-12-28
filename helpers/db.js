@@ -1,14 +1,15 @@
-const bcrypt = require('bcrypt')
+var simplecrypt = require('simplecrypt')
+var sc = simplecrypt()
 
 module.exports = {
-  genHash: async function(string) {
-    let salt = await bcrypt.genSalt(10)
-    let hash = await bcrypt.hash(string, salt)
+  genHash(string) {
+    let hash = sc.encrypt(string)
     return hash
   },
 
-  compareHash: async function(initString, stringToCompare) {
-    let isSame = await bcrypt.compare(initString, stringToCompare)
+  compareHash(string, compareString) {
+    var decryptedString = sc.decrypt(string)
+    let isSame = decryptedString.trim() == compareString.trim()
     return isSame
   }
 }

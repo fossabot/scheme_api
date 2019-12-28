@@ -5,8 +5,12 @@ const verifier = require('email-verify')
 function verifyEmail(email, errmsg) {
   return new Promise((resolve, reject) => {
     verifier.verify(email, (err, info) => {
-      if (err) reject(err.message)
-      else {
+      if (err) {
+        reject(err.message)
+      } else {
+        if (info.code === infoCodes.domainNotFound) {
+          reject('no_domain')
+        }
         if (info.success) {
           resolve(info.success)
         } else {
@@ -41,7 +45,7 @@ module.exports = {
     }
   },
   verifyUser: async req => {
-    let email = req.user.email
+    let email = req.user.data.email
     let errmsg = 'Failed to verify email, please enter a valid email.'
     let successmsg = 'Email successfully verified.'
     try {
@@ -61,6 +65,12 @@ module.exports = {
         return Promise.reject(errmsg)
       }
     } catch (e) {
+      if (e == 'no_domain') {
+        await User.findOneAndUpdate({ email: email }, { verified: 'error' })
+        return Promise.reject(
+          'Email is invalid, your account has been flagged with an error'
+        )
+      }
       return Promise.reject(e)
     }
   },
