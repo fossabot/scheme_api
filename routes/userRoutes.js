@@ -5,7 +5,9 @@ const router = express.Router()
 router.post('/login', (req, res) => {
   user.login(req, res)
 })
-
+router.post('/forgotpassword', (req, res) => {
+  user.forgotPassword(req, res)
+})
 router.post('/register', (req, res) => {
   user.register(req, res)
 })

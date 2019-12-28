@@ -17,6 +17,29 @@ function verifyEmail(email, errmsg) {
   })
 }
 module.exports = {
+  forgotPassword: async req => {
+    try {
+      let params = req.body
+      let pwd = params.password
+      let email = params.email
+      let password = await helpers.db.genHash(pwd)
+      let updatedUser = await User.findOneAndUpdate(
+        { email: email },
+        { password: password }
+      )
+      if (updatedUser) {
+        return Promise.resolve(
+          'Password successfully changed, you can now login'
+        )
+      } else {
+        return Promise.reject(
+          'Failed to update password, please try again later'
+        )
+      }
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
   verifyUser: async req => {
     let params = req.body
     let email = params.email
