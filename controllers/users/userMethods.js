@@ -2,7 +2,7 @@ const User = require('./../../models/User')
 const helpers = require('./../../helpers/helpers')
 const verifier = require('email-verify')
 
-let verifyEmail = (email, errmsg) => {
+function verifyEmail(email, errmsg) {
   return new Promise((resolve, reject) => {
     verifier.verify(email, (err, info) => {
       if (err) reject(err.message)
