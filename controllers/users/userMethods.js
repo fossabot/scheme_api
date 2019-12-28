@@ -21,7 +21,7 @@ module.exports = {
     try {
       let params = req.body
       let pwd = params.password
-      let email = params.email
+      let email = params.email || req.user.email
       let password = await helpers.db.genHash(pwd)
       let updatedUser = await User.findOneAndUpdate(
         { email: email },
@@ -41,8 +41,7 @@ module.exports = {
     }
   },
   verifyUser: async req => {
-    let params = req.body
-    let email = params.email
+    let email = req.user.email
     let errmsg = 'Failed to verify email, please enter a valid email.'
     let successmsg = 'Email successfully verified.'
     try {

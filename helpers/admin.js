@@ -3,7 +3,7 @@ const nodeMailer = require('nodemailer')
 module.exports = {
   sign(obj) {
     const token = jwt.sign({ data: obj }, process.env.JWT_SECRET, {
-      expiresIn: '2h'
+      expiresIn: '1d'
     })
     return token
   },
