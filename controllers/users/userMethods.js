@@ -92,14 +92,6 @@ module.exports = {
   logOut: async req => {
     let currentUser = req.user._id
     try {
-      let isUserSignedIn = await User.findOne({
-        _id: currentUser
-      })
-      if (!isUserSignedIn) {
-        return Promise.reject(
-          'User not signed in, you can only sign in if your are logged in.'
-        )
-      }
       await User.findByIdAndUpdate({ _id: currentUser }, { is_online: false })
       return Promise.resolve('User successfully logged out.')
     } catch (error) {
