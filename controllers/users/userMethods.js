@@ -75,6 +75,7 @@ module.exports = {
     }
   },
   getAllUsers: async req => {
+    // Change to only return team members that arent you
     const params = req.body
     const clientID = params.client_id
 
@@ -89,11 +90,11 @@ module.exports = {
   },
 
   logOut: async req => {
+    console.log(req.user)
     let currentUser = req.user._id
     try {
       let isUserSignedIn = await User.findOne({
-        _id: currentUser,
-        is_online: true
+        _id: currentUser
       })
       if (!isUserSignedIn) {
         return Promise.reject(
@@ -179,7 +180,7 @@ module.exports = {
       const email = params.email
       const password = params.password
       const name = params.name
-      const employeeType = params.employee_type
+      const employeeType = params.employee_type || 2
       const clientID = params.client_id || 123
       const dateOfBirth = params.date_of_birth
       const gender = params.gender

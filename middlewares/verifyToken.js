@@ -16,7 +16,7 @@ const isRouteAllowed = (req, res, next) => {
         helpers.error(res, err)
         return
       } else {
-        req.user = decoded
+        req.user = decoded.data
         req.isAdmin = req.user.employee_type == 1
         next()
       }
