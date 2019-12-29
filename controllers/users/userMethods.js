@@ -8,9 +8,9 @@ function verifyEmail(email, errmsg) {
       if (err) {
         reject(err.message)
       } else {
-        if (info.code === infoCodes.domainNotFound) {
-          reject('no_domain')
-        }
+        // if (info.code == infoCodes.domainNotFound) {
+        //   reject('no_domain')
+        // }
         if (info.success) {
           resolve(info.success)
         } else {
@@ -45,7 +45,7 @@ module.exports = {
     }
   },
   verifyUser: async req => {
-    let email = req.user.data.email
+    let email = req.user.email
     let errmsg = 'Failed to verify email, please enter a valid email.'
     let successmsg = 'Email successfully verified.'
     try {
@@ -90,7 +90,6 @@ module.exports = {
   },
 
   logOut: async req => {
-    console.log(req.user)
     let currentUser = req.user._id
     try {
       let isUserSignedIn = await User.findOne({
