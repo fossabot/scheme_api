@@ -15,9 +15,9 @@ let notificationModel = mongoose.Schema({
       user_id: String
     }
   ],
-  is_read: {
-    type: Boolean,
-    default: false
+  status: {
+    type: String,
+    default: 'unread'
   },
   requestBody: {
     type: Object,
@@ -36,7 +36,8 @@ let notificationModel = mongoose.Schema({
   created_at: {
     default: Date.now,
     type: Date
-  }
+  },
+
 })
 
 module.exports = mongoose.model('Notification', notificationModel)

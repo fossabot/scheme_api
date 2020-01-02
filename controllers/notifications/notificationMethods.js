@@ -15,8 +15,7 @@ module.exports = {
       let notificationID = req.body.id
       let notificationUpdate = req.body.update
       let notification = await Notification.findByIdAndUpdate(
-        { _id: notificationID },
-        { is_read: true }
+        { _id: notificationID }, notificationUpdate
       )
       return Promise.resolve(notification)
     } catch (error) {
