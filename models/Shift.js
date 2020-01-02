@@ -3,7 +3,7 @@ const shiftSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     default: Date.now,
-    index: { expires: '1m' }
+    // index: { expires: '30d' }
   },
   assigned_to: {
     type: String,

@@ -118,19 +118,23 @@ module.exports = {
 
       if (!duplicateShift) {
         let shift = new Shift(mongoShift)
+        // Send request to admins if they are an admin
+
         if (req.isAdmin) {
           const savedShift = await shift.save()
           return Promise.resolve(savedShift)
         } else {
+
+          // Create notification
           let admins = await getAdmins()
           let msg = `${req.user.name} has made a request`
 
           await createNotification({
             message: msg,
             for: admins,
-            content: { method: 'POST', data: mongoShift },
+            content: mongoShift,
             type: 'approve',
-            url: '/shifts/create',
+            requestBody: { url: '/shifts/create', method: 'POST', data: mongoShift },
             requested_by: req.user._id
           })
 
