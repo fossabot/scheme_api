@@ -1,6 +1,13 @@
 const User = require('./../../models/User')
 const helpers = require('./../../helpers/helpers')
 const verifier = require('email-verify')
+const Notification = require("../../models/Notification");
+const moment = require('moment')
+const now = moment();
+
+function checkDateOfBirth(date) {
+  return now.diff(moment(date), 'years') == 16
+}
 
 function verifyEmail(email, errmsg) {
   return new Promise((resolve, reject) => {
@@ -101,8 +108,22 @@ module.exports = {
 
   updateUser: async req => {
     let params = req.body
-    const userID = params._id
-    const userUpdate = params.user_update
+    const userID = params._id || req.user._id;
+    const userUpdate = params.update;
+
+    if (!req.isAdmin && userUpdate.hasOwnProperty('employee_type')) {
+      let permissionsUpdateMsg = `${req.user.name} is requesting changes to their permissions`;
+      // Create notification for the admins to allow the user
+      await new Notification({
+        type: 'approve',
+        for: await User.find({ employee_type: 1 }, '_id'),
+        message: permissionsUpdateMsg,
+        requested_by: req.user._id,
+        content: userUpdate,
+        requestBody: { url: '/users/update', method: 'POST', data: { _id: userID, update: userUpdate } }
+      }).save();
+      return Promise.resolve('Request successfully sent for admin access');
+    }
     try {
       const updatedUser = await User.updateOne({ _id: userID }, userUpdate)
       return Promise.resolve('User successfully updated')
@@ -185,6 +206,9 @@ module.exports = {
       if (isDuplicate) {
         return Promise.reject('User already exists, please try again later')
       } else {
+        if (!checkDateOfBirth(dateOfBirth)) {
+          return Promise.reject('Employees must be above the age of 16');
+        }
         const mongoUser = {
           email: email,
           password: hashedPwd,

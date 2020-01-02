@@ -49,7 +49,8 @@ module.exports = {
         title: '',
         message: msg,
         for: await getAdmins(),
-        content: { id: shiftID, update: updateParams },
+        requestData: { id: shiftID, update: updateParams },
+        content: updateParams,
         type: 'approve',
         url: '/shifts/update',
         requested_by: req.user._id

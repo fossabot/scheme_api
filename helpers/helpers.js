@@ -32,15 +32,7 @@ module.exports = {
       .json(responseObj.success)
       .end()
   },
-  validate(req, res, key) {
-    const params = req.body
-    if (!params[key]) {
-      this.error(res, 'Missing paramter please try again')
-      return false
-    } else {
-      return true
-    }
-  },
+
   admin,
   date,
   db,

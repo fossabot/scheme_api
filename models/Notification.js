@@ -19,6 +19,10 @@ let notificationModel = mongoose.Schema({
     type: Boolean,
     default: false
   },
+  requestBody: {
+    type: Object,
+    required: true
+  },
   content: {
     type: Object
   },

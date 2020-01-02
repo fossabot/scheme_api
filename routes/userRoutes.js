@@ -2,6 +2,7 @@ const user = require('../controllers/users/userController')
 const express = require('express')
 const verifyToken = require('./../middlewares/verifyToken')
 const router = express.Router()
+
 router.post('/login', (req, res) => {
   user.login(req, res)
 })
@@ -20,7 +21,7 @@ router.post('/verify', verifyToken, (req, res) => {
 router.post('/remove', (req, res) => {
   user.removeUser(req, res)
 })
-router.post('/update', (req, res) => {
+router.post('/update', verifyToken, (req, res) => {
   user.updateUser(req, res)
 })
 router.get('/logout', verifyToken, (req, res) => {
