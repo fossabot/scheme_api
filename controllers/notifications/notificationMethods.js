@@ -1,11 +1,18 @@
 const Notification = require('./../../models/Notification')
 
 module.exports = {
-  deleteNotification: async req => {
+  deleteNotifications: async (req, all) => {
     try {
       let id = req.body.id
-      await Notification.findByIdAndDelete({ _id: id })
-      return Promise.resolve('Notification removed')
+      if (!all) {
+        await Notification.findByIdAndDelete({ _id: id })
+      } else {
+        await Notification.deleteMany({
+          'for._id': req.user._id
+        })
+      }
+      let resolveMessage = all ? 'All notifications cleared.' : 'Notification removed';
+      return Promise.resolve(resolveMessage)
     } catch (error) {
       return Promise.reject(error)
     }

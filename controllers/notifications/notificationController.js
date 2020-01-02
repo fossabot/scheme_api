@@ -3,7 +3,7 @@ const helpers = require('./../../helpers/helpers')
 module.exports = {
   deleteNotification: (req, res) => {
     methods
-      .deleteNotification(req, helpers)
+      .deleteNotifications(req, null)
       .then(response => {
         helpers.success(res, response)
       })
@@ -30,5 +30,16 @@ module.exports = {
       .catch(err => {
         helpers.error(res, err)
       })
-  }
+  },
+  deleteAllNotifications: (req, res) => {
+    methods
+      .deleteNotifications(req, true)
+      .then(response => {
+        helpers.success(res, response)
+      })
+      .catch(err => {
+        helpers.error(res, err)
+      })
+  },
+
 }

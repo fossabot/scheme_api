@@ -10,4 +10,7 @@ router.get('/all', (req, res) => {
 router.delete('/one', (req, res) => {
   notification.deleteNotification(req, res)
 })
+router.delete('/all', (req, res) => {
+  notification.deleteAllNotifications(req, res)
+})
 module.exports = router
