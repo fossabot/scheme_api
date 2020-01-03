@@ -1,4 +1,4 @@
-const helpers = require('./../../helpers/helpers')
+const helpers = require('./../../helpers')
 const methods = require('./clientMethods')
 
 module.exports = {

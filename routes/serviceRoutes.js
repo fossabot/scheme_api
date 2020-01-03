@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport')
-const helpers = require('./../helpers/helpers')
+const helpers = require('./../helpers')
 const methods = require('./../controllers/users/userMethods')
 require('./../controllers/service/google')
 require('./../controllers/service/facebook')

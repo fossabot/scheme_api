@@ -1,5 +1,5 @@
 const methods = require('./messengerMethods')
-const helpers = require('./../../helpers/helpers')
+const helpers = require('./../../helpers')
 module.exports = {
   deleteTranscript: (req, res) => {
     methods

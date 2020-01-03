@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken')
-const helpers = require('./../helpers/helpers')
+const helpers = require('./../helpers')
 
 const isRouteAllowed = (req, res, next) => {
   const token = req.header('authorisation')
   if (!token) {
     helpers.error(res, 'No token detected')
   } else {
-    jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+    jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
       if (err) {
         if (err.name == 'TokenExpiredError') {
           helpers.error(res, {

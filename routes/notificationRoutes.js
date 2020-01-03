@@ -4,6 +4,9 @@ let notification = require('./../controllers/notifications/notificationControlle
 router.post('/update', (req, res) => {
   notification.updateNotification(req, res)
 })
+router.post('/create', (req, res) => {
+  notification.createNotification(req, res)
+})
 router.get('/all', (req, res) => {
   notification.getNotifications(req, res)
 })

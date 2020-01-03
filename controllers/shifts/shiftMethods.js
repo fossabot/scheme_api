@@ -1,22 +1,13 @@
 const Shift = require('./../../models/Shift')
 const Notification = require('./../../models/Notification')
+const helpers = require("../../helpers")
 const User = require('./../../models/User')
+const db = helpers.db;
 async function getAdmins() {
   let admins = await User.find({ employee_type: 1 }, '_id')
   return admins
 }
-async function createNotification(config) {
-  /**
-   * title: '',
-    message: msg,
-    for: admins,
-    content: { id: shiftID, update: updateParams },
-    type: 'approve',
-    url: '/shifts/update',
-    requested_by: req.user._id
-   */
-  await new Notification(config).save()
-}
+
 module.exports = {
   deleteShift: async req => {
     try {
@@ -35,7 +26,7 @@ module.exports = {
     // Check if admin & create notification for admins to approve
     if (!req.isAdmin) {
       let msg = `${req.user.name} is requesting changes to their shift`
-      let sameShiftNotifications = await Notification.findOne({
+      let sameShiftNotifications = await db.findDuplicateNotification({
         content: { id: shiftID },
         requested_by: req.user._id
       })
@@ -45,7 +36,7 @@ module.exports = {
         )
       }
 
-      await createNotification({
+      await db.createNotification({
         title: '',
         message: msg,
         for: await getAdmins(),
@@ -129,7 +120,7 @@ module.exports = {
           let admins = await getAdmins()
           let msg = `${req.user.name} has made a request`
 
-          await createNotification({
+          await db.createNotification({
             message: msg,
             for: admins,
             content: mongoShift,

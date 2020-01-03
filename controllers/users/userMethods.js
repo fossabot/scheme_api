@@ -1,7 +1,6 @@
 const User = require('./../../models/User')
-const helpers = require('./../../helpers/helpers')
+const helpers = require('./../../helpers')
 const verifier = require('email-verify')
-const Notification = require("../../models/Notification");
 const moment = require('moment')
 const now = moment();
 
@@ -114,14 +113,14 @@ module.exports = {
     if (!req.isAdmin && userUpdate.hasOwnProperty('employee_type')) {
       let permissionsUpdateMsg = `${req.user.name} is requesting changes to their permissions`;
       // Create notification for the admins to allow the user
-      await new Notification({
+      await helpers.db.createNotification({
         type: 'approve',
         for: await User.find({ employee_type: 1 }, '_id'),
         message: permissionsUpdateMsg,
         requested_by: req.user._id,
         content: userUpdate,
         requestBody: { url: '/users/update', method: 'POST', data: { _id: userID, update: userUpdate } }
-      }).save();
+      })
       return Promise.resolve('Request successfully sent for admin access');
     }
     try {

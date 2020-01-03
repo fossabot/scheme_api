@@ -1,5 +1,6 @@
 const Notification = require('./../../models/Notification')
-
+const User = require("../../models/User");
+const db = require("../../helpers").db;
 module.exports = {
   deleteNotifications: async (req, all) => {
     try {
@@ -38,5 +39,22 @@ module.exports = {
     } catch (error) {
       return Promise.reject(error)
     }
+  },
+  createNotification: async req => {
+    const params = req.body;
+    const sendTo = params.for;
+    try {
+      if (sendTo == 'admins') {
+        sendTo = await User.find({ employee_type: 1 })
+      }
+      await db.createNotification({
+        ...params
+      });
+      return Promise.resolve(sendTo == 'admins' ? `Notification sent to all admins` : 'Notification sent to ' + sendTo)
+    } catch (error) {
+      return Promise.resolve(error)
+
+    }
+
   }
 }
