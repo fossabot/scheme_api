@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 // 1 (admin), 2(Normal), 3(Locumn)
 
 const userSchema = new mongoose.Schema({
@@ -66,10 +66,10 @@ const userSchema = new mongoose.Schema({
         live_schedule: false,
         live_notifications: false,
         live_dashboard: false,
-        notifications: false
+        sounds: true
       }
     },
     required: false
   }
-})
-module.exports = mongoose.model('User', userSchema)
+});
+module.exports = mongoose.model("User", userSchema);

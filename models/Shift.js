@@ -1,9 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 const shiftSchema = new mongoose.Schema({
-  created_at: {
-    type: Date,
-    default: Date.now,
-  },
   assigned_to: {
     type: String,
     required: true
@@ -46,5 +42,5 @@ const shiftSchema = new mongoose.Schema({
     //   reapeat_for: 1
     // }
   }
-})
-module.exports = mongoose.model('Shift', shiftSchema)
+});
+module.exports = mongoose.model("Shift", shiftSchema);
