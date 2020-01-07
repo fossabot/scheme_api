@@ -32,11 +32,5 @@ module.exports = {
       .updateShift(req)
       .then(response => helpers.success(res, response))
       .catch(err => helpers.error(res, err));
-  },
-  getTemplates: (req, res) => {
-    methods
-      .getTemplates(req)
-      .then(response => helpers.success(res, response))
-      .catch(err => helpers.error(res, err));
   }
 };

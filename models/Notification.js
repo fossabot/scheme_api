@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 let notificationModel = mongoose.Schema({
   message: {
@@ -8,7 +8,7 @@ let notificationModel = mongoose.Schema({
 
   type: {
     type: String,
-    default: 'info'
+    default: "info"
   },
   for: [
     {
@@ -17,11 +17,10 @@ let notificationModel = mongoose.Schema({
   ],
   status: {
     type: String,
-    default: 'unread'
+    default: "unread"
   },
   requestBody: {
-    type: Object,
-    required: true
+    type: Object
   },
   content: {
     type: Object
@@ -36,8 +35,7 @@ let notificationModel = mongoose.Schema({
   created_at: {
     default: Date.now,
     type: Date
-  },
+  }
+});
 
-})
-
-module.exports = mongoose.model('Notification', notificationModel)
+module.exports = mongoose.model("Notification", notificationModel);

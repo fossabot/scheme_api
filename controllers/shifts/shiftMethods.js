@@ -1,7 +1,7 @@
 const Shift = require("./../../models/Shift");
 const helpers = require("../../helpers");
 const User = require("./../../models/User");
-const Template = require("./../../models/Templates");
+const Template = require("../../models/Template");
 
 const db = helpers.db;
 
@@ -11,17 +11,6 @@ async function getAdmins() {
 }
 
 module.exports = {
-  getTemplates: async req => {
-    try {
-      let templates = await Template.find(
-        { assigned_to: req.user._id },
-        "name content date_created"
-      );
-      return Promise.resolve(templates);
-    } catch (error) {
-      return Promise.reject("Error when getting templates");
-    }
-  },
   createFromTimesheet: async req => {
     try {
       let successMsg =
@@ -32,8 +21,10 @@ module.exports = {
       if (template) {
         template.assigned_to = req.user._id;
         successMsg = "Timesheet and template successfully saved.";
+        // Create new template
         await new Template(template).save();
       }
+      // Insert timesheet
       await Shift.insertMany(timesheet);
 
       return Promise.resolve(successMsg);
