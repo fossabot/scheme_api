@@ -8,7 +8,9 @@ router.post("/timesheet", (req, res) => {
 router.get("/all", (req, res) => {
   shift.getAllShifts(req, res);
 });
-
+router.get("/templates", (req, res) => {
+  shift.getTemplates(req, res);
+});
 router.post("/create", (req, res) => {
   shift.createShift(req, res);
 });

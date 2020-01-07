@@ -1,8 +1,8 @@
 const Shift = require("./../../models/Shift");
-const Notification = require("./../../models/Notification");
 const helpers = require("../../helpers");
 const User = require("./../../models/User");
-const convertToJSON = require("csvtojson");
+const Template = require("./../../models/Templates");
+
 const db = helpers.db;
 
 async function getAdmins() {
@@ -11,12 +11,32 @@ async function getAdmins() {
 }
 
 module.exports = {
+  getTemplates: async req => {
+    try {
+      let templates = await Template.find(
+        { assigned_to: req.user._id },
+        "name content date_created"
+      );
+      return Promise.resolve(templates);
+    } catch (error) {
+      return Promise.reject("Error when getting templates");
+    }
+  },
   createFromTimesheet: async req => {
     try {
+      let successMsg =
+        "Timesheet successfully added, it should appear on your schedule soon";
       const params = req.body;
       const timesheet = params.timesheet;
+      const template = params.template;
+      if (template) {
+        template.assigned_to = req.user._id;
+        successMsg = "Timesheet and template successfully saved.";
+        await new Template(template).save();
+      }
       await Shift.insertMany(timesheet);
-      return Promise.resolve("Timesheet successfully added");
+
+      return Promise.resolve(successMsg);
     } catch (error) {
       return Promise.reject(error);
     }
