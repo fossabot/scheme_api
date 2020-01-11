@@ -1,11 +1,15 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
   logo: {
     type: String,
     required: true
   },
-  name: {
+  company_phone: {
+    type: String,
+    required: true
+  },
+  company_name: {
     type: String,
     required: true
   },
@@ -13,6 +17,6 @@ const clientSchema = mongoose.Schema({
     type: Date,
     default: Date.now
   }
-})
+});
 
-module.exports = mongoose.model('Client', clientSchema)
+module.exports = mongoose.model("Client", clientSchema);

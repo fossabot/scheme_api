@@ -43,7 +43,6 @@ const userSchema = new mongoose.Schema({
   },
   client_id: {
     type: String,
-    max: 1024,
     required: false
   },
 
@@ -67,6 +66,9 @@ const userSchema = new mongoose.Schema({
         live_notifications: false,
         live_dashboard: false,
         sounds: true
+      },
+      colour_settings: {
+        accent: "#2f74eb"
       }
     },
     required: false
