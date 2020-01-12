@@ -1,28 +1,46 @@
-const Cryptr = require('cryptr')
-const cryptr = new Cryptr(process.env.ENCRYPT_SECRET)
-const Notification = require("../models/Notification")
+const Cryptr = require("cryptr");
+const cryptr = new Cryptr(process.env.ENCRYPT_SECRET);
+const Notification = require("../models/Notification");
+const mongoose = require("mongoose");
+
 module.exports = {
+  connect() {
+    // DB Connect
+    mongoose.connect(
+      process.env.DB_CONNECT,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+      },
+      err => {
+        !err
+          ? console.log("Database Status: Connected")
+          : console.log(`Database Status: Error ${err}`);
+      }
+    );
+  },
   genHash(string) {
-    let hash = cryptr.encrypt(string)
-    return hash
+    let hash = cryptr.encrypt(string);
+    return hash;
   },
 
   compareHash(compareString, encryptedString) {
-    let decryptedString = cryptr.decrypt(encryptedString)
-    let isSame = decryptedString.trim() == compareString.trim()
-    return isSame
+    let decryptedString = cryptr.decrypt(encryptedString);
+    let isSame = decryptedString.trim() == compareString.trim();
+    return isSame;
   },
-  findDuplicateNotification: async (query) => {
+  findDuplicateNotification: async query => {
     let allNotifications = await Notification.find(query);
     if (allNotifications.length > 0) {
       return true;
     } else {
-      return false
+      return false;
     }
-
   },
 
-  createNotification: async (config) => {
+  createNotification: async config => {
     /**
      * title: '',
       message: msg,
@@ -33,6 +51,6 @@ module.exports = {
       requested_by: req.user._id
      */
 
-    await new Notification(config).save()
+    await new Notification(config).save();
   }
-}
+};

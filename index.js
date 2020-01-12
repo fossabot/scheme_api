@@ -3,11 +3,10 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const compression = require("compression");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
-const passport = require("passport");
+const fileUpload = require("express-fileupload");
 
 const shiftRoutes = require("./routes/shiftRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -20,22 +19,16 @@ const serviceRoutes = require("./routes/serviceRoutes");
 const templateRoutes = require("./routes/templateRoutes");
 const verifyToken = require("./middlewares/verifyToken");
 
+//DB Connect
+require("./helpers").db.connect();
+
 // Middlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(compression());
-app.use(passport.initialize());
 app.use(morgan("combined"));
-
-// Test
-app.get("/test", (req, res) => {
-  res
-    .json({
-      message: "Hello"
-    })
-    .end();
-});
+app.use(fileUpload());
 
 // Routing
 app.use("/users", userRoutes);
@@ -46,22 +39,6 @@ app.use("/messenger", verifyToken, messengerRoutes);
 app.use("/notifications", verifyToken, notificationRoutes);
 app.use("/auth", serviceRoutes);
 app.use("/templates", verifyToken, templateRoutes);
-
-// DB Connect
-mongoose.connect(
-  process.env.DB_CONNECT,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true
-  },
-  err => {
-    !err
-      ? console.log("Database Status: Connected")
-      : console.log(`Database Status: Error ${err}`);
-  }
-);
 
 // Server init
 app.listen(7070, () => {
