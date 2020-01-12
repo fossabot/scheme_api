@@ -6,7 +6,6 @@ const compression = require("compression");
 const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
-const fileUpload = require("express-fileupload");
 
 const shiftRoutes = require("./routes/shiftRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -28,7 +27,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(compression());
 app.use(morgan("combined"));
-app.use(fileUpload());
 
 // Routing
 app.use("/users", userRoutes);

@@ -1,15 +1,18 @@
 const Client = require("./../../models/Client");
 const User = require("../../models/User");
+const helpers = require("../../helpers");
+const path = require("path");
 module.exports = {
   getOneClient: async req => {
     try {
-      const params = req.params;
-      const clientName = params.client_name;
-      let foundClient = await Client.findOne({ name: clientName });
+      const { client_name } = req.query;
+
+      let foundClient = await Client.findOne({ company_name: client_name });
       const properties = "name email employee_type is_online _id";
 
       if (foundClient) {
         // Get the team after
+        foundClient.company_image = path.resolve(foundClient.company_image);
         let returnData = {
           client: foundClient,
           team: await User.find({ client_id: foundClient._id }, properties)
@@ -23,50 +26,58 @@ module.exports = {
     }
   },
   deleteClient: async req => {
-    const params = req.body;
-    const clientID = params.client_id;
+    const { client_id } = req.body;
     try {
-      await Client.deleteOne({ _id: clientID });
+      await Client.deleteOne({ _id: client_id });
       return Promise.resolve("Client successfully deleted");
     } catch (error) {
       return Promise.reject(error);
     }
   },
   createClient: async req => {
-    const params = req.body;
-    const companyName = params.company_name;
-    const adminName = params.admin_name;
-    const logo = params.logo;
-    const email = params.email;
-    const phone_number = params.phone_number;
-    const password = params.password;
-    const gender = params.gender;
-
-    const createClient = {
-      company_name: companyName,
-      logo: logo
-    };
-
-    const createdFirstAdmin = {
-      email,
+    let {
+      company_name,
+      company_image,
+      company_colours,
+      company_phone,
       name,
+      email,
       phone_number,
-      employee_type: 1,
-      registered,
       password,
-      is_online: true,
       gender
+    } = req.body;
+
+    let createClient = {
+      company_name,
+      company_phone,
+      company_image,
+      company_colours
     };
-    if (!logo) {
+
+    if (!company_image) {
       return Promise.reject("Please provide a logo");
-    } else if (!name) {
+    } else if (!company_name) {
       return Promise.reject("Please provide a name");
     }
     try {
-      const client = await Client.findOne({ name: name });
-      if (!client) {
-        const client = await new Client(createClient).save();
-        return Promise.resolve(client);
+      let duplicateClient = await Client.findOne({ company_name });
+
+      if (!duplicateClient) {
+        let newClient = await new Client(createClient).save();
+
+        const createdFirstAdmin = {
+          client_id: newClient._id,
+          email,
+          name,
+          phone_number,
+          employee_type: 1,
+          password: helpers.db.genHash(password),
+          is_online: true,
+          gender
+        };
+        let admin = await new User(createdFirstAdmin).save();
+
+        return Promise.resolve({ user: admin, client: newClient });
       } else {
         return Promise.reject(
           "Client already exists, please change the client details"

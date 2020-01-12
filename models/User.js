@@ -51,8 +51,8 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   date_of_birth: {
-    required: true,
-    type: Date
+    type: Date,
+    default: new Date(+0)
   },
   admin_gen: {
     type: Boolean,

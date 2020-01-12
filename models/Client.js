@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
-  logo: {
-    type: String,
-    required: true
-  },
   company_phone: {
     type: String,
     required: true
@@ -15,6 +11,10 @@ const clientSchema = mongoose.Schema({
   },
   company_image: {
     type: String,
+    required: true
+  },
+  company_colours: {
+    type: Object,
     required: true
   },
   registration_date: {

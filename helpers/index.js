@@ -1,41 +1,37 @@
-const admin = require('./admin')
-const date = require('./date')
-const db = require('./db')
-const getters = require('./getters')
-const socket = require('./socket')
+const admin = require("./admin");
+const date = require("./date");
+const db = require("./db");
 let responseObj = {
   success: {
     success: true,
-    content: ''
+    content: ""
   },
   error: {
     error: true,
-    content: ''
+    content: ""
   }
-}
+};
 
 module.exports = {
   error(res, err) {
-    console.log(err)
+    console.log(err);
 
-    responseObj.error.content = err.hasOwnProperty('message')
+    responseObj.error.content = err.hasOwnProperty("message")
       ? err.message
-      : err
+      : err;
 
-    res.json(responseObj.error).end()
+    res.json(responseObj.error).end();
   },
   success(res, success) {
-    responseObj.success.content = success
+    responseObj.success.content = success;
 
     res
       .status(200)
       .json(responseObj.success)
-      .end()
+      .end();
   },
 
   admin,
   date,
-  db,
-  getters,
-  socket
-}
+  db
+};

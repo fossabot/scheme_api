@@ -15,9 +15,7 @@ module.exports = {
     try {
       let successMsg =
         "Timesheet successfully added, it should appear on your schedule soon";
-      const params = req.body;
-      const timesheet = params.timesheet;
-      const template = params.template;
+      const { timesheet, template } = req.body;
       if (template) {
         template.assigned_to = req.user._id;
         successMsg = "Timesheet and template successfully saved.";
