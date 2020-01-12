@@ -1,6 +1,28 @@
 const Client = require("./../../models/Client");
+const User = require("../../models/User");
 module.exports = {
-  deleteClient: async function(req) {
+  getOneClient: async req => {
+    try {
+      const params = req.params;
+      const clientName = params.client_name;
+      let foundClient = await Client.findOne({ name: clientName });
+      const properties = "name email employee_type is_online _id";
+
+      if (foundClient) {
+        // Get the team after
+        let returnData = {
+          client: foundClient,
+          team: await User.find({ client_id: foundClient._id }, properties)
+        };
+        return Promise.resolve(returnData);
+      } else {
+        return Promise.reject("No client found, please try again later");
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+  deleteClient: async req => {
     const params = req.body;
     const clientID = params.client_id;
     try {
@@ -10,7 +32,7 @@ module.exports = {
       return Promise.reject(error);
     }
   },
-  createClient: async function(req) {
+  createClient: async req => {
     const params = req.body;
     const companyName = params.company_name;
     const adminName = params.admin_name;
@@ -68,7 +90,7 @@ module.exports = {
       return Promise.reject(error);
     }
   },
-  updateClient: async function(req) {
+  updateClient: async req => {
     const params = req.body;
     const clientUpdate = parmas.client_update;
     const clientID = params.client_id;

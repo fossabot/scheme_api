@@ -13,6 +13,10 @@ const clientSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  company_image: {
+    type: String,
+    required: true
+  },
   registration_date: {
     type: Date,
     default: Date.now
