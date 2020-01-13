@@ -2,6 +2,7 @@ const Client = require("./../../models/Client");
 const User = require("../../models/User");
 const helpers = require("../../helpers");
 const fs = require("fs");
+const path = require("path");
 module.exports = {
   getOneClient: async req => {
     try {
@@ -28,6 +29,8 @@ module.exports = {
     }
   },
   createClient: async req => {
+    // Init the sightengine
+
     let {
       company_name,
       company_image,
