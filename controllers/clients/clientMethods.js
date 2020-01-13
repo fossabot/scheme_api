@@ -1,23 +1,16 @@
 const Client = require("./../../models/Client");
 const User = require("../../models/User");
 const helpers = require("../../helpers");
-const path = require("path");
+const fs = require("fs");
 module.exports = {
   getOneClient: async req => {
     try {
       const { client_name } = req.query;
 
       let foundClient = await Client.findOne({ company_name: client_name });
-      const properties = "name email employee_type is_online _id";
 
       if (foundClient) {
-        // Get the team after
-        foundClient.company_image = path.resolve(foundClient.company_image);
-        let returnData = {
-          client: foundClient,
-          team: await User.find({ client_id: foundClient._id }, properties)
-        };
-        return Promise.resolve(returnData);
+        return Promise.resolve(foundClient);
       } else {
         return Promise.reject("No client found, please try again later");
       }
@@ -64,7 +57,6 @@ module.exports = {
 
       if (!duplicateClient) {
         let newClient = await new Client(createClient).save();
-
         const createdFirstAdmin = {
           client_id: newClient._id,
           email,

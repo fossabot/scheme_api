@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(compression());
 app.use(morgan("combined"));
+app.use(express.static("uploads"));
 
 // Routing
 app.use("/users", userRoutes);

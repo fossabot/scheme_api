@@ -1,11 +1,16 @@
 const helpers = require("./../../helpers");
 const methods = require("./clientMethods");
+const fs = require("fs");
+const path = require("path");
 
 module.exports = {
   getOneClient: (req, res) => {
     methods
       .getOneClient(req)
-      .then(response => helpers.success(res, response))
+      .then(response => {
+        fs.createReadStream(path.resolve(response.company_image)).pipe(res);
+        helpers.success(res, response);
+      })
       .catch(error => helpers.error(res, error));
   },
   createClient: (req, res) => {
