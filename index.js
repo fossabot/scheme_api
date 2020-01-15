@@ -39,6 +39,13 @@ app.use("/notifications", verifyToken, notificationRoutes);
 app.use("/auth", serviceRoutes);
 app.use("/templates", verifyToken, templateRoutes);
 
+// test
+app.get("test", (req, res) => {
+  res.json({
+    message: "HELLO"
+  });
+});
+
 // Server init
 app.listen(7070, () => {
   console.log(

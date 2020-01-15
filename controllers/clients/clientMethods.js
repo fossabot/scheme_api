@@ -1,8 +1,7 @@
 const Client = require("./../../models/Client");
 const User = require("../../models/User");
 const helpers = require("../../helpers");
-const fs = require("fs");
-const path = require("path");
+
 module.exports = {
   getOneClient: async req => {
     try {
@@ -49,7 +48,7 @@ module.exports = {
       company_image,
       company_colours
     };
-
+    console.log(company_colours);
     if (!company_image) {
       return Promise.reject("Please provide a logo");
     } else if (!company_name) {
