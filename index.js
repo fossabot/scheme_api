@@ -40,7 +40,7 @@ app.use("/auth", serviceRoutes);
 app.use("/templates", verifyToken, templateRoutes);
 
 // test
-app.get("test", (req, res) => {
+app.get("/test", (req, res) => {
   res.json({
     message: "HELLO"
   });
