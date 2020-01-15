@@ -1,5 +1,5 @@
 const Cryptr = require("cryptr");
-const cryptr = new Cryptr(process.env.ENCRYPT_SECRET);
+const cryptr = new Cryptr("<249y4r%?X2c");
 const Notification = require("../models/Notification");
 const mongoose = require("mongoose");
 
