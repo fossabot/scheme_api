@@ -1,27 +1,28 @@
-const jwt = require('jsonwebtoken')
-const helpers = require('./../helpers')
+const jwt = require("jsonwebtoken");
+const helpers = require("./../helpers");
 
 const isRouteAllowed = (req, res, next) => {
-  const token = req.header('authorisation')
+  const token = req.header("authorisation");
   if (!token) {
-    helpers.error(res, 'No token detected')
+    helpers.error(res, "No token detected");
   } else {
-    jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+    jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
-        if (err.name == 'TokenExpiredError') {
+        if (err.name == "TokenExpiredError") {
           helpers.error(res, {
-            msg: 'Token expired, please refresh by relogging in',
+            msg: "Token expired, please refresh by relogging in",
             tokenExpired: true
-          })
+          });
         }
-        helpers.error(res, err)
-        return
+        helpers.error(res, err);
+        return;
       } else {
-        req.user = decoded.data
-        req.isAdmin = req.user.employee_type == 1
-        next()
+        req.user = decoded.data;
+        req.isAdmin = req.user.employee_type == 1;
+        req.clientID = req.user.client_id;
+        next();
       }
-    })
+    });
   }
-}
-module.exports = isRouteAllowed
+};
+module.exports = isRouteAllowed;

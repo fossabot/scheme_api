@@ -96,14 +96,12 @@ module.exports = {
     }
   },
   updateClient: async req => {
-    const params = req.body;
-    const clientUpdate = parmas.client_update;
-    const clientID = params.client_id;
+    const { update } = req.body;
     try {
-      const clients = await Client.updateOne({ _id: clientID }, clientUpdate);
-      return Promise.resolve("Successfully updated client");
+      await Client.updateOne({ _id: req.clientID }, update);
+      return Promise.resolve();
     } catch (error) {
-      return Promise.reject("Failed to update client please try again.");
+      return Promise.reject();
     }
   }
 };
