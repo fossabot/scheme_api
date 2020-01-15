@@ -1,5 +1,6 @@
 const methods = require("./shiftMethods");
-const helpers = require("./../../helpers");
+const helpers = require("../../helpers");
+
 module.exports = {
   createFromTimesheet: (req, res) => {
     methods

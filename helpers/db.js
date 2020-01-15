@@ -4,55 +4,6 @@ const Notification = require("../models/Notification");
 const mongoose = require("mongoose");
 
 module.exports = {
-  storageEngineInit() {
-    const multer = require("multer");
-    const fs = require("fs");
-    const storage = multer.diskStorage({
-      destination(req, file, cb) {
-        let destDir;
-        let origin = req.originalUrl;
-        switch (origin) {
-          case origin.includes("uploadlogo"): {
-            let { client_name } = req.body;
-            destDir = `uploads/${client_name}`;
-            break;
-          }
-          case origin.includes("uploadavatar"): {
-            let { email } = req.body;
-            destDir = `uploads/${email}/avatar/`;
-            break;
-          }
-
-          default:
-            break;
-        }
-
-        fs.exists(destDir, exists => {
-          if (!exists) {
-            return fs.mkdir(destDir, error => cb(error, destDir));
-          }
-          return cb(null, destDir);
-        });
-      },
-
-      filename(req, file, cb) {
-        switch (origin) {
-          case origin.includes("uploadlogo"): {
-            cb(null, `logo`);
-            break;
-          }
-          case origin.includes("uploadavatar"): {
-            cb(null, `${file.originalname}`);
-            break;
-          }
-
-          default:
-            break;
-        }
-      }
-    });
-    return storage;
-  },
   connect() {
     // DB Connect
     mongoose.connect(
@@ -99,7 +50,6 @@ module.exports = {
       url: '/shifts/update',
       requested_by: req.user._id
      */
-
     await new Notification(config).save();
   }
 };

@@ -2,14 +2,11 @@ const Shift = require("./../../models/Shift");
 const helpers = require("../../helpers");
 const User = require("./../../models/User");
 const Template = require("../../models/Template");
-
 const db = helpers.db;
-
 async function getAdmins() {
   let admins = await User.find({ employee_type: 1 }, "_id");
   return admins;
 }
-
 module.exports = {
   createFromTimesheet: async req => {
     try {
@@ -93,11 +90,9 @@ module.exports = {
     try {
       let params = req.body;
       const user = req.user;
+      let { repeatDays, startDate, endDate } = params.repeatDays;
 
       let assignedTo = params.assigned_to ? params.assigned_to : user._id;
-      let repeatDays = params.repeatDays;
-      let startDate = params.startDate;
-      let endDate = params.endDate;
       let employeeType = user.employee_type;
       let shiftType = !params.shift_type ? employeeType : params.shift_type;
       let isApprvoed = {};
