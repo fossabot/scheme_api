@@ -13,7 +13,7 @@ module.exports = {
         useUnifiedTopology: true,
         useFindAndModify: false,
         useCreateIndex: true
-      },
+      }
       err => {
         !err
           ? console.log("Database Status: Connected")
