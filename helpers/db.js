@@ -13,7 +13,7 @@ module.exports = {
         useUnifiedTopology: true,
         useFindAndModify: false,
         useCreateIndex: true
-      }
+      },
       err => {
         !err
           ? console.log("Database Status: Connected")
@@ -49,7 +49,7 @@ module.exports = {
       type: 'approve',
       url: '/shifts/update',
       requested_by: req.user._id
-     */
+  */
     await new Notification(config).save();
   }
 };

@@ -14,7 +14,7 @@ const clientSchema = mongoose.Schema({
     required: true
   },
   company_colours: {
-    type: Array,
+    type: String,
     required: true
   },
   registration_date: {
