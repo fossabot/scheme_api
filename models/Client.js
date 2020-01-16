@@ -20,6 +20,10 @@ const clientSchema = mongoose.Schema({
   registration_date: {
     type: Date,
     default: Date.now
+  },
+  stroage_ref: {
+    type: String,
+    required: true
   }
 });
 

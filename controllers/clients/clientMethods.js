@@ -39,16 +39,17 @@ module.exports = {
       email,
       phone_number,
       password,
-      gender
+      gender,
+      storage_ref
     } = req.body;
 
     let createClient = {
       company_name,
       company_phone,
       company_image,
-      company_colours
+      company_colours,
+      storage_ref
     };
-    console.log(company_colours);
     if (!company_image) {
       return Promise.reject("Please provide a logo");
     } else if (!company_name) {
