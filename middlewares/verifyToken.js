@@ -19,7 +19,7 @@ const isRouteAllowed = (req, res, next) => {
       } else {
         req.user = decoded.data;
         req.isAdmin = req.user.employee_type == 1;
-        req.clientID = req.user.client_id;
+
         next();
       }
     });

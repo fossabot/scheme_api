@@ -98,8 +98,9 @@ module.exports = {
   },
   updateClient: async req => {
     const { update } = req.body;
+
     try {
-      await Client.updateOne({ _id: req.clientID }, update);
+      await Client.updateOne({ _id: req.user.client_id }, update);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject();

@@ -1,6 +1,7 @@
 const admin = require("./admin");
 const date = require("./date");
 const db = require("./db");
+const email = require("./email");
 let responseObj = {
   success: {
     success: true,
@@ -33,5 +34,6 @@ module.exports = {
 
   admin,
   date,
-  db
+  db,
+  email
 };
