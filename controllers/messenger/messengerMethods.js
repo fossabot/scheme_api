@@ -22,22 +22,18 @@ module.exports = {
         reciever_id,
         transcript_id
       };
-      let mongoNotification = {
-        message: "",
-        url: "/messenger/send",
-        content,
-        for: reciever,
-        type: "message"
-      };
+
       // Find transcript first
       const foundTranscript = await Messenger.transcript.find({
         _id: transcript_id
       });
       if (foundTranscript.length > 0) {
         const success = await new Messenger.message(mongoMessage).save();
+        // console.log("success");
         await new Notification(mongoNotification).save();
         return Promise.resolve(success);
       } else {
+        console.log("Nothing");
         return Promise.reject(
           "No transcript with that ID found, please start a new chat"
         );
