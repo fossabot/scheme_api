@@ -1,6 +1,12 @@
 const methods = require("./templateMethods");
 const helpers = require("../../helpers");
 module.exports = {
+  create: (req, res) => {
+    methods
+      .create(req)
+      .then(response => helpers.success(res, response))
+      .catch(error => helpers.error(res, error));
+  },
   update: (req, res) => {
     methods
       .update(req)

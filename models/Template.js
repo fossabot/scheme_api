@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 let mongooseTemplate = mongoose.Schema({
   name: {
     type: String,
-    required: true,
     default: `shift schedule ${Date.now}`
   },
   content: {

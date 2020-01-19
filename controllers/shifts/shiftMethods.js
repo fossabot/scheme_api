@@ -1,28 +1,20 @@
 const Shift = require("./../../models/Shift");
 const helpers = require("../../helpers");
 const User = require("./../../models/User");
-const Template = require("../../models/Template");
 const db = helpers.db;
 async function getAdmins() {
   let admins = await User.find({ employee_type: 1 }, "_id");
   return admins;
 }
 module.exports = {
+  /**
+   * Create shifts from a new timesheet and then save the timesheet
+   */
   createFromTimesheet: async req => {
     try {
-      let successMsg =
-        "Timesheet successfully added, it should appear on your schedule soon";
-      const { timesheet, template } = req.body;
-      if (template) {
-        template.assigned_to = req.user._id;
-        successMsg = "Timesheet and template successfully saved.";
-        // Create new template
-        await new Template(template).save();
-      }
-      // Insert timesheet
+      const { timesheet } = req.body;
       await Shift.insertMany(timesheet);
-
-      return Promise.resolve(successMsg);
+      return Promise.resolve("Timesheet successfully added to schedule");
     } catch (error) {
       return Promise.reject(error);
     }
@@ -90,7 +82,7 @@ module.exports = {
     try {
       let params = req.body;
       const user = req.user;
-      let { repeatDays, startDate, endDate } = params.repeatDays;
+      let { repeatDays, startDate, endDate } = params;
 
       let assignedTo = params.assigned_to ? params.assigned_to : user._id;
       let employeeType = user.employee_type;

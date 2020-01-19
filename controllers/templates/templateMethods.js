@@ -1,10 +1,24 @@
 const Template = require("../../models/Template");
 module.exports = {
+  create: async req => {
+    // Create template
+    try {
+      const { name, content } = req.body;
+      let foundTemplate = await Template.findOne({ name });
+      if (foundTemplate) {
+        return Promise.reject(
+          "Template already exists with that name, please enter another name"
+        );
+      }
+      await new Template({ name, content, assigned_to: req.user._id }).save();
+      return Promise.resolve("Template successfully saved");
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
   update: async req => {
     try {
-      const params = req.body;
-      const id = params.id;
-      const updateContent = params.update;
+      const { id, update } = req.body;
       await Template.updateOne({ _id: id }, updateContent);
       return Promise.resolve();
     } catch (error) {
