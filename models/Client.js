@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
+  company_subdomain: {
+    type: String,
+    required: true
+  },
   company_phone: {
     type: String,
     required: true

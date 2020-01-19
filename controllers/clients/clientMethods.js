@@ -40,7 +40,8 @@ module.exports = {
       phone_number,
       password,
       gender,
-      storage_ref
+      storage_ref,
+      company_subdomain
     } = req.body;
 
     let createClient = {
@@ -50,13 +51,20 @@ module.exports = {
       company_colours,
       storage_ref
     };
-    if (!company_image) {
-      return Promise.reject("Please provide a logo");
-    } else if (!company_name) {
-      return Promise.reject("Please provide a name");
+    if (
+      !company_image ||
+      !company_name ||
+      !company_subdomain ||
+      !company_phone
+    ) {
+      return Promise.reject(
+        "Missing company data, please re-enter the required fields and try again"
+      );
     }
     try {
-      let duplicateClient = await Client.findOne({ company_name });
+      let duplicateClient = await Client.findOne({
+        company_name: company_name.toLowerCase().trim()
+      });
 
       if (!duplicateClient) {
         let newClient = await new Client(createClient).save();
