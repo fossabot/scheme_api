@@ -1,5 +1,14 @@
 const Template = require("../../models/Template");
 module.exports = {
+  delete: async req => {
+    try {
+      const { id } = req.body;
+      await Template.deleteOne({ _id: id });
+      return Promise.resolve("Tmeplate successfully deleted");
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
   create: async req => {
     // Create template
     try {

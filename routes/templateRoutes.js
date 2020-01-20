@@ -9,4 +9,7 @@ router.post("/update", (req, res) => {
 router.get("/all", (req, res) => {
   template.getTemplates(req, res);
 });
+router.delete("/delete", (req, res) => {
+  template.delete(req, res);
+});
 module.exports = router;
