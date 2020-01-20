@@ -37,6 +37,10 @@ const shiftSchema = new mongoose.Schema({
   repeat_days: {
     type: Object,
     default: null
+  },
+  notes: {
+    type: String,
+    default: null
   }
 });
 module.exports = mongoose.model("Shift", shiftSchema);

@@ -21,23 +21,21 @@ module.exports = {
   },
   deleteShift: async req => {
     try {
-      const shiftID = req.body.id;
-      await Shift.findByIdAndDelete({ _id: shiftID });
+      const { id } = req.body;
+      await Shift.findByIdAndDelete({ _id: id });
       return Promise.resolve("Shift successfully deleted");
     } catch (error) {
       return Promise.reject(error);
     }
   },
   updateShift: async req => {
-    const params = req.body;
-    const shiftID = params.id;
-    const updateParams = params.update;
+    const { update, id } = req.body;
 
     // Check if admin & create notification for admins to approve
     if (!req.isAdmin) {
       let msg = `${req.user.name} is requesting changes to their shift`;
       let sameShiftNotifications = await db.findDuplicateNotification({
-        content: { id: shiftID },
+        content: { id },
         requested_by: req.user._id
       });
       if (sameShiftNotifications && sameShiftNotifications.length >= 2) {
@@ -50,18 +48,15 @@ module.exports = {
         title: "",
         message: msg,
         for: await getAdmins(),
-        requestData: { id: shiftID, update: updateParams },
-        content: updateParams,
+        requestData: { id, update },
+        content: update,
         type: "approve",
         url: "/shifts/update",
         requested_by: req.user._id
       });
     } else {
       try {
-        const updatedShift = await Shift.findByIdAndUpdate(
-          { _id: shiftID },
-          updateParams
-        );
+        const updatedShift = await Shift.findByIdAndUpdate({ _id: id }, update);
         return Promise.resolve(updatedShift);
       } catch (error) {
         return Promise.reject("Error when updating shift, please try again");
@@ -82,7 +77,7 @@ module.exports = {
     try {
       let params = req.body;
       const user = req.user;
-      let { repeatDays, startDate, endDate } = params;
+      let { repeatDays, startDate, endDate, notes } = params;
 
       let assignedTo = params.assigned_to ? params.assigned_to : user._id;
       let employeeType = user.employee_type;
@@ -104,7 +99,8 @@ module.exports = {
         assigned_to: assignedTo,
         startDate: startDate,
         endDate: endDate,
-        shift_type: shiftType
+        shift_type: shiftType,
+        notes
       };
       if (repeatDays) {
         mongoShift["repeat_days"] = repeatDays;
@@ -154,3 +150,5 @@ module.exports = {
     }
   }
 };
+
+function createNotificationForAdmins() {}

@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
   },
   client_id: {
     type: String,
-    required: false
+    required: true
   },
 
   gender: {

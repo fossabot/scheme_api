@@ -83,12 +83,14 @@ module.exports = {
   },
   getAllUsers: async req => {
     // Change to only return team members that arent you
-    const params = req.body;
-    const clientID = params.client_id;
+    const { client_id } = req.user;
 
     try {
       const properties = "name email employee_type is_online _id";
-      let users = await User.find({ _id: { $ne: req.user._id } }, properties);
+      let users = await User.find(
+        { _id: { $ne: req.user._id }, client_id },
+        properties
+      );
 
       return Promise.resolve(users);
     } catch (error) {
@@ -153,10 +155,10 @@ module.exports = {
     }
   },
 
-  login: async (req, helpers, service) => {
-    const params = req.body;
+  login: async req => {
+    const { client_id, email, password } = req.body;
     const user = await User.findOneAndUpdate(
-      { email: params.email },
+      { client_id, email },
       { is_online: true }
     );
     if (!user) {
@@ -166,19 +168,16 @@ module.exports = {
     } else {
       let isPasswordCorrect = false;
 
-      if (!service) {
-        if (user.password) {
-          isPasswordCorrect = await helpers.db.compareHash(
-            params.password,
-            user.password
-          );
-        } else {
-          return Promise.reject(
-            "Failed to get password please try again later."
-          );
-        }
+      if (user.password) {
+        isPasswordCorrect = await helpers.db.compareHash(
+          password,
+          user.password
+        );
+      } else {
+        return Promise.reject("Failed to get password please try again later.");
       }
-      if (service || isPasswordCorrect) {
+
+      if (isPasswordCorrect) {
         const userObj = user.toObject();
         delete userObj.password;
 

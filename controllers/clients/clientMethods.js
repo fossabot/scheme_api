@@ -106,9 +106,14 @@ module.exports = {
   },
   updateClient: async req => {
     const { update } = req.body;
+    let { client_id } = req.user;
     try {
-      await Client.updateOne({ _id: req.user.client_id }, update);
-      return Promise.resolve();
+      if (await Client.findOne({ _id: client_id })) {
+        await Client.findByIdAndUpdate({ _id: req.user.client_id }, update);
+        return Promise.resolve();
+      } else {
+        return Promise.reject("Client not found", client_id);
+      }
     } catch (error) {
       return Promise.reject(error);
     }
