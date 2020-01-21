@@ -4,20 +4,18 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    min: 5
+    required: true
   },
   email: {
     type: String,
-    required: true,
-    max: 255
+    required: true
   },
   verified: {
     type: Boolean,
     default: false
   },
   phone_number: {
-    type: Number
+    type: String
   },
   address: {
     type: Object
@@ -30,8 +28,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     max: 1025,
-    required: true,
-    min: 6
+    required: true
   },
   registered_date: {
     type: Date,
@@ -62,9 +59,9 @@ const userSchema = new mongoose.Schema({
     type: Object,
     default: {
       general: {
-        live_schedule: false,
-        live_notifications: false,
-        live_dashboard: false,
+        live_schedule: true,
+        live_notifications: true,
+        live_dashboard: true,
         sounds: true
       },
       colour_settings: {

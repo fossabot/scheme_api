@@ -28,6 +28,16 @@ function verifyEmail(email, errmsg) {
   });
 }
 module.exports = {
+  registerMultiple: async req => {
+    let { employees } = req.body;
+
+    try {
+      await User.insertMany(employees);
+      return Promise.resolve("Users added");
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
   forgotPassword: async req => {
     try {
       let params = req.body;

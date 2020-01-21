@@ -9,8 +9,11 @@ router.post("/login", (req, res) => {
 router.post("/forgotpassword", (req, res) => {
   user.forgotPassword(req, res);
 });
-router.post("/register", (req, res) => {
+router.post("/register/one", (req, res) => {
   user.register(req, res);
+});
+router.post("/register/multiple", (req, res) => {
+  user.registerMultiple(req, res);
 });
 router.post("/newemployee", (req, res) => {
   user.updateNewEmployee(req, res);

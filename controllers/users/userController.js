@@ -1,6 +1,12 @@
 const methods = require("./userMethods");
 const helpers = require("./../../helpers");
 module.exports = {
+  registerMultiple: (req, res) => {
+    methods
+      .registerMultiple(req, helpers)
+      .then(response => helpers.success(res, response))
+      .catch(err => helpers.error(res, err));
+  },
   forgotPassword: (req, res) => {
     methods
       .forgotPassword(req, helpers)
