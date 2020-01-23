@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const shiftSchema = new mongoose.Schema({
   assigned_to: {
-    type: String,
+    type: Array,
     required: true
   },
   date_created: {
