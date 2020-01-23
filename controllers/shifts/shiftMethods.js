@@ -57,9 +57,9 @@ module.exports = {
     } else {
       try {
         const updatedShift = await Shift.findByIdAndUpdate({ _id: id }, update);
-        return Promise.resolve(updatedShift);
+        return Promise.resolve("Shift successfully updated.");
       } catch (error) {
-        return Promise.reject("Error when updating shift, please try again");
+        return Promise.reject(error);
       }
     }
   },
