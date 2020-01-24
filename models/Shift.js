@@ -24,7 +24,7 @@ const shiftSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  // 1 (Normal), 2(Locumn), 3(Holiday) 4(Time OfF) 5 Sick Leave
+  // 1 (General), 2(Locumn), 3(Holiday) 4(Time OfF) 5 Sick Leave
   shift_type: {
     type: Number,
     required: true
