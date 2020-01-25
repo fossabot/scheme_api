@@ -21,6 +21,5 @@
       "src": "/.*",
       "dest": "/index.js"
     }
-  ],
-  "alias": "schemecloudapi.cloud"
+  ]
 }
