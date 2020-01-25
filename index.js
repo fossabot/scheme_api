@@ -39,7 +39,8 @@ app.use("/templates", verifyToken, templateRoutes);
 // test
 app.get("/test", (req, res) => {
   res.json({
-    message: "HELLO"
+    message: "test",
+    environment: process.env.NODE_ENV
   });
 });
 
