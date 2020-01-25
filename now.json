@@ -1,6 +1,6 @@
 {
   "name": "schemeapp-cloud-api",
-  "version": 1,
+  "version": 2,
 
   "env": {
     "DB_CONNECT": "mongodb+srv://yomi:Oluwayom1@scheme-trgab.mongodb.net/scheme?retryWrites=true&w=majority",
