@@ -5,9 +5,9 @@ const helpers = require("../../helpers");
 module.exports = {
   getOneClient: async req => {
     try {
-      const { client_name } = req.query;
+      const { client_subdomain } = req.query;
 
-      let foundClient = await Client.findOne({ company_name: client_name });
+      let foundClient = await Client.findOne({ client_subdomain });
 
       if (foundClient) {
         return Promise.resolve(foundClient);
@@ -28,46 +28,49 @@ module.exports = {
     }
   },
   createClient: async req => {
-    // Init the sightengine
-
+    // Recieved details
     let {
-      company_name,
-      company_image,
-      company_colours,
-      company_phone,
+      client_name,
+      client_image,
+      client_colours,
+      client_phone,
       name,
       email,
       phone_number,
       password,
       gender,
       storage_ref,
-      company_subdomain
+      client_subdomain
     } = req.body;
-
+    // Client details
     let createClient = {
-      company_name,
-      company_phone,
-      company_image,
-      company_colours,
-      storage_ref
+      client_name,
+      client_phone,
+      client_image,
+      client_colours,
+      storage_ref,
+      client_subdomain
     };
     if (
-      !company_image ||
-      !company_name ||
-      !company_subdomain ||
-      !company_phone
+      !storage_ref ||
+      !client_image ||
+      !client_name ||
+      !client_subdomain ||
+      !client_phone
     ) {
       return Promise.reject(
-        "Missing company data, please re-enter the required fields and try again"
+        "Missing client data, please re-enter the required fields and try again"
       );
     }
     try {
       let duplicateClient = await Client.findOne({
-        company_name: company_name.toLowerCase().trim()
+        client_name
       });
 
       if (!duplicateClient) {
         let newClient = await new Client(createClient).save();
+
+        // Create admin details
         const createdFirstAdmin = {
           client_id: newClient._id,
           email,
@@ -78,6 +81,7 @@ module.exports = {
           is_online: true,
           gender
         };
+
         let admin = await new User(createdFirstAdmin).save();
 
         return Promise.resolve({ user: admin, client: newClient });
