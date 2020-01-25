@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const compression = require("compression");
 const cors = require("cors");
 const app = express();
-const morgan = require("morgan");
+const helmet = require("helmet");
 
 const shiftRoutes = require("./routes/shiftRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -21,10 +21,12 @@ const verifyToken = require("./middlewares/verifyToken");
 require("./helpers").db.connect();
 
 // Middlewares
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(compression());
+
 // app.use(morgan("combined"));
 
 // Routing
@@ -39,7 +41,8 @@ app.use("/templates", verifyToken, templateRoutes);
 // test
 app.get("/test", (req, res) => {
   res.json({
-    message: "HELLO"
+    message: "test",
+    environment: process.env.NODE_ENV
   });
 });
 

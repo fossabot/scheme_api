@@ -1,7 +1,5 @@
 {
-  "name": "schemeapp-cloud-api",
-  "version": 1,
-
+  "name": "scheme_api",
   "env": {
     "DB_CONNECT": "mongodb+srv://yomi:Oluwayom1@scheme-trgab.mongodb.net/scheme?retryWrites=true&w=majority",
     "JWT_SECRET": "dock_pharmacy",
