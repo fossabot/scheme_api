@@ -27,8 +27,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(compression());
 
-// app.use(morgan("combined"));
-
 // Routing
 app.use("/users", userRoutes);
 app.use("/shifts", verifyToken, shiftRoutes);
@@ -38,10 +36,10 @@ app.use("/messenger", verifyToken, messengerRoutes);
 app.use("/notifications", verifyToken, notificationRoutes);
 app.use("/templates", verifyToken, templateRoutes);
 
-// test
-app.get("/test", (req, res) => {
+// Welcome route
+app.get("/", (req, res) => {
   res.json({
-    message: "test",
+    message: "Welcome to the schemeapp api",
     environment: process.env.NODE_ENV
   });
 });

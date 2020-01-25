@@ -1,23 +1,23 @@
 const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
-  company_subdomain: {
+  client_subdomain: {
     type: String,
     required: true
   },
-  company_phone: {
+  client_phone: {
     type: String,
     required: true
   },
-  company_name: {
+  client_name: {
     type: String,
     required: true
   },
-  company_image: {
+  client_image: {
     type: String,
     required: true
   },
-  company_colours: {
+  client_colours: {
     type: String,
     required: true
   },

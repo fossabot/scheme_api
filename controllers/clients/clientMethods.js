@@ -6,7 +6,6 @@ module.exports = {
   getOneClient: async req => {
     try {
       const { client_subdomain } = req.query;
-      console.log(client_subdomain);
       let foundClient = await Client.findOne({ client_subdomain });
 
       if (foundClient) {
@@ -18,6 +17,7 @@ module.exports = {
       return Promise.reject(error);
     }
   },
+
   deleteClient: async req => {
     const { client_id } = req.body;
     try {
@@ -27,6 +27,7 @@ module.exports = {
       return Promise.reject(error);
     }
   },
+
   createClient: async req => {
     // Recieved details
     let {
@@ -94,6 +95,7 @@ module.exports = {
       return Promise.reject(error);
     }
   },
+
   getAllClients: async function() {
     try {
       const clients = await Client.find({});
@@ -108,6 +110,7 @@ module.exports = {
       return Promise.reject(error);
     }
   },
+
   updateClient: async req => {
     const { update } = req.body;
     let { client_id } = req.user;
