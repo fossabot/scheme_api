@@ -69,35 +69,39 @@ module.exports = {
     try {
       let now = moment().toISOString();
       let shifts = await Shift.find();
-      
+
       let payload = {
-        upcoming:[],
-        previous:[],
-        today:[],
-        all:shifts
+        upcoming: [],
+        previous: [],
+        today: [],
+        all: []
+      };
+
+      for (let i = 0, len = shifts.length; i < len; i++) {
+        const shift = shifts[i].toObject();
+        let { startDate, endDate } = shift;
+
+        startDate = moment(startDate);
+        endDate = moment(endDate);
+
+        payload.all.push(shift);
+
+        if (endDate.isBefore(now)) {
+          shift.timeTag = "previous";
+          payload.previous.push(shift);
+        }
+
+        if (startDate.isAfter(now)) {
+          payload.upcoming.push(shift);
+          shift.timeTag = "upcoming";
+        }
+
+        if (startDate.isSame(new Date(), "day")) {
+          shift.timeTag = "today";
+
+          payload.today.push(shift);
+        }
       }
-
-for(let i = 0, len = payload.all.length; i < len; i++){
-
-  const shift = shifts[i];
-  let {startDate,endDate} = shift;
-        
-  startDate = moment(startDate);
-  endDate = moment(endDate);
-
- 
-  if(endDate.isBefore(now)){
-    payload.previous.push(shift);
-  }
-  
-  if(startDate.isAfter(now)){
-    payload.upcoming.push(shift);
-  }
-
-  if(startDate.isSame(new Date(),'day'))
-  payload.today.push(shift);
-}
-
 
       return Promise.resolve(payload);
     } catch (error) {

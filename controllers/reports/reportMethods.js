@@ -2,10 +2,18 @@ const Shift = require("../../models/Shift");
 const User = require("../../models/User");
 const moment = require("moment");
 const now = moment();
+
 module.exports = {
   weekly: async req => {
-    let shifts = await Shift.find();
-    let users = await User.find();
+    let dates = {
+      startOfWeek: now.startOf("week").toISOString(),
+      endOfWeek: now.endOf("week").toISOString()
+    };
+
+    let shifts = await Shift.find({ startDate: { $gt: dates.startOfWeek } });
+    console.log(shifts);
+    let users = await User.find({ employeeType: { $gt: 1 } });
+
     let weeklyTotalsDisplay = {
       mostHours: {
         label: "Worked this most hours this week",
