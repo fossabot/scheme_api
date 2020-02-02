@@ -5,8 +5,9 @@ const helpers = require("../../helpers");
 module.exports = {
   getOneClient: async req => {
     try {
-      const { client_subdomain } = req.query;
-      let foundClient = await Client.findOne({ client_subdomain });
+      const { clientSubdomain } = req.query;
+    
+      let foundClient = await Client.findOne({subdomain:clientSubdomain});
 
       if (foundClient) {
         return Promise.resolve(foundClient);
@@ -19,9 +20,9 @@ module.exports = {
   },
 
   deleteClient: async req => {
-    const { client_id } = req.body;
+    const { clientID } = req.body;
     try {
-      await Client.deleteOne({ _id: client_id });
+      await Client.deleteOne({ _id: clientID });
       return Promise.resolve("Client successfully deleted");
     } catch (error) {
       return Promise.reject(error);
@@ -29,63 +30,28 @@ module.exports = {
   },
 
   createClient: async req => {
-    // Recieved details
-    let {
-      client_name,
-      client_image,
-      client_colours,
-      client_phone,
-      name,
-      email,
-      phone_number,
-      password,
-      gender,
-      storage_ref,
-      client_subdomain
-    } = req.body;
-    // Client details
-    let createClient = {
-      client_name,
-      client_phone,
-      client_image,
-      client_colours,
-      storage_ref,
-      client_subdomain
-    };
-    if (
-      !storage_ref ||
-      !client_image ||
-      !client_name ||
-      !client_subdomain ||
-      !client_phone
-    ) {
-      return Promise.reject(
-        "Missing client data, please re-enter the required fields and try again"
-      );
+    let { clientInformation, userInformation } = req.body;
+
+    if (clientInformation.subdomain.length <= 0) {
+      clientInformation.subdomain = clientInformation.name;
     }
+
     try {
       let duplicateClient = await Client.findOne({
-        client_name
+        name: clientInformation.clientName
       });
 
       if (!duplicateClient) {
-        let newClient = await new Client(createClient).save();
+        let client = await new Client(clientInformation).save();
 
         // Create admin details
-        const createdFirstAdmin = {
-          client_id: newClient._id,
-          email,
-          name,
-          phone_number,
-          employee_type: 1,
-          password: helpers.db.genHash(password),
-          is_online: true,
-          gender
-        };
 
-        let admin = await new User(createdFirstAdmin).save();
+        userInformation.password = helpers.db.genHash(userInformation.password);
+        userInformation.employeeType = 1;
+        userInformation.clientID = client._id;
 
-        return Promise.resolve({ user: admin, client: newClient });
+        let user = await new User(userInformation).save();
+        return Promise.resolve({ user, client });
       } else {
         return Promise.reject(
           "Client already exists, please change the client details"

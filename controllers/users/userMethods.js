@@ -28,6 +28,22 @@ function verifyEmail(email, errmsg) {
   });
 }
 module.exports = {
+  syncWithGoogle: async req => {
+    const oauth2Client = new google.auth.OAuth2(
+      YOUR_CLIENT_ID,
+      YOUR_CLIENT_SECRET,
+      YOUR_REDIRECT_URL
+    );
+    const scopes = ["https://www.googleapis.com/auth/calendar"];
+
+    const url = oauth2Client.generateAuthUrl({
+      // 'online' (default) or 'offline' (gets refresh_token)
+      access_type: "online",
+
+      // If you only need one scope you can pass it as a string
+      scope: scopes
+    });
+  },
   registerMultiple: async req => {
     let { employees } = req.body;
 
@@ -93,12 +109,13 @@ module.exports = {
   },
   getAllUsers: async req => {
     // Change to only return team members that arent you
-    const { client_id } = req.user;
+    const { clientID } = req.user;
 
     try {
-      const properties = "name email employee_type is_online _id";
+      const properties = "name email employeeType isOnline _id dateCreated";
+
       let users = await User.find(
-        { _id: { $ne: req.user._id }, client_id },
+        { _id: { $ne: req.user._id }, clientID },
         properties
       );
 
@@ -123,12 +140,12 @@ module.exports = {
     const userID = params._id || req.user._id;
     const userUpdate = params.update;
 
-    if (!req.isAdmin && userUpdate.hasOwnProperty("employee_type")) {
+    if (!req.isAdmin && userUpdate.hasOwnProperty("employeeType")) {
       let permissionsUpdateMsg = `${req.user.name} is requesting changes to their permissions`;
       // Create notification for the admins to allow the user
       await helpers.db.createNotification({
         type: "approve",
-        for: await User.find({ employee_type: 1 }, "_id"),
+        for: await User.find({ employeeType: 1 }, "_id"),
         message: permissionsUpdateMsg,
         requested_by: req.user._id,
         content: userUpdate,
@@ -203,57 +220,60 @@ module.exports = {
 
   register: async (req, helpers) => {
     try {
-      const params = req.body;
-      const email = params.email;
-      const password = params.password;
-      const name = params.name;
-      const employeeType = params.employee_type || 2;
-      const clientID = params.client_id || 123;
-      const dateOfBirth = params.date_of_birth;
-      const gender = params.gender;
-      const hashedPwd = await helpers.db.genHash(password);
-      const adminGen = params.admin_gen;
+      const { body } = req;
+      let {
+        email,
+        name,
+        adminGen,
+        gender,
+        clientID,
+        password,
+        dateOfBirth
+      } = body;
+
+      clientID = body.clientID ? body.clientID : req.user.clientID;
+      employeeType = body.employeeType ? body.employeeType : 2;
+
+      if (adminGen) {
+        password = await helpers.db.genHash(name);
+      }
+
       if (!email || !password || !name) {
         return Promise.reject("Missing parameters, please try again");
       }
 
-      const isDuplicate = await User.findOne({ email: email });
+      const isDuplicate = await User.findOne({ email });
+
       if (isDuplicate) {
         return Promise.reject("User already exists, please try again later");
       } else {
-        if (!checkDateOfBirth(dateOfBirth)) {
+        if (dateOfBirth && !checkDateOfBirth(dateOfBirth)) {
           return Promise.reject("Employees must be above the age of 16");
         }
         const mongoUser = {
-          email: email,
-          password: hashedPwd,
-          employee_type: employeeType,
-          name: name,
-          is_online: true,
-          client_id: clientID,
-          gender: gender,
-          date_of_birth: dateOfBirth,
-          admin_gen: adminGen
+          email,
+          password,
+          employeeType,
+          name,
+          isOnline: true,
+          clientID,
+          gender,
+          dateOfBirth,
+          adminGen
         };
 
-        const newUser = new User(mongoUser);
-        const createdUser = await newUser.save();
+        const createdUser = await new User(mongoUser).save();
+        const token = helpers.admin.sign(createdUser);
 
-        const secureUser = {
-          _id: createdUser._id,
-          email: createdUser.email,
-          name: createdUser.name,
-          employee_type: createdUser.employee_type,
-          registration_date: createdUser.registration_date
+        let returnData = {
+          user: createdUser,
+          token
         };
-        let returnData = {};
 
-        const token = helpers.admin.sign(secureUser);
         if (adminGen) {
           returnData = "Employee successfully created";
-        } else {
-          returnData = { user: createdUser, token: token };
         }
+
         return Promise.resolve(returnData);
       }
     } catch (error) {

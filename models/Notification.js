@@ -28,11 +28,11 @@ let notificationModel = mongoose.Schema({
   url: {
     type: String
   },
-  requested_by: {
+  requestedBy: {
     type: String,
     required: false
   },
-  created_at: {
+  dateCreated: {
     default: Date.now,
     type: Date
   }

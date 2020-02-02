@@ -1,17 +1,17 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 const messageModel = mongoose.Schema({
   editted: {
     type: Boolean,
     default: false
   },
-  time: {
+  sentAt: {
     type: Date,
     default: Date.now
   },
   attachments: {
     type: Array
   },
-  is_read: {
+  isRead: {
     type: Boolean,
     default: false
   },
@@ -19,39 +19,39 @@ const messageModel = mongoose.Schema({
     type: String,
     required: true
   },
-  sender_id: {
+  senderID: {
     type: String,
     required: true
   },
 
-  reciever_id: {
+  recieverID: {
     type: String,
     required: true
   },
-  transcript_id: {
+  transcriptID: {
     type: String,
     required: true
   }
-})
+});
 const transcriptModel = mongoose.Schema({
-  user_1: {
+  userOne: {
     type: String,
     required: true
   },
-  user_2: {
+  userTwo: {
     type: String,
     required: true
   },
-  created_at: {
+  dateCreated: {
     required: true,
     type: Date
   },
-  updated_at: {
+  dateUpdated: {
     default: Date.now,
     type: Date
   }
-})
+});
 module.exports = {
-  message: mongoose.model('Message', messageModel),
-  transcript: mongoose.model('Transcript', transcriptModel)
-}
+  message: mongoose.model("Message", messageModel),
+  transcript: mongoose.model("Transcript", transcriptModel)
+};

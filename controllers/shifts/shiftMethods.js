@@ -1,9 +1,10 @@
 const Shift = require("./../../models/Shift");
 const helpers = require("../../helpers");
 const User = require("./../../models/User");
+const moment = require("moment");
 const db = helpers.db;
 async function getAdmins() {
-  let admins = await User.find({ employee_type: 1 }, "_id");
+  let admins = await User.find({ employeeType: 1 }, "_id");
   return admins;
 }
 module.exports = {
@@ -66,8 +67,39 @@ module.exports = {
 
   getShift: async req => {
     try {
-      let shifts = await Shift.find({});
-      return Promise.resolve(shifts);
+      let now = moment().toISOString();
+      let shifts = await Shift.find();
+      
+      let payload = {
+        upcoming:[],
+        previous:[],
+        today:[],
+        all:shifts
+      }
+
+for(let i = 0, len = payload.all.length; i < len; i++){
+
+  const shift = shifts[i];
+  let {startDate,endDate} = shift;
+        
+  startDate = moment(startDate);
+  endDate = moment(endDate);
+
+ 
+  if(endDate.isBefore(now)){
+    payload.previous.push(shift);
+  }
+  
+  if(startDate.isAfter(now)){
+    payload.upcoming.push(shift);
+  }
+
+  if(startDate.isSame(new Date(),'day'))
+  payload.today.push(shift);
+}
+
+
+      return Promise.resolve(payload);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -79,9 +111,9 @@ module.exports = {
       const user = req.user;
       let { repeatDays, startDate, endDate, notes } = params;
 
-      let assignedTo = params.assigned_to ? params.assigned_to : user._id;
-      let employeeType = user.employee_type;
-      let shiftType = !params.shift_type ? employeeType : params.shift_type;
+      let assignedTo = params.assignedTo ? params.assignedTo : user._id;
+      let employeeType = user.employeeType;
+      let type = !params.type ? employeeType : params.type;
       let isApprvoed = {};
 
       if (req.isAdmin) {
@@ -95,11 +127,11 @@ module.exports = {
       }
 
       let mongoShift = {
-        is_approved: isApprvoed,
-        assigned_to: assignedTo,
+        isApproved: isApprvoed,
+        assignedTo: assignedTo,
         startDate: startDate,
         endDate: endDate,
-        shift_type: shiftType,
+        type: type,
         notes
       };
       if (repeatDays) {

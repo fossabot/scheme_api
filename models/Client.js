@@ -1,31 +1,31 @@
 const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
-  client_subdomain: {
+  subdomain: {
     type: String,
     required: true
   },
-  client_phone: {
+  phone: {
     type: String,
     required: true
   },
-  client_name: {
+  name: {
     type: String,
     required: true
   },
-  client_image: {
+  image: {
     type: String,
     required: true
   },
-  client_colours: {
+  colours: {
     type: String,
     required: true
   },
-  registration_date: {
+  dateCreated: {
     type: Date,
     default: Date.now
   },
-  stroage_ref: {
+  storageRef: {
     type: String,
     required: true
   }

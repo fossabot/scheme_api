@@ -19,7 +19,7 @@ module.exports = {
           "Template already exists with that name, please enter another name"
         );
       }
-      await new Template({ name, content, assigned_to: req.user._id }).save();
+      await new Template({ name, content, assignedTo: req.user._id }).save();
       return Promise.resolve("Template successfully saved");
     } catch (error) {
       return Promise.reject(error);
@@ -37,7 +37,7 @@ module.exports = {
   getTemplates: async req => {
     try {
       let templates = await Template.find(
-        { assigned_to: req.user._id },
+        { assignedTo: req.user._id },
         "name content date_created"
       );
       return Promise.resolve(templates);

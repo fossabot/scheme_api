@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  googleCalendar: {
+    type: Object,
+    default: {}
+  },
+
   email: {
     type: String,
     required: true
@@ -15,13 +20,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  phone_number: {
+  phoneNumber: {
     type: String
   },
   address: {
     type: Object
   },
-  employee_type: {
+  employeeType: {
     type: Number,
     required: true,
     default: 2
@@ -31,15 +36,15 @@ const userSchema = new mongoose.Schema({
     max: 1025,
     required: true
   },
-  registered_date: {
+  dateCreated: {
     type: Date,
     default: Date.now
   },
-  is_online: {
+  isOnline: {
     type: Boolean,
     default: false
   },
-  client_id: {
+  clientID: {
     type: String,
     required: true
   },
@@ -48,11 +53,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  date_of_birth: {
+  dateOfBirth: {
     type: Date,
     default: new Date(+0)
   },
-  admin_gen: {
+  adminGen: {
     type: Boolean,
     default: false
   },
@@ -60,12 +65,12 @@ const userSchema = new mongoose.Schema({
     type: Object,
     default: {
       general: {
-        live_schedule: true,
-        live_notifications: true,
-        live_dashboard: true,
+        liveSchedule: true,
+        liveNotifications: true,
+        liveDashboard: true,
         sounds: true
       },
-      colour_settings: {
+      colourSettings: {
         accent: "#2f74eb"
       }
     },

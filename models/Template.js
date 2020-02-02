@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
+
 let mongooseTemplate = mongoose.Schema({
   name: {
     type: String,
-    default: `shift schedule ${Date.now}`
+    default: `template ${Date.now}`
   },
   content: {
     type: Array,
     required: true
   },
-  assigned_to: {
+  assignedTo: {
     type: String,
     required: true
   },
-  date_created: {
+  dateCreated: {
     type: Date,
     default: Date.now
   }

@@ -15,7 +15,7 @@ router.delete("/delete", (req, res) => {
   client.deleteClient(req, res);
 });
 
-router.get("/one", (req, res) => {
+router.get("/get", (req, res) => {
   client.getOneClient(req, res);
 });
 

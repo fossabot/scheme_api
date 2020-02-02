@@ -1,15 +1,20 @@
 const mongoose = require("mongoose");
 const shiftSchema = new mongoose.Schema({
-  assigned_to: {
+  assignedTo: {
     type: Array,
     required: true
   },
-  date_created: {
+  dateCreated: {
     type: Date,
     default: Date.now
   },
+  
+  status:{
+    type:String,
+    default:'incomplete'
+  },
 
-  is_approved: {
+  isApproved: {
     type: Object,
     default: {
       admin: 0,
@@ -25,18 +30,18 @@ const shiftSchema = new mongoose.Schema({
     required: true
   },
   // 1 (General), 2(Locumn), 3(Holiday) 4(Time OfF) 5 Sick Leave
-  shift_type: {
+  type: {
     type: Number,
     required: true
   },
-  is_pickup: {
+  isPickup: {
     type: Boolean,
     default: false
   },
 
-  repeat_days: {
-    type: Object,
-    default: null
+  repeatDays: {
+    type: Number,
+    default: 0
   },
   notes: {
     type: String,

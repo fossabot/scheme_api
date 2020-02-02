@@ -56,7 +56,9 @@ module.exports = {
     methods
       .register(req, helpers)
       .then(response => {
-        res.header("Authorisation", response.token);
+        if (response && response.hasOwnProperty("token")) {
+          res.header("Authorisation", response.token);
+        }
         helpers.success(res, response);
       })
       .catch(error => helpers.error(res, error));
