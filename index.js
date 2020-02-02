@@ -14,9 +14,9 @@ const requestRoutes = require("./routes/requestRoutes");
 const clientRoutes = require("./routes/clientRoutes");
 const messengerRoutes = require("./routes/messengerRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
-
 const templateRoutes = require("./routes/templateRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const todoRoutes = require("./routes/todoRoutes");
 
 const verifyToken = require("./middlewares/verifyToken");
 
@@ -37,7 +37,8 @@ app.use("/clients", clientRoutes);
 app.use("/messenger", verifyToken, messengerRoutes);
 app.use("/notifications", verifyToken, notificationRoutes);
 app.use("/templates", verifyToken, templateRoutes);
-app.use("/reports", reportRoutes);
+app.use("/reports", verifyToken, reportRoutes);
+app.use("/todos", verifyToken, todoRoutes);
 
 // Initial routing
 app.get("/", (req, res) => {
@@ -57,7 +58,6 @@ app.get("/", (req, res) => {
 // Health route
 app.get("/healthcheck", (req, res) => {
   try {
-    console.log(res.status);
     let healthCheckObject = {
       healthy: res.statusCode == 200 ? true : false,
       status: res.statusCode,
