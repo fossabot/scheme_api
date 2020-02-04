@@ -1,19 +1,19 @@
-const todo = require("../controllers/todos/todoController");
+const task = require("../controllers/tasks/taskController");
 const express = require("express");
-const verifyToken = require("./../middlewares/verifyToken");
+const verifyToken = require("../middlewares/verifyToken");
 const router = express.Router();
 
 router.get("/get", (req, res) => {
-  todo.get(req, res);
+  task.get(req, res);
 });
 router.post("/create", (req, res) => {
-  todo.create(req, res);
+  task.create(req, res);
 });
 router.delete("/remove", (req, res) => {
-  todo.remove(req, res);
+  task.remove(req, res);
 });
 router.post("/edit", (req, res) => {
-  todo.edit(req, res);
+  task.edit(req, res);
 });
 
 module.exports = router;

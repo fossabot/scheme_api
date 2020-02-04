@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
-const todoSchema = mongoose.Schema({
+const taskSchema = mongoose.Schema({
+  dueDate: {
+    type: Date,
+    default: null
+  },
   attachments: {
     type: String,
     default: null
@@ -28,6 +32,10 @@ const todoSchema = mongoose.Schema({
   },
   content: {
     type: String,
+    /**
+     * content:{
+     * titlk}
+     */
     required: true
   },
   completeDate: {
@@ -36,4 +44,4 @@ const todoSchema = mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("Todo", todoSchema);
+module.exports = mongoose.model("Todo", taskSchema);

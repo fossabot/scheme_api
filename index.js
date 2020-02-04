@@ -16,7 +16,8 @@ const messengerRoutes = require("./routes/messengerRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const templateRoutes = require("./routes/templateRoutes");
 const reportRoutes = require("./routes/reportRoutes");
-const todoRoutes = require("./routes/todoRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const noteRoutes = require("./routes/noteRoutes");
 
 const verifyToken = require("./middlewares/verifyToken");
 
@@ -38,7 +39,8 @@ app.use("/messenger", verifyToken, messengerRoutes);
 app.use("/notifications", verifyToken, notificationRoutes);
 app.use("/templates", verifyToken, templateRoutes);
 app.use("/reports", verifyToken, reportRoutes);
-app.use("/todos", verifyToken, todoRoutes);
+app.use("/tasks", verifyToken, taskRoutes);
+app.use("/notes", verifyToken, noteRoutes);
 
 // Initial routing
 app.get("/", (req, res) => {

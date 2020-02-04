@@ -1,45 +1,56 @@
 const helpers = require("../../helpers");
-const Todo = require("../../models/Todo");
+const Task = require("../../models/Task");
 module.exports = {
-  create: async req => {
+  createTasks: async req => {
     try {
+      
       const { content, assignedTo, category, attachments } = req.body;
+      
+      assignedTo ? (assignedTo = req.user._id) : assignedTo;
+      
       // Create notification for the user if they are not the assignee
 
-      await new Todo.save({
+      await new Task.save({
         category,
         attachments,
         content,
         assignedTo,
         createdBy: req.user._id
       });
+
+
     } catch (error) {
+      
       return new Promise.reject(error);
     }
   },
-  get: async req => {
-    try {
-      let todos = await Todo.find({ assignedTo: req.user._id });
+  getTasks: async req => {
 
-      return Promise.resolve(todos);
+    try {
+      let tasks = await Task.find({ assignedTo: req.user._id });
+
+    
+      return Promise.resolve(tasks);
+
     } catch (error) {
+
       return Promise.reject(error);
     }
   },
-  edit: async req => {
+  editTasks: async req => {
     try {
       const { id, update } = req.body;
-      let todo = await Todo.findByIdAndUpdate({ _id: id }, { ...update });
-      return Promise.resolve(todo);
+      let task = await Task.findByIdAndUpdate({ _id: id }, { ...update });
+      return Promise.resolve(task);
     } catch (error) {
       return Promise.reject(error);
     }
   },
-  remove: async req => {
+  removeTasks: async req => {
     const { id } = req.body;
     try {
-      await Todo.findOneAndDelete({ _id: id });
-      return Promise.resolve("Todo successfully removed.");
+      await Task.findOneAndDelete({ _id: id });
+      return Promise.resolve("Task successfully removed.");
     } catch (error) {
       return Promise.reject(error);
     }

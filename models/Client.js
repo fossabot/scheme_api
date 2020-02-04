@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
+  userTypes:{
+    type:Array,
+    required:true
+  },
   subdomain: {
     type: String,
     required: true
