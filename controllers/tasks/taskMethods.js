@@ -21,9 +21,10 @@ module.exports = {
   },
   getTasks: async req => {
     try {
-      let tasks = await Task.find();
-
-      console.log("Tasks", tasks, req.user._id);
+      let tasks = await Task.find()
+        .where(req.user._id)
+        .in(["assignedTo"])
+        .or([{ createdBy: req.user._id }]);
 
       return Promise.resolve(tasks);
     } catch (error) {
