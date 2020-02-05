@@ -1,58 +1,59 @@
-const helpers = require("./../../helpers");
-const methods = require("./clientMethods");
+const { success, error } = require("./../../helpers");
+const {
+  getOneClient,
+  getAllClients,
+  createClient,
+  updateClient,
+  deleteClient
+} = require("./clientMethods");
 
 module.exports = {
-  getOneClient: (req, res) => {
-    methods
-      .getOneClient(req)
+  getOne: (req, res) => {
+    getOneClient(req)
       .then(response => {
-        helpers.success(res, response);
+        success(res, response);
       })
-      .catch(error => {
-        helpers.error(res, error);
+      .catch(err => {
+        error(res, err);
       });
   },
-  createClient: (req, res) => {
-    methods
-      .createClient(req)
+  create: (req, res) => {
+    createClient(req)
       .then(response => {
-        helpers.success(res, response);
+        success(res, response);
       })
-      .catch(error => {
-        helpers.error(res, error);
-      });
-  },
-
-  getAllClients: (req, res) => {
-    methods
-      .getAllClients(req)
-      .then(response => {
-        helpers.success(res, response);
-      })
-      .catch(error => {
-        helpers.error(res, error);
+      .catch(err => {
+        error(res, err);
       });
   },
 
-  updateClient: (req, res) => {
-    methods
-      .updateClient(req)
+  get: (req, res) => {
+    getAllClients(req)
       .then(response => {
-        helpers.success(res, response);
+        success(res, response);
       })
-      .catch(error => {
-        helpers.error(res, error);
+      .catch(err => {
+        error(res, err);
       });
   },
 
-  deleteClient: (req, res) => {
-    methods
-      .deleteClient(req)
+  update: (req, res) => {
+    updateClient(req)
       .then(response => {
-        helpers.success(res, response);
+        success(res, response);
       })
-      .catch(error => {
-        helpers.error(res, error);
+      .catch(err => {
+        error(res, err);
+      });
+  },
+
+  delete: (req, res) => {
+    deleteClient(req)
+      .then(response => {
+        success(res, response);
+      })
+      .catch(err => {
+        error(res, err);
       });
   }
 };

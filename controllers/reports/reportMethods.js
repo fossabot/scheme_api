@@ -4,6 +4,20 @@ const moment = require("moment");
 const now = moment();
 
 module.exports = {
+  filteredReports: async req => {
+    // Get shifts based on filters
+
+    let { assignedTo, startDate, endDate, isApproved } = req.body;
+
+    startDate = startDate ? startDate : now.toISOString();
+
+    endDate = endDate ? endDate : now.toISOString();
+
+    assignedTo = assignedTo ? assignedTo : req.user._id;
+
+    isApproved = isApproved ? isApproved : { admin: 1, employee: 1 };
+  },
+
   weekly: async req => {
     let dates = {
       startOfWeek: now.startOf("week").toISOString(),
@@ -11,7 +25,6 @@ module.exports = {
     };
 
     let shifts = await Shift.find({ startDate: { $gt: dates.startOfWeek } });
-    console.log(shifts);
     let users = await User.find({ employeeType: { $gt: 1 } });
 
     let weeklyTotalsDisplay = {
