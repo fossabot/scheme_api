@@ -4,30 +4,32 @@ module.exports = {
   createTasks: async req => {
     try {
       
-      const { content, assignedTo, category, attachments } = req.body;
+      let { content, assignedTo, category, completeDate } = req.body;
       
-      assignedTo ? (assignedTo = req.user._id) : assignedTo;
+      assignedTo ?  assignedTo : (assignedTo = req.user._id) ;
       
       // Create notification for the user if they are not the assignee
 
-      await new Task.save({
+      await new Task({
         category,
-        attachments,
         content,
         assignedTo,
+        completeDate,
         createdBy: req.user._id
-      });
+      }).save();
+
+      return Promise.resolve('Task successfully created');
 
 
     } catch (error) {
       
-      return new Promise.reject(error);
+      return Promise.reject(error);
     }
   },
   getTasks: async req => {
 
     try {
-      let tasks = await Task.find({ assignedTo: req.user._id });
+      let tasks = await Task.find({ assignedTo: {$in:[req.user._id] }});
 
     
       return Promise.resolve(tasks);
