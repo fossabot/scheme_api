@@ -1,23 +1,29 @@
-const methods = require("./reportMethods");
-const helpers = require("../../helpers");
+const { filteredReports, weekly, shifts, metrics } = require("./reportMethods");
+const { success, error } = require("../../helpers");
 
 module.exports = {
-  metrics: (req, res) => {
-    methods
-      .metrics(req, res)
-      .then(response => helpers.success(res, response))
-      .catch(error => helpers.error(res, error));
+  getfilteredReports: (req, res) => {
+    filteredReports(req)
+      .then(response => {
+        success(res, response);
+      })
+      .catch(err => {
+        error(res, err);
+      });
   },
-  shifts: (req, res) => {
-    methods
-      .shifts(req, res)
-      .then(response => helpers.success(res, response))
-      .catch(error => helpers.error(res, error));
+  getMetrics: (req, res) => {
+    metrics(req, res)
+      .then(response => success(res, response))
+      .catch(err => error(res, err));
   },
-  weekly: (req, res) => {
-    methods
-      .weekly(req, res)
-      .then(response => helpers.success(res, response))
-      .catch(error => helpers.error(res, error));
+  getShifts: (req, res) => {
+    shifts(req, res)
+      .then(response => success(res, response))
+      .catch(err => error(res, err));
+  },
+  getWeekly: (req, res) => {
+    weekly(req, res)
+      .then(response => success(res, response))
+      .catch(err => error(res, err));
   }
 };

@@ -4,11 +4,8 @@ module.exports = {
   createTasks: async req => {
     try {
       let { content, assignedTo, category, completeDate } = req.body;
-
       assignedTo ? assignedTo : (assignedTo = [req.user._id]);
-
       // Create notification for the user if they are not the assignee
-
       await new Task({
         category,
         content,
