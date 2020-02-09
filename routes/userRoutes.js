@@ -33,5 +33,8 @@ router.get("/logout", verifyToken, (req, res) => {
 router.get("/all", verifyToken, (req, res) => {
   user.getAllUsers(req, res);
 });
+router.get("/gcal", verifyToken, (req, res) => {
+  user.getGoogleCal(req, res);
+});
 
 module.exports = router;

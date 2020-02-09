@@ -7,6 +7,8 @@ const cors = require("cors");
 const app = express();
 const helmet = require("helmet");
 const helpers = require("./helpers");
+const verifyToken = require("./middlewares/verifyToken");
+const ejs = require("ejs");
 
 const shiftRoutes = require("./routes/shiftRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -18,10 +20,13 @@ const templateRoutes = require("./routes/templateRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const noteRoutes = require("./routes/noteRoutes");
-
-const verifyToken = require("./middlewares/verifyToken");
+const serviceRoutes = require("./routes/serviceRoutes");
+const callbackRoutes = require("./routes/callbackRoutes");
 
 helpers.db.connect();
+
+app.set("view engine", "html");
+app.engine("html", ejs.renderFile);
 
 // Middlewares
 app.use(helmet());
@@ -29,7 +34,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(compression());
-
 // Routing
 app.use("/users", userRoutes);
 app.use("/shifts", verifyToken, shiftRoutes);
@@ -41,6 +45,8 @@ app.use("/templates", verifyToken, templateRoutes);
 app.use("/reports", verifyToken, reportRoutes);
 app.use("/tasks", verifyToken, taskRoutes);
 app.use("/notes", verifyToken, noteRoutes);
+app.use("/services", verifyToken, serviceRoutes);
+app.use("/callback", callbackRoutes);
 
 // Initial routing
 app.get("/", (req, res) => {
@@ -73,7 +79,7 @@ app.get("/healthcheck", (req, res) => {
 });
 
 // Server init
-app.listen(7070, () => {
+app.listen(process.env.PORT, () => {
   console.log(
     `Running | Environment : ${process.env.NODE_ENV || "Development"}`
   );

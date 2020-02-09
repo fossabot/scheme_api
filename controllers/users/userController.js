@@ -1,6 +1,16 @@
 const methods = require("./userMethods");
 const helpers = require("./../../helpers");
 module.exports = {
+  getGoogleCal: (req, res) => {
+    methods
+      .getGoogleCal(req)
+      .then(response => {
+        helpers.success(res, response);
+      })
+      .catch(err => {
+        helpers.error(res, err);
+      });
+  },
   registerMultiple: (req, res) => {
     methods
       .registerMultiple(req, helpers)

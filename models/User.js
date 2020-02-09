@@ -7,9 +7,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  googleCalendar: {
+  gcalToken: {
     type: Object,
-    default: {}
+    default: null
   },
 
   email: {

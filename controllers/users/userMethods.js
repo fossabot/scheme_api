@@ -3,6 +3,11 @@ const helpers = require("./../../helpers");
 const verifier = require("email-verify");
 const moment = require("moment");
 const now = moment();
+const { google } = require("googleapis");
+
+const REDIRECT_URL = !process.env.NODE_ENV
+  ? "http://localhost:7070/"
+  : "http://production-schemeapi.now.sh/";
 
 function checkDateOfBirth(date) {
   let diff = now.diff(moment(date), "years") >= 16;
@@ -28,21 +33,34 @@ function verifyEmail(email, errmsg) {
   });
 }
 module.exports = {
-  syncWithGoogle: async req => {
-    const oauth2Client = new google.auth.OAuth2(
-      YOUR_CLIENT_ID,
-      YOUR_CLIENT_SECRET,
-      YOUR_REDIRECT_URL
-    );
-    const scopes = ["https://www.googleapis.com/auth/calendar"];
+  getGoogleCal: async req => {
+    try {
+      const oAuth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        `${REDIRECT_URL}callback/google`
+      );
 
-    const url = oauth2Client.generateAuthUrl({
-      // 'online' (default) or 'offline' (gets refresh_token)
-      access_type: "online",
+      let foundUser = await User.findById(req.user._id);
 
-      // If you only need one scope you can pass it as a string
-      scope: scopes
-    });
+      oAuth2Client.setCredentials(foundUser.gcalToken);
+
+      const cal = google.calendar({ version: "v3", auth: oAuth2Client });
+      let { data } = await cal.events.list({
+        calendarId: "primary",
+        timeMin: new Date().toISOString(),
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: "startTime"
+      });
+
+      return Promise.resolve({
+        reminders: data.defaultReminders,
+        events: data.items
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
   },
   registerMultiple: async req => {
     let { employees } = req.body;

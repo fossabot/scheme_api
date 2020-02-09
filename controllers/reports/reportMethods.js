@@ -19,11 +19,67 @@ module.exports = {
 
       isApproved = isApproved ? isApproved : { admin: 1, employee: 1 };
 
-      let filteredShifts = await Shift.find({
-        startDate: { $gte: startDate, $lte: endDate },
-        endDate: { $gte: startDate, $lte: endDate }
+      let users = await User.find();
+
+      let graphData = {
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "",
+              data: []
+            }
+          ]
+        }
+      };
+
+      users.map(async (user, index) => {
+        let userShifts = await Shift.find({ assignedTo: { $in: [user._id] } });
+        let totalHours = 0;
+        console.log(userShifts);
+
+        if (userShifts.length > 0) {
+          userShifts.map(({ startDate, endDate }) => {
+            totalHours += moment(startDate).diff(endDate, "hours");
+          });
+
+          graphData.data.labels.push(user.name);
+
+          graphData.data.datasets.push({
+            label: userShifts[index].startDate,
+            data: totalHours
+          });
+        }
       });
-      return Promise.resolve(filteredShifts);
+
+      //   let response = {
+      //     data: {
+      //     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      //     datasets: [{
+      //         label: '# of Votes',
+      //         data: [12, 19, 3, 5, 2, 3],
+      //         backgroundColor: [
+      //             'rgba(255, 99, 132, 0.2)',
+      //             'rgba(54, 162, 235, 0.2)',
+      //             'rgba(255, 206, 86, 0.2)',
+      //             'rgba(75, 192, 192, 0.2)',
+      //             'rgba(153, 102, 255, 0.2)',
+      //             'rgba(255, 159, 64, 0.2)'
+      //         ],
+      //         borderColor: [
+      //             'rgba(255, 99, 132, 1)',
+      //             'rgba(54, 162, 235, 1)',
+      //             'rgba(255, 206, 86, 1)',
+      //             'rgba(75, 192, 192, 1)',
+      //             'rgba(153, 102, 255, 1)',
+      //             'rgba(255, 159, 64, 1)'
+      //         ],
+      //         borderWidth: 1
+      //     }]
+      //   }
+      // }
+
+      return Promise.resolve(graphData);
     } catch (error) {
       return Promise.reject(error);
     }
