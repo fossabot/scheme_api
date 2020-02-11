@@ -4,11 +4,7 @@ const db = require("./db");
 const email = require("./email");
 const cache = require("./cache");
 const services = require("./services");
-const path = require("path");
-const fs = require("fs");
-const lang = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "stubs/lang.json"))
-);
+const lang = require("./lang");
 
 let responseObj = {
   success: {

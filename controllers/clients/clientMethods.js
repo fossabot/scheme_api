@@ -32,8 +32,8 @@ module.exports = {
   createClient: async req => {
     let { clientInformation, userInformation } = req.body;
 
-    if (clientInformation.subdomain.length <= 0) {
-      clientInformation.subdomain = clientInformation.name;
+    if (!clientInformation.hasOwnProperty("subdomain")) {
+      clientInformation.subdomain = clientInformation.name.toLowerCase().trim();
     }
 
     try {

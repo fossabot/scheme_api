@@ -19,10 +19,10 @@ const clientSchema = mongoose.Schema({
   },
   image: {
     type: String,
-    required: true
+    required: false
   },
   colours: {
-    type: String,
+    type: Array,
     required: true
   },
   dateCreated: {
@@ -31,7 +31,7 @@ const clientSchema = mongoose.Schema({
   },
   storageRef: {
     type: String,
-    required: true
+    default: ""
   },
   userGroups: {
     type: Array,
