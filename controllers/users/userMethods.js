@@ -3,11 +3,7 @@ const helpers = require("./../../helpers");
 const verifier = require("email-verify");
 const moment = require("moment");
 const now = moment();
-const { google } = require("googleapis");
-
-const REDIRECT_URL = !process.env.NODE_ENV
-  ? "http://localhost:7070/"
-  : "http://production-schemeapi.now.sh/";
+const services = helpers.services;
 
 function checkDateOfBirth(date) {
   let diff = now.diff(moment(date), "years") >= 16;
@@ -32,20 +28,18 @@ function verifyEmail(email, errmsg) {
     });
   });
 }
+
 module.exports = {
   getGoogleCal: async req => {
     try {
-      const oAuth2Client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        `${REDIRECT_URL}callback/google`
-      );
+      let { oAuth2Client, google } = services.google(req.user._id);
 
       let foundUser = await User.findById(req.user._id);
 
       oAuth2Client.setCredentials(foundUser.gcalToken);
 
       const cal = google.calendar({ version: "v3", auth: oAuth2Client });
+
       let { data } = await cal.events.list({
         calendarId: "primary",
         timeMin: new Date().toISOString(),

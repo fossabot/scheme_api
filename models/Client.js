@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const clientSchema = mongoose.Schema({
-  userTypes:{
-    type:Array,
-    required:true
+  userTypes: {
+    type: Array,
+    required: true
   },
   subdomain: {
     type: String,
@@ -32,6 +32,21 @@ const clientSchema = mongoose.Schema({
   storageRef: {
     type: String,
     required: true
+  },
+  userGroups: {
+    type: Array,
+    default: [
+      {
+        name: "Admins",
+        value: 1
+      },
+      {
+        name: "General Staff",
+        value: 2
+      }
+    ],
+
+    required: false
   }
 });
 

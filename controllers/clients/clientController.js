@@ -4,7 +4,8 @@ const {
   getAllClients,
   createClient,
   updateClient,
-  deleteClient
+  deleteClient,
+  
 } = require("./clientMethods");
 
 module.exports = {

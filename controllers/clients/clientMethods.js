@@ -6,8 +6,8 @@ module.exports = {
   getOneClient: async req => {
     try {
       const { clientSubdomain } = req.query;
-    
-      let foundClient = await Client.findOne({subdomain:clientSubdomain});
+
+      let foundClient = await Client.findOne({ subdomain: clientSubdomain });
 
       if (foundClient) {
         return Promise.resolve(foundClient);

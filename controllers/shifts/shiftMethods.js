@@ -3,6 +3,7 @@ const helpers = require("../../helpers");
 const User = require("./../../models/User");
 const moment = require("moment");
 const db = helpers.db;
+const cache = helpers.cache;
 async function getAdmins() {
   let admins = await User.find({ employeeType: 1 }, "_id");
   return admins;
@@ -67,42 +68,48 @@ module.exports = {
 
   getShift: async req => {
     try {
+      let shifts, payload;
       let now = moment().toISOString();
-      let shifts = await Shift.find();
 
-      let payload = {
-        upcoming: [],
-        previous: [],
-        today: [],
-        all: []
-      };
+      if (!cache.get("shifts")) {
+        shifts = await Shift.find();
 
-      for (let i = 0, len = shifts.length; i < len; i++) {
-        const shift = shifts[i].toObject();
-        let { startDate, endDate } = shift;
+        payload = {
+          upcoming: [],
+          previous: [],
+          today: [],
+          all: []
+        };
 
-        startDate = moment(startDate);
-        endDate = moment(endDate);
+        for (let i = 0, len = shifts.length; i < len; i++) {
+          const shift = shifts[i].toObject();
+          let { startDate, endDate } = shift;
 
-        payload.all.push(shift);
+          startDate = moment(startDate);
+          endDate = moment(endDate);
 
-        if (endDate.isBefore(now)) {
-          shift.timeTag = "previous";
-          payload.previous.push(shift);
+          payload.all.push(shift);
+
+          if (endDate.isBefore(now)) {
+            shift.timeTag = "previous";
+            payload.previous.push(shift);
+          }
+
+          if (startDate.isAfter(now)) {
+            payload.upcoming.push(shift);
+            shift.timeTag = "upcoming";
+          }
+
+          if (startDate.isSame(new Date(), "day")) {
+            shift.timeTag = "today";
+
+            payload.today.push(shift);
+          }
         }
-
-        if (startDate.isAfter(now)) {
-          payload.upcoming.push(shift);
-          shift.timeTag = "upcoming";
-        }
-
-        if (startDate.isSame(new Date(), "day")) {
-          shift.timeTag = "today";
-
-          payload.today.push(shift);
-        }
+        cache.set("shifts", payload);
+      } else {
+        payload = cache.get("shifts");
       }
-
       return Promise.resolve(payload);
     } catch (error) {
       return Promise.reject(error);

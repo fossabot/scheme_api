@@ -3,6 +3,7 @@ const date = require("./date");
 const db = require("./db");
 const email = require("./email");
 const cache = require("./cache");
+const services = require("./services");
 let responseObj = {
   success: {
     success: true,
@@ -37,5 +38,6 @@ module.exports = {
   date,
   db,
   email,
-  cache
+  cache,
+  services
 };
