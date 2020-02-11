@@ -92,7 +92,7 @@ module.exports = {
     };
 
     let shifts = await Shift.find({ startDate: { $gt: dates.startOfWeek } });
-    let users = await User.find({ employeeType: { $gt: 1 } });
+    let users = await User.find({ groupID: { $gt: 1 } });
 
     let weeklyTotalsDisplay = {
       mostHours: {

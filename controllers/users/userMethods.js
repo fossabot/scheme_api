@@ -124,7 +124,7 @@ module.exports = {
     const { clientID } = req.user;
 
     try {
-      const properties = "name email employeeType isOnline _id dateCreated";
+      const properties = "name email groupID isOnline _id dateCreated";
 
       let users = await User.find(
         { _id: { $ne: req.user._id }, clientID },
@@ -152,12 +152,12 @@ module.exports = {
     const userID = params._id || req.user._id;
     const userUpdate = params.update;
 
-    if (!req.isAdmin && userUpdate.hasOwnProperty("employeeType")) {
+    if (!req.isAdmin && userUpdate.hasOwnProperty("groupID")) {
       let permissionsUpdateMsg = `${req.user.name} is requesting changes to their permissions`;
       // Create notification for the admins to allow the user
       await helpers.db.createNotification({
         type: "approve",
-        for: await User.find({ employeeType: 1 }, "_id"),
+        for: await User.find({ groupID: 1 }, "_id"),
         message: permissionsUpdateMsg,
         requested_by: req.user._id,
         content: userUpdate,
@@ -244,7 +244,7 @@ module.exports = {
       } = body;
 
       clientID = body.clientID ? body.clientID : req.user.clientID;
-      employeeType = body.employeeType ? body.employeeType : 2;
+      groupID = body.groupID ? body.groupID : 2;
 
       if (adminGen) {
         password = await helpers.db.genHash(name);
@@ -265,7 +265,7 @@ module.exports = {
         const mongoUser = {
           email,
           password,
-          employeeType,
+          groupID,
           name,
           isOnline: true,
           clientID,

@@ -1,7 +1,7 @@
 const Client = require("./../../models/Client");
 const User = require("../../models/User");
 const helpers = require("../../helpers");
-
+const { success, errors } = helpers.lang.clients;
 module.exports = {
   getOneClient: async req => {
     try {
@@ -47,7 +47,7 @@ module.exports = {
         // Create admin details
 
         userInformation.password = helpers.db.genHash(userInformation.password);
-        userInformation.employeeType = 1;
+        userInformation.groupID = 1;
         userInformation.clientID = client._id;
 
         let user = await new User(userInformation).save();
@@ -85,7 +85,7 @@ module.exports = {
         await Client.findByIdAndUpdate({ _id: req.user.client_id }, update);
         return Promise.resolve();
       } else {
-        return Promise.reject("Client not found", client_id);
+        return Promise.reject("Client not found");
       }
     } catch (error) {
       return Promise.reject(error);

@@ -48,7 +48,7 @@ module.exports = {
     const sendTo = params.for;
     try {
       if (sendTo == "admins") {
-        sendTo = await User.find({ employeeType: 1 });
+        sendTo = await User.find({ groupID: 1 });
       }
       await db.createNotification({
         ...params

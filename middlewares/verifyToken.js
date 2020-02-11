@@ -18,7 +18,7 @@ const isRouteAllowed = (req, res, next) => {
         return;
       } else {
         req.user = decoded.data;
-        req.isAdmin = req.user.employeeType == 1;
+        req.isAdmin = req.user.groupID == 1;
         next();
       }
     });

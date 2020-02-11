@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   address: {
     type: Object
   },
-  employeeType: {
+  groupID: {
     type: Number,
     required: true,
     default: 2

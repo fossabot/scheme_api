@@ -5,7 +5,7 @@ const moment = require("moment");
 const db = helpers.db;
 const cache = helpers.cache;
 async function getAdmins() {
-  let admins = await User.find({ employeeType: 1 }, "_id");
+  let admins = await User.find({ groupID: 1 }, "_id");
   return admins;
 }
 module.exports = {
@@ -123,8 +123,8 @@ module.exports = {
       let { repeatDays, startDate, endDate, notes } = params;
 
       let assignedTo = params.assignedTo ? params.assignedTo : user._id;
-      let employeeType = user.employeeType;
-      let type = !params.type ? employeeType : params.type;
+      let groupID = user.groupID;
+      let type = !params.type ? groupID : params.type;
       let isApprvoed = {};
 
       if (req.isAdmin) {
@@ -193,5 +193,3 @@ module.exports = {
     }
   }
 };
-
-function createNotificationForAdmins() {}

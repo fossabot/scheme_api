@@ -1,6 +1,91 @@
 {
+  "shared": {
+    "requesting_changes": {
+      "en": "is requesting changes"
+    },
+    "permission_request": {
+      "en": "is requesting permissions"
+    },
+    "made_request": {
+      "en": "has made a request"
+    },
+    "invalid_form": {
+      "en": "Please fill in all fields to proceed"
+    }
+  },
+  "shifts": {
+    "success": {
+      "timesheet_added": {
+        "en": "Timesheet successfully added"
+      },
+      "shift_deleted": {
+        "en": "Shift successfully deleted"
+      },
+      "duplicate_shift": {
+        "en": "Shift already exists"
+      }
+    },
+    "error": {
+      "max_shifts": {
+        "en": "You have made the maximum shift change requests for this shift."
+      },
+      "shift_updated": {
+        "en": "Shift successfully updated"
+      }
+    }
+  },
+  "users": {
+    "success": {
+      "users_added": {
+        "en": "Users added"
+      },
+      "valid_email": {
+        "en": "Email successfully verified."
+      },
+      "logged_out": {
+        "en": "User successfully logged out"
+      },
+      "request_sent": {
+        "en": "Request successfully sent"
+      },
+      "user_updated": {
+        "en": "User successfully updated"
+      },
+      "added_employee": {
+        "en": "Employee successfully added"
+      }
+    },
+    "error": {
+      "invalid_email": {
+        "en": "Failed to verify email, please enter a valid email."
+      },
+      "invalid_login": {
+        "en": "Email or password is incorrect , please try again later"
+      },
+      "invalid_form": {
+        "en": "Please fill in entire form to proceed"
+      },
+      "invalid_age": {
+        "en": "Employees must be above the age of 16"
+      },
+      "duplicate_user": {
+        "en": "User already exists"
+      }
+    }
+  },
   "clients": {
-    "successes": {},
-    "errors": {}
+    "success": {
+      "deleted_client": {
+        "en": "Successfully deleted client"
+      }
+    },
+    "errors": {
+      "no_client_found": {
+        "en": "No client found, please try again later"
+      },
+      "client_exists": {
+        "en": "Client already exists, please change the client details"
+      }
+    }
   }
 }
