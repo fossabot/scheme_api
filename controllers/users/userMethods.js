@@ -32,7 +32,7 @@ function verifyEmail(email, errmsg) {
 module.exports = {
   getGoogleCal: async req => {
     try {
-      let { oAuth2Client, google } = services.google(req.user._id);
+      let { oAuth2Client, google } = await services.google(req.user._id);
 
       let foundUser = await User.findById(req.user._id);
 

@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema({
         liveSchedule: true,
         liveNotifications: true,
         liveDashboard: true,
-        sounds: true
+        sounds: false
       },
       colourSettings: {
         accent: "#2f74eb"

@@ -8,7 +8,7 @@ const User = require("../models/User");
 router.get("/google", async (req, res) => {
   try {
     let { id, returnPath } = cache.get("gcalCache");
-    const { oAuth2Client } = services.google(id);
+    const { oAuth2Client } = await services.google(id);
     const { tokens } = await oAuth2Client.getToken(req.query.code);
 
     oAuth2Client.setCredentials(tokens);
